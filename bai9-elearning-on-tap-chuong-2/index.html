@@ -1,6 +1,70 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<script id="loa-chung">
+/* MỘT LOA CHUNG CHO CẢ BÀI — máy đóng gói chèn đoạn này vào đầu mỗi bài e-learning (17/11/2026).
+   Lỗi gặp: trình phát tạo một thẻ <audio> mới cho từng câu đọc rồi tự phát theo dòng thời gian (không do bấm tay).
+   Điện thoại (nhất là iPhone, Safari) chỉ cho phát thẻ âm thanh nào đã được "mở" bằng một lần chạm → câu đầu
+   (ngay sau khi chạm) có tiếng, các câu sau bị chặn: im lặng, nhân vật không mấp máy môi.
+   Cách sửa: cả bài dùng MỘT thẻ âm thanh, mở nó ngay lần chạm đầu tiên, rồi chỉ đổi tệp tiếng cho từng câu.
+   Mỗi câu vẫn có "tay cầm" riêng (__LOA) giống thẻ <audio> cũ: play, pause, paused, currentTime, playbackRate,
+   onended, sự kiện ended/pause — nên trình phát của bài không phải sửa gì khác. */
+(function () {
+  var a = null, chu = null, daMo = false;
+  function loa() {
+    if (a) return a;
+    a = document.createElement('audio'); a.preload = 'auto'; a.setAttribute('playsinline', '');
+    a.addEventListener('ended', function () { var h = chu; if (!h || h._dung) return; h._het = true; if (typeof h.onended === 'function') try { h.onended(); } catch (e) {} h.dispatchEvent(new Event('ended')); });
+    return a;
+  }
+  function im() {   // tệp WAV im lặng rất ngắn, chỉ để "mở loa" trong lần chạm đầu
+    var n = 400, b = new Uint8Array(44 + n), v = new DataView(b.buffer), w = function (o, s) { for (var i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+    for (var i = 0; i < n; i++) b[44 + i] = 128;
+    var s = ''; for (var j = 0; j < b.length; j++) s += String.fromCharCode(b[j]); return 'data:audio/wav;base64,' + btoa(s);
+  }
+  function moLoa() {
+    if (daMo) return; var x = loa(); if (chu) { daMo = true; return; }
+    try {
+      x.src = im(); x.dataset.id = '';
+      var p = x.play(); daMo = true;
+      if (p && p.then) p.then(function () { if (!chu) x.pause(); }, function () { daMo = false; });
+    } catch (e) { daMo = false; }
+  }
+  ['touchend', 'pointerup', 'click', 'keydown'].forEach(function (k) { window.addEventListener(k, moLoa, true); });
+
+  class TayCam extends EventTarget {   // phải kế thừa thật (class), không thì addEventListener báo lỗi
+    constructor(src) { super(); this._src = src; this._tu = 0; this._toc = 1; this._dung = true; this._het = false; this.onended = null; this.preload = 'auto'; }
+  }
+  Object.defineProperty(TayCam.prototype, 'paused', { get: function () { return this._dung || this._het || chu !== this || !a || a.paused; } });
+  Object.defineProperty(TayCam.prototype, 'currentTime', {
+    get: function () { return chu === this && a ? a.currentTime : this._tu; },
+    set: function (t) { this._tu = +t || 0; if (chu === this && a && a.readyState >= 1) try { a.currentTime = this._tu; } catch (e) {} }
+  });
+  Object.defineProperty(TayCam.prototype, 'playbackRate', {
+    get: function () { return this._toc; },
+    set: function (r) { this._toc = +r || 1; if (chu === this && a) try { a.playbackRate = this._toc; } catch (e) {} }
+  });
+  TayCam.prototype.play = function () {
+    var x = loa(), h = this, tu = this._tu;
+    if (chu && chu !== h && !chu._dung) chu.pause();
+    chu = h; h._dung = false; h._het = false;
+    if (x.dataset.id !== h._src) { x.src = h._src; x.dataset.id = h._src; }
+    try { x.playbackRate = h._toc; } catch (e) {}
+    if (x.readyState >= 1) { try { x.currentTime = tu; } catch (e) {} }
+    else x.addEventListener('loadedmetadata', function () { if (chu === h) try { x.currentTime = tu; x.playbackRate = h._toc; } catch (e) {} }, { once: true });
+    var p = x.play();
+    return p && p.then ? p : Promise.resolve();
+  };
+  TayCam.prototype.pause = function () {
+    if (this._dung) return; this._dung = true;
+    if (chu === this && a) { this._tu = a.currentTime; try { a.pause(); } catch (e) {} }
+    this.dispatchEvent(new Event('pause'));   // báo ngay cho câu đang chờ (như thẻ <audio> cũ báo "pause")
+  };
+  window.__LOA = function (src) { return new TayCam(src); };
+})();
+</script>
 <script id="cau-noi-web">
 /* CẦU NỐI BÁO ĐIỂM — máy đóng gói chèn đoạn này vào đầu mỗi bài e-learning (thay bai9-elearning-on-tap-chuong-2 bằng mã bài).
    Bài e-learning mở trong khung của web lớp (xem.html). Khi kho bài nằm ở tên miền khác web lớp,
@@ -415,7 +479,7 @@ function phat(id, tu = 0){
     vco.playbackRate = P.toc; vco.onended = () => { if (dangNoi === me) dangNoi = null; };
     vco.play().catch(() => { if (dangNoi === me) dangNoi = null; }); return me; }
   if (m.loai === "am"){
-    if (!kho[id]){ kho[id] = new Audio(m.s); kho[id].preload = "auto"; }
+    if (!kho[id]){ kho[id] = window.__LOA ? __LOA(m.s) : new Audio(m.s); kho[id].preload = "auto"; }
     const a = kho[id], me = {id, a}; dangNoi = me;
     try { a.currentTime = Math.max(0, tu); } catch(e){}
     a.playbackRate = P.toc; a.onended = () => { if (dangNoi === me) dangNoi = null; };
