@@ -78,7 +78,9 @@ const BAI = [['1','Thành phần của nguyên tử'],['2','Nguyên tố hoá h�
   ['5','Cấu tạo của bảng tuần hoàn các nguyên tố hoá học'],['6','Xu hướng biến đổi một số tính chất của nguyên tử trong một chu kì và trong một nhóm'],
   ['7','Xu hướng biến đổi thành phần và một số tính chất của hợp chất trong một chu kì'],['8','Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn'],['9','Ôn tập chương 2'],
   ['10','Quy tắc octet'],['11','Liên kết ion'],['12','Liên kết cộng hoá trị'],['13','Liên kết hydrogen và tương tác van der Waals'],['14','Ôn tập chương 3'],
-  ['15','Phản ứng oxi hoá – khử'],['16','Ôn tập chương 4']];
+  ['15','Phản ứng oxi hoá – khử'],['16','Ôn tập chương 4'],
+  ['17','Biến thiên enthalpy trong các phản ứng hoá học'],['18','Ôn tập chương 5'],['19','Tốc độ phản ứng'],['20','Ôn tập chương 6'],
+  ['21','Nhóm halogen'],['22','Hydrogen halide. Muối halide'],['23','Ôn tập chương 7']];
 const $ = s => document.querySelector(s);
 const Q = new URLSearchParams(location.search);
 const MA = Q.get('bai'), ID = (Q.get('id') || '').replace(/[^a-z0-9-]/g, '');
@@ -105,7 +107,7 @@ function len() { scrollTo(0, 0); }
 
 /* ---------- TRANG CHỦ: chọn bài (mở riêng, không qua web lớp) ---------- */
 if (!MA) {
-  datTieuDe('Hoá học 10 · cô Thơi', 'Luyện dạng bài tập — Bài 1 đến 16');
+  datTieuDe('Hoá học 10 · cô Thơi', 'Luyện dạng bài tập — Bài 1 đến 23');
   const t = tienDo();
   $('#noi').innerHTML = '<p class="bao">Các em nên vào từ <b>web lớp Hoá 10</b> (mục ✍️ Bài tập) để bài 15 phút được gửi điểm cho cô.</p>' +
     BAI.map(([m, ten]) => `<a class="the" href="?bai=${m}"><b>Bài ${m}. ${esc(ten)}</b><span class="m">Các dạng bài điển hình · bài luyện 15 phút${t['b' + m + '-15'] ? ' · điểm cao nhất ' + (t['b' + m + '-15'] / 10).toFixed(1).replace('.', ',') : ''}</span></a>`).join('');
