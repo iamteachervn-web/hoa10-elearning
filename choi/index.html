@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1e1b4b">
+<title>Trò chơi Hoá 10</title>
+<style>
+:root{--bg:#f5f3ff;--card:#fff;--ink:#1e1b4b;--mute:#5b5f80;--line:#ddd8f5;--soft:#ede9fe;--pri:#6d28d9;--pri2:#a78bfa;--pri-ink:#fff;
+  --dung:#16a34a;--dungbg:#dcfce7;--sai:#dc2626;--saibg:#fee2e2;--vang:#f59e0b;--vangbg:#fef3c7;--xanh:#0284c7;--xanhbg:#e0f2fe;--hong:#db2777;
+  --shadow:0 1px 2px #0001,0 6px 18px #6d28d91a;--san:#1e1b4b;--san2:#312e81;--sanchu:#eef2ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0d1f;--card:#1a1730;--ink:#ece9ff;--mute:#a7a3c8;--line:#332e5a;--soft:#241f45;
+  --pri:#a78bfa;--pri2:#6d28d9;--pri-ink:#140f2e;--dung:#4ade80;--dungbg:#0f3320;--sai:#f87171;--saibg:#3b1414;--vang:#fbbf24;--vangbg:#3a2a0a;--xanh:#38bdf8;--xanhbg:#0b2a3d;--shadow:0 1px 2px #0008}}
+:root[data-theme="dark"]{--bg:#0f0d1f;--card:#1a1730;--ink:#ece9ff;--mute:#a7a3c8;--line:#332e5a;--soft:#241f45;
+  --pri:#a78bfa;--pri2:#6d28d9;--pri-ink:#140f2e;--dung:#4ade80;--dungbg:#0f3320;--sai:#f87171;--saibg:#3b1414;--vang:#fbbf24;--vangbg:#3a2a0a;--xanh:#38bdf8;--xanhbg:#0b2a3d;--shadow:0 1px 2px #0008}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Segoe UI",Roboto,Arial,sans-serif;overscroll-behavior:none}
+button{font:inherit;color:inherit;touch-action:manipulation}
+[hidden]{display:none!important}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 40px}
+header{background:linear-gradient(135deg,#1e1b4b,#5b21b6 55%,#db2777);color:#fff;padding:16px 0 20px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,#fff3 0 2px,transparent 3px) 0 0/38px 38px;opacity:.7;pointer-events:none}
+header .k{font-size:13px;opacity:.85}
+header h1{margin:2px 0 0;font-size:clamp(21px,5.6vw,28px);line-height:1.2}
+header p{margin:6px 0 0;font-size:15px;opacity:.92}
+.ve{background:none;border:0;color:#fff;opacity:.9;padding:6px 0;font-size:15px;cursor:pointer}
+.the{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;text-decoration:none;color:inherit;min-height:64px}
+.the:active{transform:scale(.985)}
+.the .ic{flex:0 0 64px;height:64px;border-radius:16px;display:grid;place-items:center}
+.the .ic svg{width:46px;height:46px}
+.the b{display:block;font-size:17px;line-height:1.3}
+.the .m{display:block;font-size:14px;color:var(--mute);line-height:1.4;margin-top:2px}
+.the .sao{font-size:15px;letter-spacing:1px;margin-top:3px;display:block}
+.bao{background:var(--vangbg);border-radius:12px;padding:9px 13px;font-size:15px;margin:12px 0}
+.ghi{font-size:14px;color:var(--mute)}
+/* ---------- màn chơi: phủ kín màn hình ---------- */
+.choi{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);z-index:10}
+.tren{display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;background:linear-gradient(135deg,#1e1b4b,#5b21b6);color:#fff;min-height:52px}
+.tren .x{width:42px;height:42px;border-radius:12px;border:0;background:#ffffff22;color:#fff;font-size:20px;cursor:pointer;flex:0 0 auto}
+.tren .ten{flex:1;min-width:0;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tren .chip{background:#ffffff22;border-radius:99px;padding:4px 10px;font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;white-space:nowrap}
+.tren .chip.gap{background:var(--vang);color:#1e1b4b;animation:nay .35s}
+.san{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.cuon{flex:1;overflow:auto;padding:12px 14px calc(16px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+@keyframes nay{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes rung{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes hien{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rung{animation:rung .4s}
+.nut{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:10px 18px;border-radius:14px;border:0;background:var(--pri);color:var(--pri-ink);font-weight:700;cursor:pointer;font-size:17px}
+.nut.phu{background:var(--card);color:var(--pri);border:2px solid var(--pri)}
+.nut.to{width:100%}
+.nut:disabled{opacity:.45}
+.hang{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.hang .nut{flex:1 1 140px}
+/* lời giải hiện từ dưới lên */
+.giai{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:4px solid var(--sai);border-radius:20px 20px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px #0004;animation:len .25s}
+.giai.dung{border-top-color:var(--dung)}
+.giai b.td{display:block;font-size:18px;margin-bottom:4px}
+.giai.dung b.td{color:var(--dung)}.giai.sai b.td{color:var(--sai)}
+.giai .nd{font-size:16px;max-height:38vh;overflow:auto}
+@keyframes len{from{transform:translateY(100%)}to{transform:none}}
+/* bảng kết quả */
+.ket{position:absolute;inset:0;z-index:40;background:#0f0d1fcc;display:grid;place-items:center;padding:16px;animation:hien .3s}
+.ket .hop{background:var(--card);border-radius:22px;padding:18px 16px;width:100%;max-width:440px;max-height:100%;overflow:auto;text-align:center;box-shadow:0 10px 40px #0006}
+.ket .sao3{font-size:46px;letter-spacing:6px;line-height:1.1}
+.ket .sao3 i{font-style:normal;display:inline-block;animation:nay .5s backwards}
+.ket .sao3 i.tat{filter:grayscale(1);opacity:.25}
+.ket .lon{font-size:34px;font-weight:800;color:var(--pri);margin:4px 0}
+.ket .loi{text-align:left;font-size:15px;background:var(--soft);border-radius:12px;padding:8px 12px;margin-top:12px}
+.ket .loi p{margin:6px 0}
+canvas.hoa{position:absolute;inset:0;pointer-events:none;z-index:45}
+/* chữ hoá học */
+.nu{display:inline-flex;align-items:center;vertical-align:middle;line-height:1}
+.nu .az{display:inline-flex;flex-direction:column;align-items:flex-end;font-size:.66em;margin-right:1px;line-height:1.05}
+/* ---------- PHI THUYỀN ---------- */
+.pt{flex:1;position:relative;background:radial-gradient(ellipse at 50% 120%,#5b21b6 0,#1e1b4b 55%,#0b0920 100%);color:#fff;overflow:hidden}
+.pt .nen{position:absolute;inset:-100% 0 0;background:radial-gradient(#fff 1px,transparent 1.5px) 0 0/60px 60px,radial-gradient(#fff9 1px,transparent 1.5px) 30px 20px/90px 90px;animation:troi 6s linear infinite;opacity:.7}
+@keyframes troi{to{transform:translateY(50%)}}
+.pt .hoi{position:relative;z-index:3;margin:10px;background:#ffffffee;color:#1e1b4b;border-radius:16px;padding:10px 13px;font-size:16.5px;line-height:1.4;font-weight:600;box-shadow:0 4px 20px #0005}
+.pt .hoi .so{color:#7c3aed;font-size:13px;display:block;font-weight:700}
+.pt .lan{position:absolute;top:0;bottom:0;width:33.333%;border-left:1px dashed #ffffff22}
+.pt .lan:first-of-type{border-left:0}
+.pt .vung{position:absolute;inset:0;display:flex;z-index:4}
+.pt .vung button{flex:1;background:transparent;border:0;cursor:pointer}
+.pt .cong{position:absolute;width:31%;margin-left:1.16%;z-index:2;border-radius:14px;padding:8px 6px;text-align:center;font-size:15px;font-weight:700;line-height:1.25;color:#fff;background:linear-gradient(180deg,#7c3aed,#4c1d95);border:2px solid #c4b5fd;box-shadow:0 0 16px #a78bfa88;min-height:58px;display:grid;place-items:center;word-break:break-word}
+.pt .cong.no{animation:no .45s forwards}
+.pt .cong.dung{background:linear-gradient(180deg,#22c55e,#15803d);border-color:#bbf7d0}
+.pt .cong.sai{background:linear-gradient(180deg,#ef4444,#991b1b);border-color:#fecaca}
+@keyframes no{to{transform:scale(1.5);opacity:0}}
+.pt .tau{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));width:33.333%;display:flex;justify-content:center;transition:left .18s;z-index:3}
+.pt .tau svg{width:62px;height:76px;filter:drop-shadow(0 0 10px #f0abfc)}
+.pt .tim{position:absolute;right:10px;top:4px;z-index:5;font-size:18px}
+.pt .lao{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom));z-index:5;background:#fbbf24;color:#1e1b4b;border:0;border-radius:99px;padding:8px 16px;font-weight:800;font-size:15px;box-shadow:0 4px 14px #0006;cursor:pointer}
+.pt .goiy{position:absolute;left:0;right:0;bottom:calc(100px + env(safe-area-inset-bottom));text-align:center;font-size:13px;opacity:.75;z-index:1}
+/* ---------- LẬT THẺ ---------- */
+.lt{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;flex:1;align-content:center;max-width:560px;width:100%;margin:0 auto}
+.lt .tt{aspect-ratio:3/3.4;perspective:700px;border:0;background:none;padding:0;cursor:pointer}
+.lt .tt .in{position:relative;width:100%;height:100%;transition:transform .4s;transform-style:preserve-3d}
+.lt .tt.lat .in,.lt .tt.xong .in{transform:rotateY(180deg)}
+.lt .mat{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:grid;place-items:center;padding:6px;font-weight:700;font-size:14.5px;line-height:1.25;text-align:center;word-break:break-word}
+.lt .sau{background:linear-gradient(135deg,#6d28d9,#db2777);box-shadow:var(--shadow)}
+.lt .sau svg{width:56%;height:56%;opacity:.9}
+.lt .truoc{transform:rotateY(180deg);background:var(--card);border:2px solid var(--pri2);color:var(--ink)}
+.lt .truoc.b{border-color:var(--xanh)}
+.lt .tt.xong .truoc{background:var(--dungbg);border-color:var(--dung);animation:nay .4s}
+.lt .tt.sai .truoc{background:var(--saibg);border-color:var(--sai)}
+/* ---------- PHÂN LOẠI ---------- */
+.pl{flex:1;position:relative;background:linear-gradient(180deg,var(--xanhbg),var(--bg))}
+.pl .roi{position:absolute;left:50%;width:min(84%,380px);transform:translateX(-50%);background:var(--card);border:3px solid var(--pri);border-radius:18px;padding:14px 12px;text-align:center;font-weight:700;font-size:19px;line-height:1.3;box-shadow:0 8px 24px #0003;z-index:2}
+.pl .roi.bay{transition:all .35s ease-in;opacity:0}
+.pl .thung{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));z-index:3}
+.pl .thung button{flex:1;min-height:96px;border-radius:18px 18px 14px 14px;border:0;color:#fff;font-weight:800;font-size:15px;line-height:1.25;padding:10px 6px;cursor:pointer;box-shadow:inset 0 -6px 0 #0003,0 4px 12px #0003;position:relative}
+.pl .thung button::before{content:"";position:absolute;left:12%;right:12%;top:-7px;height:10px;border-radius:8px;background:inherit;filter:brightness(.8)}
+.pl .thung button.nhay{animation:nay .35s}
+.pl .vach{position:absolute;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,var(--sai) 0 10px,transparent 10px 18px);opacity:.5;z-index:1}
+/* ---------- Ô CHỮ ---------- */
+.oc .luoi{display:grid;gap:3px;justify-content:center;margin:6px auto 10px}
+.oc .o{width:var(--c);height:var(--c);border-radius:6px;display:grid;place-items:center;font-weight:800;font-size:calc(var(--c)*.52);background:var(--soft);border:1.5px solid var(--line);color:var(--ink)}
+.oc .o.rong{background:none;border:0}
+.oc .o.khoa{background:var(--vangbg);border-color:var(--vang)}
+.oc .o.chu{background:var(--pri);color:#fff;border-color:var(--pri)}
+.oc .o.khoa.chu{background:var(--vang);color:#1e1b4b;border-color:#b45309}
+.oc .o.dang{box-shadow:0 0 0 2px var(--hong)}
+.oc .so{width:var(--c);height:var(--c);border:0;border-radius:50%;background:var(--pri2);color:#fff;font-weight:800;font-size:calc(var(--c)*.45);cursor:pointer;padding:0}
+.oc .so.xong{background:var(--dung)}
+.oc .gy{background:var(--card);border:2px solid var(--pri2);border-radius:14px;padding:10px 12px;font-size:16px;margin-bottom:10px}
+.oc .dien{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.oc .dien span{min-width:30px;height:38px;border-bottom:3px solid var(--pri);display:grid;place-items:center;font-weight:800;font-size:21px}
+.oc .phim{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.oc .phim button{width:46px;height:50px;border-radius:12px;border:0;background:var(--card);box-shadow:0 3px 0 var(--line),0 2px 8px #0001;font-weight:800;font-size:21px;cursor:pointer}
+.oc .phim button:disabled{opacity:.2}
+.oc .phim button.xoa{width:62px;background:var(--saibg)}
+/* ---------- SẮP XẾP ---------- */
+.sx .de{background:var(--card);border-radius:16px;padding:12px 14px;font-weight:700;font-size:17px;box-shadow:var(--shadow);margin-bottom:12px}
+.sx .de small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+.sx .khe{display:flex;flex-direction:column;gap:8px}
+.sx .khe button{min-height:52px;border-radius:14px;border:2px dashed var(--pri2);background:var(--soft);display:flex;align-items:center;gap:10px;padding:6px 12px;font-weight:700;font-size:17px;text-align:left;cursor:pointer}
+.sx .khe button i{font-style:normal;flex:0 0 30px;height:30px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;font-size:15px}
+.sx .khe button.co{border-style:solid;background:var(--card)}
+.sx .khe button.dung{border-color:var(--dung);background:var(--dungbg)}
+.sx .khe button.sai{border-color:var(--sai);background:var(--saibg)}
+.sx .mui{text-align:center;color:var(--mute);font-size:14px;margin:4px 0}
+.sx .kho{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;min-height:54px}
+.sx .kho button{min-height:50px;padding:8px 16px;border-radius:14px;border:0;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:17px;box-shadow:0 4px 12px #7c3aed55;cursor:pointer;animation:hien .25s}
+/* ---------- ĐÚNG / SAI ---------- */
+.ds{flex:1;display:flex;flex-direction:column;padding:12px 14px calc(14px + env(safe-area-inset-bottom));gap:12px;background:linear-gradient(180deg,var(--soft),var(--bg))}
+.ds .dh{height:10px;border-radius:9px;background:var(--line);overflow:hidden}.ds .dh i{display:block;height:100%;background:linear-gradient(90deg,var(--dung),var(--vang),var(--sai));transition:width .25s linear}
+.ds .cau{flex:1;display:grid;place-items:center;position:relative}
+.ds .bai{width:100%;max-width:440px;min-height:210px;background:var(--card);border-radius:22px;padding:22px 18px;display:grid;place-items:center;text-align:center;font-size:20px;font-weight:700;line-height:1.4;box-shadow:0 10px 30px #6d28d92e;border:3px solid var(--line);transition:transform .3s,opacity .3s}
+.ds .bai.trai{transform:translateX(-120%) rotate(-12deg);opacity:0}.ds .bai.phai{transform:translateX(120%) rotate(12deg);opacity:0}
+.ds .bai.vao{animation:hien .25s}
+.ds .hai{display:flex;gap:12px}
+.ds .hai button{flex:1;min-height:76px;border-radius:20px;border:0;font-size:22px;font-weight:800;color:#fff;cursor:pointer;box-shadow:inset 0 -6px 0 #0003}
+.ds .hai .s{background:linear-gradient(135deg,#ef4444,#b91c1c)}.ds .hai .d{background:linear-gradient(135deg,#22c55e,#15803d)}
+.ds .chuoi{text-align:center;font-weight:800;color:var(--hong);min-height:22px}
+/* ---------- XƯỞNG NGUYÊN TỬ / ION / ORBITAL dùng chung ---------- */
+.xg .de{background:linear-gradient(135deg,#312e81,#6d28d9);color:#fff;border-radius:18px;padding:12px 14px;font-size:17px;font-weight:700;text-align:center;box-shadow:var(--shadow)}
+.xg .de small{display:block;font-weight:500;opacity:.85;font-size:14px}
+.xg .hinh{display:grid;place-items:center;margin:6px 0}
+.xg .hinh svg{width:min(78vw,300px);height:auto}
+.xg .doc{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;font-size:15px;margin:2px 0 8px}
+.xg .doc span{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.xg .dk{display:grid;gap:8px}
+.xg .dong{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:14px;padding:6px 8px;box-shadow:var(--shadow)}
+.xg .dong .tn{flex:1;font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.xg .dong .tn i{width:18px;height:18px;border-radius:50%;display:inline-block}
+.xg .dong button{width:50px;height:46px;border-radius:12px;border:0;background:var(--soft);font-size:24px;font-weight:800;cursor:pointer}
+.xg .dong b{min-width:34px;text-align:center;font-size:21px;font-variant-numeric:tabular-nums}
+.xg .chon{display:flex;gap:8px}
+.xg .chon button{flex:1;min-height:52px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:800;font-size:16px;cursor:pointer}
+.xg .chon button.on{border-color:var(--pri);background:var(--soft);color:var(--pri)}
+.xg .orb{display:flex;flex-direction:column;gap:9px;margin:6px 0}
+.xg .orb .ph{display:flex;align-items:center;gap:10px}
+.xg .orb .ph b{width:40px;text-align:right;font-size:17px}
+.xg .orb .ph .bx{display:flex}
+.xg .orb .ph button{width:52px;height:52px;border:2px solid var(--ink);margin-left:-2px;background:var(--card);font-size:24px;font-weight:800;letter-spacing:-3px;cursor:pointer;padding:0}
+.xg .orb .ph button:first-child{margin-left:0;border-radius:10px 0 0 10px}.xg .orb .ph button:last-child{border-radius:0 10px 10px 0}.xg .orb .ph button:only-child{border-radius:10px}
+.xg .orb .ph button.co{background:var(--xanhbg);color:var(--xanh)}
+.xg .orb .ph.sai button{border-color:var(--sai)}
+.xg .orb .ph.dung button{border-color:var(--dung)}
+.xg .can{height:16px;border-radius:9px;background:var(--line);position:relative;margin:8px 4px}
+.xg .can i{position:absolute;top:-6px;width:4px;height:28px;background:var(--ink);left:50%;border-radius:2px}
+.xg .can em{position:absolute;top:0;bottom:0;border-radius:9px;transition:all .25s}
+/* ---------- BẢNG TUẦN HOÀN ---------- */
+.bt .luoi{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:6px 0 10px}
+.bt .luoi .nh{font-size:11px;text-align:center;color:var(--mute);font-weight:700}
+.bt .luoi button{aspect-ratio:1/1.12;border-radius:8px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;cursor:pointer;line-height:1.05}
+.bt .luoi button b{font-size:clamp(14px,4.4vw,20px)}
+.bt .luoi button small{font-size:10px;color:var(--mute)}
+.bt .luoi button.kl{background:#fed7aa;border-color:#f97316;color:#7c2d12}
+.bt .luoi button.pk{background:#bbf7d0;border-color:#22c55e;color:#14532d}
+.bt .luoi button.kh{background:#ddd6fe;border-color:#8b5cf6;color:#3b0764}
+.bt .luoi button.kl small,.bt .luoi button.pk small,.bt .luoi button.kh small{color:inherit;opacity:.75}
+.bt .luoi .trong{visibility:hidden}
+.bt .ck{font-size:11px;color:var(--mute);display:grid;place-items:center}
+.bt .cl{background:var(--card);border:2px solid var(--pri);border-radius:16px;padding:10px 12px;font-weight:700;font-size:17px;text-align:center}
+.bt .cl small{display:block;color:var(--mute);font-weight:500;font-size:13px}
+.cthh{font-size:clamp(30px,10vw,46px);font-weight:800;text-align:center;letter-spacing:1px;margin:10px 0}
+.cthh .hl{color:var(--hong);text-decoration:underline 4px;text-underline-offset:6px}
+.phimso{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.phimso button{min-height:56px;border-radius:14px;border:0;background:var(--card);box-shadow:0 3px 0 var(--line),0 2px 8px #0001;font-weight:800;font-size:21px;cursor:pointer}
+.phimso button.dung{background:var(--dung);color:#fff}.phimso button.sai{background:var(--sai);color:#fff}
+/* ---------- CÂN BẰNG ---------- */
+.cb .pt2{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 6px;background:var(--card);border-radius:16px;padding:10px 8px;box-shadow:var(--shadow);margin:6px 0}
+.cb .ch{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+.cb .ch .hs{display:flex;align-items:center;gap:2px}
+.cb .ch .hs button{width:34px;height:34px;border-radius:10px;border:0;background:var(--soft);font-weight:800;font-size:19px;cursor:pointer;padding:0}
+.cb .ch .hs b{min-width:22px;text-align:center;font-size:20px;color:var(--pri)}
+.cb .ch .f{font-size:19px;font-weight:700;padding:2px 4px;border-radius:8px}
+.cb .ch.chon .f{background:var(--vangbg);outline:2px solid var(--vang)}
+.cb .mt{font-size:22px;font-weight:800;color:var(--mute)}
+.cb table{width:100%;border-collapse:separate;border-spacing:0 5px;font-size:16px}
+.cb td{background:var(--card);padding:6px 10px;text-align:center;font-weight:700}
+.cb td:first-child{border-radius:10px 0 0 10px}.cb td:last-child{border-radius:0 10px 10px 0}
+.cb tr.ok td{background:var(--dungbg)}.cb tr.lech td{background:var(--saibg)}
+.cb .cau2{background:var(--vangbg);border-radius:14px;padding:10px 12px;font-weight:700;text-align:center;margin:8px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* =====================================================================
+   TRÒ CHƠI HOÁ 10 — học sinh tự chơi trên điện thoại, không gửi điểm
+   ?bai=N  : các trò của bài N (dữ liệu du-lieu/baiNN.js gọi CHOI_NAP)
+   ===================================================================== */
+const BAI = [['1','Thành phần của nguyên tử'],['2','Nguyên tố hoá học'],['3','Cấu trúc lớp vỏ electron nguyên tử'],['4','Ôn tập chương 1'],
+  ['5','Cấu tạo của bảng tuần hoàn'],['6','Xu hướng biến đổi tính chất nguyên tử'],['7','Xu hướng biến đổi oxide, hydroxide'],['8','Định luật tuần hoàn'],['9','Ôn tập chương 2'],
+  ['10','Quy tắc octet'],['11','Liên kết ion'],['12','Liên kết cộng hoá trị'],['13','Liên kết hydrogen và tương tác van der Waals'],['14','Ôn tập chương 3'],
+  ['15','Phản ứng oxi hoá – khử'],['16','Ôn tập chương 4']];
+const $ = s => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const MA = (Q.get('bai') || '').replace(/[^0-9]/g, '');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const tron = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const kho = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const KK = 'hoa10_choi';
+/* {A|Z|X} kí hiệu nguyên tử · **đậm** · \n */
+function viet(s) {
+  return esc(s).replace(/\{([^|{}]*)\|([^|{}]*)\|([^|{}]+)\}/g, '<span class="nu"><span class="az"><span>$1</span><span>$2</span></span>$3</span>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+}
+/* công thức thô "Fe2(SO4)3" → chỉ số dưới */
+const SUB = '₀₁₂₃₄₅₆₇₈₉', SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻' };
+const ctf = s => String(s).replace(/([A-Za-z\)])(\d+)/g, (m, a, d) => a + [...d].map(x => SUB[+x]).join(''));
+const mu = (q) => { if (!q) return ''; const n = Math.abs(q); return (n > 1 ? String(n) : '').split('').map(x => SUP[x]).join('') + (q > 0 ? '⁺' : '⁻'); };
+const dauSo = v => v > 0 ? '+' + v : String(v).replace('-', '−');
+
+/* ---------- nguyên tố Z = 1–20 (tên theo SGK KNTT) ---------- */
+const NT = [null, ['H', 'hydrogen'], ['He', 'helium'], ['Li', 'lithium'], ['Be', 'beryllium'], ['B', 'boron'], ['C', 'carbon'], ['N', 'nitrogen'], ['O', 'oxygen'], ['F', 'fluorine'], ['Ne', 'neon'],
+  ['Na', 'sodium'], ['Mg', 'magnesium'], ['Al', 'aluminium'], ['Si', 'silicon'], ['P', 'phosphorus'], ['S', 'sulfur'], ['Cl', 'chlorine'], ['Ar', 'argon'], ['K', 'potassium'], ['Ca', 'calcium']];
+const KHI_HIEM = [2, 10, 18], KIM_LOAI = [3, 4, 11, 12, 13, 19, 20];
+const loaiNT = z => KHI_HIEM.includes(z) ? 'kh' : KIM_LOAI.includes(z) ? 'kl' : 'pk';
+const zTu = kh => NT.findIndex(x => x && x[0] === kh);
+function lop(e) { const c = [2, 8, 8, 2], r = []; let con = e; for (const n of c) { if (con <= 0) break; r.push(Math.min(n, con)); con -= n; } return r; }
+const PL = [['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6], ['4s', 2]];
+function phanLop(e) { const r = []; let con = e; for (const [t, n] of PL) { if (con <= 0) break; r.push([t, Math.min(n, con)]); con -= n; } return r; }
+const cauHinh = e => phanLop(e).map(([t, n]) => t + String(n).split('').map(x => SUP[x]).join('')).join('');
+const viTri = z => { const l = lop(z), ck = l.length, v = l[ck - 1]; const nhom = z === 2 ? 8 : v; return { ck, nhom }; };
+const LA = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+
+/* ---------- âm thanh nhỏ (tự tạo, không tải gì) ---------- */
+let AC = null, amBat = kho.get(KK + '_am', true);
+function am(loai) {
+  if (!amBat) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume();
+    const t = AC.currentTime, n = { dung: [660, 990], sai: [196, 147], cham: [520], thang: [523, 659, 784, 1046], lat: [880], combo: [784, 988, 1175] }[loai] || [440];
+    n.forEach((f, i) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = loai === 'sai' ? 'square' : 'triangle'; o.frequency.value = f;
+      const s = t + i * 0.08; g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(loai === 'sai' ? 0.06 : 0.16, s + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, s + 0.22);
+      o.connect(g); g.connect(AC.destination); o.start(s); o.stop(s + 0.25); });
+  } catch (e) {}
+}
+const rungMay = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+/* pháo giấy */
+function phaoGiay(noi) {
+  const c = document.createElement('canvas'); c.className = 'hoa'; noi.appendChild(c);
+  const W = c.width = noi.clientWidth, H = c.height = noi.clientHeight, x = c.getContext('2d');
+  const mau = ['#f59e0b', '#db2777', '#7c3aed', '#22c55e', '#0ea5e9', '#f43f5e'];
+  const p = Array.from({ length: 110 }, () => ({ x: W / 2, y: H * 0.35, vx: (Math.random() - 0.5) * 12, vy: -Math.random() * 12 - 3, r: Math.random() * 6 + 3, m: mau[Math.random() * mau.length | 0], a: Math.random() * 6 }));
+  let k = 0; (function ve() { x.clearRect(0, 0, W, H); p.forEach(q => { q.x += q.vx; q.y += q.vy; q.vy += 0.32; q.vx *= 0.99; q.a += 0.2; x.save(); x.translate(q.x, q.y); x.rotate(q.a); x.fillStyle = q.m; x.fillRect(-q.r, -q.r / 2, q.r * 2, q.r); x.restore(); });
+    if (++k < 140) requestAnimationFrame(ve); else c.remove(); })();
+}
+
+/* ---------- hình vẽ dùng chung ---------- */
+const SVG_TAU = '<svg viewBox="0 0 62 76"><defs><linearGradient id="gt" x1="0" x2="1"><stop offset="0" stop-color="#e0e7ff"/><stop offset="1" stop-color="#a5b4fc"/></linearGradient></defs><path d="M31 2C43 14 46 32 44 50H18C16 32 19 14 31 2Z" fill="url(#gt)" stroke="#4338ca" stroke-width="2"/><circle cx="31" cy="26" r="7" fill="#22d3ee" stroke="#4338ca" stroke-width="2"/><path d="M18 38 6 54v6l12-6M44 38l12 16v6l-12-6" fill="#db2777" stroke="#831843" stroke-width="2"/><path d="M22 52h18l-4 10h-10z" fill="#f59e0b"/><path d="M25 62h12l-6 13z" fill="#fde047"><animate attributeName="d" values="M25 62h12l-6 13z;M25 62h12l-6 8z;M25 62h12l-6 13z" dur=".25s" repeatCount="indefinite"/></path></svg>';
+const SVG_NT = '<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2.4"><ellipse cx="24" cy="24" rx="20" ry="8"/><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(60 24 24)"/><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(120 24 24)"/><circle cx="24" cy="24" r="4" fill="#fff"/></svg>';
+const ICON = {
+  phithuyen: ['#1e1b4b', '<svg viewBox="0 0 62 76">' + SVG_TAU.slice(SVG_TAU.indexOf('>') + 1)],
+  latthe: ['#db2777', '<svg viewBox="0 0 48 48"><rect x="4" y="8" width="22" height="30" rx="4" fill="#fff" transform="rotate(-10 15 23)"/><rect x="22" y="10" width="22" height="30" rx="4" fill="#fde68a" transform="rotate(8 33 25)"/><text x="33" y="31" font-size="14" font-weight="800" text-anchor="middle" fill="#9d174d" transform="rotate(8 33 25)">?</text></svg>'],
+  phanloai: ['#0284c7', '<svg viewBox="0 0 48 48"><rect x="14" y="3" width="20" height="13" rx="3" fill="#fff"/><path d="M24 18v8" stroke="#fff" stroke-width="3" stroke-dasharray="3 3"/><path d="M3 30h18l-2 15H5zM27 30h18l-2 15H29z" fill="#fde68a"/><path d="M3 30h18M27 30h18" stroke="#fff" stroke-width="3"/></svg>'],
+  ochu: ['#16a34a', '<svg viewBox="0 0 48 48"><g fill="#fff"><rect x="4" y="6" width="11" height="11" rx="2"/><rect x="18" y="6" width="11" height="11" rx="2"/><rect x="32" y="6" width="11" height="11" rx="2"/><rect x="18" y="20" width="11" height="11" rx="2" fill="#fde68a"/><rect x="18" y="34" width="11" height="11" rx="2"/><rect x="4" y="20" width="11" height="11" rx="2"/></g><text x="23.5" y="29" font-size="10" font-weight="800" text-anchor="middle" fill="#166534">A</text></svg>'],
+  sapxep: ['#f59e0b', '<svg viewBox="0 0 48 48"><g fill="#fff"><rect x="6" y="30" width="9" height="14" rx="2"/><rect x="19" y="20" width="9" height="24" rx="2"/><rect x="32" y="8" width="9" height="36" rx="2"/></g><path d="M8 22 30 6" stroke="#7c2d12" stroke-width="3"/><path d="m24 5 7 1-2 7" fill="none" stroke="#7c2d12" stroke-width="3"/></svg>'],
+  dungsai: ['#dc2626', '<svg viewBox="0 0 48 48"><circle cx="15" cy="24" r="12" fill="#22c55e"/><path d="m9 24 4 4 8-8" stroke="#fff" stroke-width="3.5" fill="none"/><circle cx="33" cy="24" r="12" fill="#fff"/><path d="m28 19 10 10m0-10-10 10" stroke="#dc2626" stroke-width="3.5"/></svg>'],
+  nguyentu: ['#7c3aed', SVG_NT],
+  orbital: ['#0891b2', '<svg viewBox="0 0 48 48"><g fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="16" width="14" height="16"/><rect x="17" y="16" width="14" height="16"/><rect x="31" y="16" width="14" height="16"/></g><g stroke="#fde68a" stroke-width="2.5"><path d="M8 29V19m-3 3 3-3 3 3"/><path d="M13 19v10m-3-3 3 3 3-3"/><path d="M24 29V19m-3 3 3-3 3 3"/><path d="M38 29V19m-3 3 3-3 3 3"/></g></svg>'],
+  bangth: ['#ea580c', '<svg viewBox="0 0 48 48"><g fill="#fff"><rect x="3" y="6" width="8" height="8" rx="1.5"/><rect x="37" y="6" width="8" height="8" rx="1.5"/><rect x="3" y="16" width="8" height="8" rx="1.5"/><rect x="13" y="16" width="8" height="8" rx="1.5"/><rect x="27" y="16" width="8" height="8" rx="1.5"/><rect x="37" y="16" width="8" height="8" rx="1.5"/><rect x="3" y="26" width="8" height="8" rx="1.5"/><rect x="13" y="26" width="8" height="8" rx="1.5"/><rect x="27" y="26" width="8" height="8" rx="1.5"/><rect x="37" y="26" width="8" height="8" rx="1.5"/></g><rect x="13" y="26" width="8" height="8" rx="1.5" fill="#fde047"/><circle cx="17" cy="30" r="9" fill="none" stroke="#fde047" stroke-width="2.5"/><path d="m23 36 7 7" stroke="#fde047" stroke-width="3"/></svg>'],
+  ion: ['#be185d', '<svg viewBox="0 0 48 48"><circle cx="14" cy="24" r="10" fill="#fff"/><text x="14" y="29" font-size="13" font-weight="800" text-anchor="middle" fill="#be185d">+</text><circle cx="35" cy="24" r="10" fill="#fde68a"/><text x="35" y="29" font-size="15" font-weight="800" text-anchor="middle" fill="#9d174d">−</text><circle cx="24.5" cy="12" r="3" fill="#a5f3fc"/></svg>'],
+  sooxh: ['#4f46e5', '<svg viewBox="0 0 48 48"><text x="24" y="30" font-size="20" font-weight="800" text-anchor="middle" fill="#fff">+6</text><path d="M8 38h32" stroke="#fde68a" stroke-width="3"/><circle cx="38" cy="12" r="6" fill="none" stroke="#fde68a" stroke-width="3"/><path d="m42 16 4 4" stroke="#fde68a" stroke-width="3"/></svg>'],
+  canbang: ['#059669', '<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2.6"><path d="M24 6v34M12 40h24M8 14h32"/><path d="M8 14 3 26h10zM40 14l-5 12h10z" fill="#fde68a"/><circle cx="24" cy="8" r="3" fill="#fff"/></svg>'],
+};
+
+/* ---------- khung trang ---------- */
+let D = null, DON = [];
+function don() { DON.forEach(f => { try { f(); } catch (e) {} }); DON = []; }
+const hen = (f, ms) => { const t = setTimeout(f, ms); DON.push(() => clearTimeout(t)); return t; };
+const lap = (f, ms) => { const t = setInterval(f, ms); DON.push(() => clearInterval(t)); return t; };
+function khung(f) { let id = 0, song = true; DON.push(() => { song = false; cancelAnimationFrame(id); }); const v = t => { if (!song) return; if (f(t) !== false) id = requestAnimationFrame(v); }; id = requestAnimationFrame(v); }
+const saoDat = k => kho.get(KK, {})[k] || 0;
+function ghiSao(k, s) { const t = kho.get(KK, {}); if (s > (t[k] || 0)) { t[k] = s; kho.set(KK, t); } }
+const veSao = n => '⭐'.repeat(n) + '<span style="opacity:.25;filter:grayscale(1)">' + '⭐'.repeat(3 - n) + '</span>';
+
+function trangChu() {
+  don(); document.title = 'Trò chơi Hoá 10';
+  $('#app').innerHTML = `<header><div class="wrap"><div class="k">Hoá học 10 · cô Thơi</div><h1>🎮 Trò chơi luyện tập</h1><p>Mỗi bài 3 trò chơi để em tự chơi trên điện thoại sau khi học.</p></div></header>
+    <main class="wrap">${BAI.map(([m, t]) => `<a class="the" href="?bai=${m}"><span class="ic" style="background:linear-gradient(135deg,#6d28d9,#db2777)"><b style="color:#fff;font-size:22px">${m}</b></span><span><b>Bài ${m}. ${esc(t)}</b><span class="m">${[0, 1, 2].map(i => saoDat('b' + m + '-' + i)).reduce((a, b) => a + b, 0)} / 9 ⭐</span></span></a>`).join('')}</main>`;
+}
+function trangBai() {
+  don(); document.title = 'Trò chơi Bài ' + D.ma + ' – Hoá 10';
+  const ngoai = window.parent === window;
+  $('#app').innerHTML = `<header><div class="wrap">${ngoai ? `<button class="ve" id="ve">← ${document.referrer && history.length > 1 ? 'Quay lại web lớp' : 'Các bài'}</button>` : ''}<div class="k">Hoá học 10 · Bài ${esc(D.ma)}</div><h1>🎮 ${esc(D.ten)}</h1><p>Chọn một trò để chơi. Mỗi trò có 3 sao, chơi lại bao nhiêu lần cũng được.</p></div></header>
+    <main class="wrap">${D.tro.map((t, i) => { const ic = ICON[t.loai]; const s = saoDat('b' + D.ma + '-' + i);
+      return `<button class="the" data-i="${i}"><span class="ic" style="background:${ic[0]}">${ic[1]}</span><span><b>${esc(t.ten)}</b><span class="m">${esc(t.mo)}</span><span class="sao">${veSao(s)}</span></span></button>`; }).join('')}
+    <p class="ghi" style="text-align:center;margin-top:18px">Trò chơi để em luyện tập, điểm chỉ lưu trên máy này, không gửi cho cô.</p></main>`;
+  if (ngoai) $('#ve').onclick = () => { if (document.referrer && history.length > 1) history.back(); else location.href = '?'; };
+  document.querySelectorAll('[data-i]').forEach(b => b.onclick = () => vaoTro(+b.dataset.i));
+  scrollTo(0, 0);
+}
+function vaoTro(i) {
+  don(); const t = D.tro[i];
+  $('#app').innerHTML = `<div class="choi"><div class="tren"><button class="x" id="thoat" aria-label="Thoát">✕</button><span class="ten">${esc(t.ten)}</span><span class="chip" id="phu" hidden></span><span class="chip" id="diem">0</span><button class="x" id="am" aria-label="Bật tắt âm thanh">${amBat ? '🔊' : '🔈'}</button></div><div class="san" id="san"></div></div>`;
+  $('#thoat').onclick = trangBai;
+  $('#am').onclick = () => { amBat = !amBat; kho.set(KK + '_am', amBat); $('#am').textContent = amBat ? '🔊' : '🔈'; };
+  const c = {
+    t, i, san: $('#san'), diem: 0, saiDs: [], combo: 0,
+    cong(n, chuoi) { if (chuoi) { this.combo++; if (this.combo >= 3) n += Math.min(10, (this.combo - 2) * 2); } this.diem += n; const d = $('#diem'); d.textContent = this.diem; d.classList.remove('gap'); void d.offsetWidth; d.classList.add('gap');
+      if (chuoi && this.combo >= 3 && this.combo % 3 === 0) { am('combo'); this.phu('🔥 Chuỗi ' + this.combo); } },
+    hong() { this.combo = 0; },
+    phu(s) { const p = $('#phu'); p.hidden = !s; p.textContent = s; },
+    ghiSai(hoi, dap, giai) { this.saiDs.push({ hoi, dap, giai }); },
+    giai(dung, td, nd, tiep, chu) {   // bảng lời giải trượt lên; tiep() khi bấm
+      const g = document.createElement('div'); g.className = 'giai ' + (dung ? 'dung' : 'sai');
+      g.innerHTML = `<b class="td">${td}</b><div class="nd">${nd || ''}</div><div class="hang"><button class="nut">${chu || 'Tiếp tục →'}</button></div>`;
+      this.san.appendChild(g); g.querySelector('button').onclick = () => { g.remove(); tiep && tiep(); };
+    },
+    ket(ti, ghi) {                   // ti: tỉ lệ 0–1 → sao
+      don(); const sao = ti >= 0.9 ? 3 : ti >= 0.7 ? 2 : ti >= 0.4 ? 1 : 0;
+      const k = 'b' + D.ma + '-' + i, cu = saoDat(k); ghiSao(k, sao);
+      const loi = this.saiDs.slice(0, 12);
+      const h = document.createElement('div'); h.className = 'ket';
+      h.innerHTML = `<div class="hop"><div class="sao3">${[0, 1, 2].map(j => `<i class="${j < sao ? '' : 'tat'}" style="animation-delay:${0.15 + j * 0.2}s">⭐</i>`).join('')}</div>
+        <div class="lon">${this.diem} điểm</div><div>${esc(ghi || '')}</div>
+        <div class="ghi" style="margin-top:4px">${sao > cu ? '🎉 Kỉ lục mới của em!' : cu ? 'Kỉ lục của em: ' + cu + ' ⭐' : ''}</div>
+        <div style="font-weight:700;margin-top:8px">${['Chưa sao nào — em xem lại lời giải rồi chơi lại nhé!', 'Khá rồi! Chơi lại để lấy thêm sao nhé.', 'Giỏi lắm! Còn một sao nữa thôi.', 'Xuất sắc! Em nắm chắc bài rồi.'][sao]}</div>
+        ${loi.length ? `<div class="loi"><b>📌 Xem lại chỗ em nhầm:</b>${loi.map(x => `<p>• ${viet(x.hoi)}<br><b>→ ${viet(x.dap)}</b>${x.giai ? '<br><span class="ghi">' + viet(x.giai) + '</span>' : ''}</p>`).join('')}</div>` : ''}
+        <div class="hang"><button class="nut" id="lai">↻ Chơi lại</button><button class="nut phu" id="khac">Trò khác</button></div></div>`;
+      this.san.appendChild(h); am(sao >= 2 ? 'thang' : 'cham'); if (sao >= 2) phaoGiay(this.san);
+      h.querySelector('#lai').onclick = () => vaoTro(i); h.querySelector('#khac').onclick = trangBai;
+    },
+  };
+  (ENG[t.loai] || (() => { c.san.innerHTML = '<p class="bao">Chưa có trò này.</p>'; }))(c);
+}
+
+/* =====================================================================
+   CÁC TRÒ CHƠI
+   ===================================================================== */
+const ENG = {};
+
+/* 1. PHI THUYỀN TRI THỨC — chạm làn có đáp án đúng trước khi cổng chạm tàu
+   cau: [hoi, dung, sai1, sai2, giai] */
+ENG.phithuyen = c => {
+  const ds = tron(c.t.cau).slice(0, c.t.so || 10); let k = 0, mang = 3, dung = 0, lanTau = 1;
+  c.san.innerHTML = `<div class="pt"><div class="nen"></div><div class="lan" style="left:0"></div><div class="lan" style="left:33.333%"></div><div class="lan" style="left:66.666%"></div>
+    <div class="hoi" id="hoi"></div><div id="cong"></div><div class="tau" id="tau" style="left:33.333%">${SVG_TAU}</div>
+    <div class="goiy" id="goiy">Chạm vào làn có đáp án đúng để lái tàu</div><button class="lao" id="lao" hidden>⚡ Lao tới!</button><div class="vung" id="vung"><button data-l="0" aria-label="Làn trái"></button><button data-l="1" aria-label="Làn giữa"></button><button data-l="2" aria-label="Làn phải"></button></div></div>`;
+  const tau = $('#tau'), hoi = $('#hoi'), cong = $('#cong'), lao = $('#lao');
+  const datLan = l => { lanTau = l; tau.style.left = (l * 33.333) + '%'; };
+  document.querySelectorAll('#vung button').forEach(b => b.onclick = () => { datLan(+b.dataset.l); am('cham'); $('#goiy').hidden = true; lao.hidden = false; });
+  const phim = e => { if (e.key === 'ArrowLeft') datLan(Math.max(0, lanTau - 1)); if (e.key === 'ArrowRight') datLan(Math.min(2, lanTau + 1)); };
+  addEventListener('keydown', phim); DON.push(() => removeEventListener('keydown', phim));
+  c.phu('❤️'.repeat(mang));
+  function cau() {
+    if (k >= ds.length || mang <= 0) return c.ket(dung / ds.length, `Em trả lời đúng ${dung}/${ds.length} câu${mang <= 0 ? ' — tàu hết năng lượng' : ''}.`);
+    const q = ds[k]; const pa = tron([0, 1, 2]); const chu = [q[1], q[2], q[3]];
+    hoi.innerHTML = `<span class="so">Câu ${k + 1}/${ds.length}</span>${viet(q[0])}`;
+    cong.innerHTML = pa.map((p, l) => `<div class="cong" data-p="${p}" style="left:${l * 33.333}%;top:0">${viet(chu[p])}</div>`).join('');
+    const cs = [...cong.children]; const top0 = hoi.offsetTop + hoi.offsetHeight + 8, dich = tau.offsetTop - 66;
+    const tg = Math.max(6, Math.min(14, 7 + (q[0].length + chu.join('').length) / 22)) * 1000 * Math.max(0.65, 1 - k * 0.03);
+    let t0 = null, xong = false, nhanh = false;
+    lao.onclick = () => { nhanh = true; lao.hidden = true; };
+    khung(t => {
+      if (xong) return false; if (t0 === null) t0 = t;
+      let p = (t - t0) / tg; if (nhanh) { t0 -= 60; }
+      p = Math.min(1, p); const y = top0 + (dich - top0) * p * p * (3 - 2 * p) * 0.15 + (dich - top0) * p * 0.85;
+      cs.forEach(x => x.style.top = y + 'px');
+      if (p >= 1) { xong = true; cham(1 - (t - t0) / tg); return false; }
+    });
+    function cham() {
+      lao.hidden = true; const g = cs[lanTau], ok = +g.dataset.p === 0;
+      cs.forEach(x => { if (+x.dataset.p === 0) x.classList.add('dung'); else if (x === g) x.classList.add('sai'); });
+      if (ok) { dung++; c.cong(10 + (nhanh ? 5 : 0), true); am('dung'); g.classList.add('no'); k++; hen(cau, 650); }
+      else { c.hong(); mang--; c.phu('❤️'.repeat(mang) + '🖤'.repeat(3 - mang)); am('sai'); rungMay(120); tau.classList.add('rung'); hen(() => tau.classList.remove('rung'), 450);
+        c.ghiSai(q[0], q[1], q[4]); k++;
+        hen(() => c.giai(false, '💥 Trượt rồi! Đáp án: ' + viet(q[1]), viet(q[4] || ''), cau), 500); }
+    }
+  }
+  hen(cau, 300);
+};
+
+/* 2. LẬT THẺ — ghép cặp. cap: [a, b] */
+ENG.latthe = c => {
+  const cap = tron(c.t.cap).slice(0, 6); const the = tron(cap.flatMap((p, i) => [{ i, chu: p[0], b: 0 }, { i, chu: p[1], b: 1 }]));
+  let mo = [], buoc = 0, xongN = 0, t0 = Date.now(), khoa = false;
+  c.san.innerHTML = `<div class="cuon" style="display:flex;flex-direction:column"><p class="ghi" style="text-align:center;margin:0">Lật 2 thẻ, tìm cặp đi với nhau. Ít lượt lật = nhiều sao!</p>
+    <div class="lt">${the.map((x, j) => `<button class="tt" data-j="${j}"><div class="in"><div class="mat sau">${SVG_NT}</div><div class="mat truoc ${x.b ? 'b' : ''}">${viet(x.chu)}</div></div></button>`).join('')}</div></div>`;
+  const nut = [...document.querySelectorAll('.tt')];
+  lap(() => c.phu('⏱ ' + Math.round((Date.now() - t0) / 1000) + 's · ' + buoc + ' lượt'), 500);
+  nut.forEach(b => b.onclick = () => {
+    const j = +b.dataset.j; if (khoa || b.classList.contains('lat') || b.classList.contains('xong')) return;
+    b.classList.add('lat'); am('lat'); mo.push(j);
+    if (mo.length < 2) return; buoc++; khoa = true;
+    const [a, d] = mo; mo = [];
+    if (the[a].i === the[d].i) { hen(() => { nut[a].classList.add('xong'); nut[d].classList.add('xong'); am('dung'); c.cong(10, true); khoa = false; xongN++;
+        if (xongN === cap.length) hen(() => { const ti = buoc <= cap.length + 3 ? 1 : buoc <= cap.length + 7 ? 0.75 : 0.5; c.ket(ti, `Em ghép xong ${cap.length} cặp sau ${buoc} lượt lật, ${Math.round((Date.now() - t0) / 1000)} giây.`); }, 700); }, 350); }
+    else { c.hong(); hen(() => { nut[a].classList.add('sai'); nut[d].classList.add('sai'); }, 350); hen(() => { [a, d].forEach(x => nut[x].classList.remove('lat', 'sai')); khoa = false; }, 1100); }
+  });
+};
+
+/* 3. PHÂN LOẠI SIÊU TỐC — thẻ rơi, chạm thùng đúng. thung: [ten], the: [chu, chiSo, giai] */
+ENG.phanloai = c => {
+  const ds = tron(c.t.the).slice(0, c.t.so || 14), MAU = ['#ea580c', '#0284c7', '#16a34a', '#9333ea'];
+  let k = 0, dung = 0;
+  c.san.innerHTML = `<div class="pl" id="pl"><p class="ghi" style="text-align:center;margin:8px 12px 0">Thẻ rơi xuống — chạm đúng thùng trước khi thẻ chạm vạch!</p><div class="vach" id="vach"></div><div id="o"></div>
+    <div class="thung">${c.t.thung.map((t, i) => `<button data-t="${i}" style="background:${MAU[i]}">${viet(t)}</button>`).join('')}</div></div>`;
+  const pl = $('#pl'), o = $('#o'), th = [...document.querySelectorAll('.thung button')];
+  const dayY = () => pl.clientHeight - th[0].offsetHeight - 30;
+  $('#vach').style.top = (dayY() + 8) + 'px';
+  let hienTai = null;
+  function the() {
+    if (k >= ds.length) return c.ket(dung / ds.length, `Em xếp đúng ${dung}/${ds.length} thẻ.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const q = ds[k]; o.innerHTML = `<div class="roi" id="roi" style="top:40px">${viet(q[0])}</div>`;
+    const r = $('#roi'), tg = Math.max(3800, 7500 - k * 260), day = dayY() - r.offsetHeight; let t0 = null; hienTai = { q, r, xong: false };
+    khung(t => { if (hienTai.xong) return false; if (t0 === null) t0 = t; const p = Math.min(1, (t - t0) / tg); r.style.top = (40 + (day - 40) * p) + 'px';
+      if (p >= 1) { chon(-1); return false; } });
+  }
+  function chon(ti) {
+    const h = hienTai; if (!h || h.xong) return; h.xong = true; const q = h.q, ok = ti === q[1];
+    if (ti >= 0) { const b = th[ti]; b.classList.remove('nhay'); void b.offsetWidth; b.classList.add('nhay');
+      const rb = b.getBoundingClientRect(), rr = h.r.getBoundingClientRect(); h.r.classList.add('bay'); h.r.style.transform = `translate(calc(-50% + ${rb.left + rb.width / 2 - rr.left - rr.width / 2}px), ${rb.top - rr.top}px) scale(.3)`; }
+    k++;
+    if (ok) { dung++; am('dung'); c.cong(10, true); hen(the, 380); }
+    else { c.hong(); am('sai'); rungMay(100); c.ghiSai(q[0], 'thuộc nhóm «' + c.t.thung[q[1]] + '»', q[2]);
+      hen(() => c.giai(false, ti < 0 ? '⏰ Hết giờ! ' : '✘ Chưa đúng!', `<b>${viet(q[0])}</b> → thuộc <b>«${viet(c.t.thung[q[1]])}»</b>.<br>${viet(q[2] || '')}`, the), 380); }
+  }
+  th.forEach(b => b.onclick = () => chon(+b.dataset.t));
+  hen(the, 400);
+};
+
+/* 4. Ô CHỮ BÍ MẬT — hang: [goiY, DAPAN (A–Z), viTriChuKhoa, hienCoDau]; khoa: [TUKHOA, goiYTuKhoa, hien] */
+ENG.ochu = c => {
+  const H = c.t.hang, KH = c.t.khoa, n = H.length;
+  const trai = Math.max(...H.map(h => h[2])), cot = Math.max(...H.map(h => trai - h[2] + h[1].length)) + 1;
+  const giai = H.map(() => false), goi = H.map(() => 0); let dang = -1, nhap = [], phimDs = [], daDoanKhoa = false;
+  const c0 = Math.max(20, Math.min(34, Math.floor((Math.min(innerWidth, 560) - 32) / (cot + 0.4)) - 3));
+  c.san.innerHTML = `<div class="cuon oc" style="--c:${c0}px"><div class="luoi" id="luoi" style="grid-template-columns:repeat(${cot},var(--c))"></div><div id="ban"></div></div>`;
+  c.phu(`0/${n} hàng`);
+  function veLuoi() {
+    let h = '';
+    H.forEach((r, i) => { const lech = trai - r[2];
+      for (let x = 0; x < cot; x++) {
+        if (x === 0) { h += `<button class="so ${giai[i] ? 'xong' : ''}" data-h="${i}">${i + 1}</button>`; continue; }
+        const j = x - 1 - lech; if (j < 0 || j >= r[1].length) { h += '<span class="o rong"></span>'; continue; }
+        h += `<span class="o ${j === r[2] ? 'khoa' : ''} ${giai[i] ? 'chu' : ''} ${dang === i ? 'dang' : ''}">${giai[i] ? r[1][j] : ''}</span>`;
+      } });
+    $('#luoi').innerHTML = h; document.querySelectorAll('.oc .so').forEach(b => b.onclick = () => chonHang(+b.dataset.h));
+  }
+  const tuKhoaHien = () => H.map((r, i) => giai[i] ? r[1][r[2]] : '_').join(' ');
+  function banDau() {
+    dang = -1; veLuoi(); const xong = giai.filter(Boolean).length;
+    $('#ban').innerHTML = `<div class="gy"><b>🔑 Từ khoá hàng dọc:</b> ${esc(tuKhoaHien())}<br><span class="ghi">${viet(KH[1])}</span></div>
+      <p style="text-align:center;margin:6px 0">Chạm vào <b>số thứ tự</b> của một hàng để giải.</p>
+      <div class="hang"><button class="nut ${xong >= Math.ceil(n / 2) ? '' : 'phu'}" id="doan" ${xong >= Math.ceil(n / 2) && !daDoanKhoa ? '' : 'disabled'}>🔑 Đoán từ khoá ${xong >= Math.ceil(n / 2) ? '' : '(giải ' + Math.ceil(n / 2) + ' hàng trước)'}</button></div>`;
+    const d = $('#doan'); if (d) d.onclick = () => banPhim(-1);
+  }
+  function chonHang(i) { if (giai[i]) return; dang = i; veLuoi(); banPhim(i); }
+  function banPhim(i) {
+    const tu = i < 0 ? KH[0] : H[i][1];
+    const nhieu = 'ABCDEGHIKLMNOPQRSTUVXY'.split('').filter(x => !tu.includes(x));
+    phimDs = tron([...tu].concat(tron(nhieu).slice(0, Math.max(3, Math.min(6, 14 - tu.length))))).map((ch, id) => ({ ch, id, dung: false }));
+    nhap = [];
+    const ve = () => {
+      $('#ban').innerHTML = `<div class="gy">${i < 0 ? '<b>🔑 Từ khoá</b> (' + tu.length + ' chữ): ' + viet(KH[1]) : '<b>Hàng ' + (i + 1) + '</b> (' + tu.length + ' chữ): ' + viet(H[i][0])}</div>
+        <div class="dien">${[...tu].map((x, j) => `<span>${nhap[j] ? phimDs[nhap[j] - 1].ch : ''}</span>`).join('')}</div>
+        <div class="phim">${phimDs.map(p => `<button data-p="${p.id}" ${nhap.includes(p.id + 1) ? 'disabled' : ''}>${p.ch}</button>`).join('')}<button class="xoa" id="xoa">⌫</button></div>
+        <div class="hang"><button class="nut phu" id="boQua">← Hàng khác</button>${i >= 0 ? '<button class="nut phu" id="goi">💡 Mở 1 chữ (−3)</button>' : ''}</div>`;
+      document.querySelectorAll('.phim [data-p]').forEach(b => b.onclick = () => { if (nhap.length >= tu.length) return; nhap.push(+b.dataset.p + 1); am('cham'); ve(); if (nhap.length === tu.length) kiem(); });
+      $('#xoa').onclick = () => { nhap.pop(); ve(); };
+      $('#boQua').onclick = banDau;
+      const g = $('#goi'); if (g) g.onclick = () => { // điền đúng chữ kế tiếp
+        const j = nhap.length; if (j >= tu.length) return; const p = phimDs.find(x => x.ch === tu[j] && !nhap.includes(x.id + 1));
+        if (p) { nhap.push(p.id + 1); goi[i]++; ve(); if (nhap.length === tu.length) kiem(); } };
+    };
+    const kiem = () => {
+      const tl = nhap.map(x => phimDs[x - 1].ch).join('');
+      if (tl === tu) {
+        am('dung');
+        if (i < 0) { daDoanKhoa = true; const conLai = giai.filter(x => !x).length; c.cong(20 + conLai * 5, true); H.forEach((r, j) => giai[j] = true); veLuoi();
+          return hen(() => c.ket(1, `Từ khoá: ${KH[2]}. Em đoán đúng khi còn ${conLai} hàng chưa giải.`), 600); }
+        giai[i] = true; c.cong(Math.max(4, 10 - goi[i] * 3), true); c.phu(giai.filter(Boolean).length + '/' + n + ' hàng');
+        c.giai(true, '✔ ' + esc(H[i][3]), viet(H[i][0]), () => { if (giai.every(Boolean)) { veLuoi(); c.ket(0.6 + 0.4 * (1 - Math.min(1, goi.reduce((a, b) => a + b, 0) / n)), `Từ khoá: ${KH[2]}. Lần sau thử đoán từ khoá sớm để được thưởng thêm!`); } else banDau(); });
+      } else { am('sai'); rungMay(80); c.hong(); if (i < 0) c.cong(-5); document.querySelector('.dien').classList.add('rung'); hen(() => { nhap = []; ve(); }, 500); }
+    };
+    ve();
+  }
+  banDau();
+};
+
+/* 5. SẮP XẾP — vong: [de, [mục đúng thứ tự], giai, ghiChu(vd 'tăng dần')] */
+ENG.sapxep = c => {
+  const ds = tron(c.t.vong).slice(0, c.t.so || 6); let k = 0, dung = 0;
+  c.san.innerHTML = '<div class="cuon sx" id="sx"></div>';
+  function vong() {
+    if (k >= ds.length) return c.ket(dung / ds.length, `Em xếp đúng ${dung}/${ds.length} dãy.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const v = ds[k], dung0 = v[1]; let o = dung0.map(() => null); const tr = tron(dung0.map((x, i) => i));
+    const ve = () => {
+      $('#sx').innerHTML = `<div class="de">${viet(v[0])}<small>Chạm các thẻ bên dưới theo đúng thứ tự (chạm ô đã xếp để gỡ ra).</small></div>
+        <div class="khe">${o.map((x, i) => `<button data-o="${i}" class="${x === null ? '' : 'co'}"><i>${i + 1}</i>${x === null ? '' : viet(dung0[x])}</button>`).join('')}</div>
+        <div class="kho">${tr.filter(i => !o.includes(i)).map(i => `<button data-k="${i}">${viet(dung0[i])}</button>`).join('')}</div>`;
+      document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const j = o.indexOf(null); o[j] = +b.dataset.k; am('cham'); ve(); if (!o.includes(null)) kiem(); });
+      document.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { const j = +b.dataset.o; if (o[j] !== null) { o[j] = null; ve(); } });
+    };
+    const kiem = () => {
+      const ok = o.every((x, i) => dung0[x] === dung0[i]);   // so theo chữ (mục trùng chữ vẫn đúng)
+      document.querySelectorAll('[data-o]').forEach((b, i) => b.classList.add(dung0[o[i]] === dung0[i] ? 'dung' : 'sai'));
+      k++;
+      if (ok) { dung++; am('dung'); c.cong(10, true); c.giai(true, '✔ Chính xác!', viet(v[2] || ''), vong); }
+      else { c.hong(); am('sai'); rungMay(100); c.ghiSai(v[0], dung0.join(' → '), v[2]); c.giai(false, '✘ Chưa đúng thứ tự', `Thứ tự đúng: <b>${dung0.map(viet).join(' → ')}</b><br>${viet(v[2] || '')}`, vong); }
+    };
+    ve();
+  }
+  vong();
+};
+
+/* 6. ĐÚNG HAY SAI 60 GIÂY — cau: [menhDe, true/false, giai] */
+ENG.dungsai = c => {
+  const ds = tron(c.t.cau); let k = 0, dung = 0, lam = 0, con = c.t.giay || 60, dung0 = false;
+  c.san.innerHTML = `<div class="ds"><div class="dh"><i id="dh" style="width:100%"></i></div><div class="chuoi" id="chuoi">Đọc nhanh — Đúng hay Sai?</div>
+    <div class="cau"><div class="bai" id="bai"></div></div><div class="hai"><button class="s" id="s">✘ SAI</button><button class="d" id="d">✔ ĐÚNG</button></div></div>`;
+  const tong = con; c.phu('⏱ ' + con + 's');
+  lap(() => { if (dung0) return; con--; c.phu('⏱ ' + Math.max(0, con) + 's'); $('#dh').style.width = Math.max(0, con / tong * 100) + '%'; if (con <= 0) het(); }, 1000);
+  const het = () => { dung0 = true; c.ket(lam ? (dung / lam) * Math.min(1, lam / 10) : 0, `Em trả lời ${lam} câu, đúng ${dung} câu.`); };
+  const hien = () => { if (k >= ds.length) return het(); const b = $('#bai'); b.className = 'bai vao'; b.innerHTML = viet(ds[k][0]); };
+  const tra = v => {
+    if (dung0 || k >= ds.length) return; const q = ds[k], ok = v === q[1], b = $('#bai'); lam++; k++;
+    b.classList.remove('vao'); b.classList.add(v ? 'phai' : 'trai');
+    if (ok) { dung++; am('dung'); c.cong(10, true); $('#chuoi').textContent = c.combo >= 3 ? '🔥 Chuỗi ' + c.combo + ' câu đúng!' : '✔ Đúng!'; hen(hien, 300); }
+    else { c.hong(); am('sai'); rungMay(100); dung0 = true; $('#chuoi').textContent = '';
+      c.ghiSai(q[0], q[1] ? 'Mệnh đề ĐÚNG' : 'Mệnh đề SAI', q[2]);
+      c.giai(false, '✘ Mệnh đề này ' + (q[1] ? 'ĐÚNG' : 'SAI'), `${viet(q[0])}<br><b>${viet(q[2] || '')}</b>`, () => { dung0 = false; hien(); }, 'Hiểu rồi, chơi tiếp →'); }
+  };
+  $('#d').onclick = () => tra(true); $('#s').onclick = () => tra(false);
+  let x0 = null; const bai = $('#bai');
+  bai.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  bai.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 60) tra(dx > 0); });
+  hien();
+};
+
+/* vẽ nguyên tử (mô hình Bohr) */
+function veNguyenTu(p, n, e, kh, ngoai) {
+  const l = lop(e), R = [44, 70, 96, 120], W = 260, cx = 130, cy = 130;
+  let h = `<svg viewBox="0 0 ${W} ${W}">`;
+  l.forEach((s, i) => { h += `<circle cx="${cx}" cy="${cy}" r="${R[i]}" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+    for (let j = 0; j < s; j++) { const a = j / s * Math.PI * 2 - Math.PI / 2 + i * 0.4; h += `<circle cx="${(cx + R[i] * Math.cos(a)).toFixed(1)}" cy="${(cy + R[i] * Math.sin(a)).toFixed(1)}" r="6" fill="${ngoai && i === l.length - 1 ? '#f59e0b' : '#0ea5e9'}" stroke="#fff" stroke-width="1.5"/>`; } });
+  const hat = []; for (let i = 0; i < p; i++) hat.push('#ef4444'); for (let i = 0; i < n; i++) hat.push('#94a3b8');
+  const tr = hat.map((m, i) => ({ m, i })).sort((a, b) => ((a.i * 7919) % 13) - ((b.i * 7919) % 13));
+  tr.forEach((q, i) => { const r = 3.2 * Math.sqrt(i + 0.5), a = i * 2.39996; h += `<circle cx="${(cx + r * Math.cos(a)).toFixed(1)}" cy="${(cy + r * Math.sin(a)).toFixed(1)}" r="4.6" fill="${q.m}" stroke="#0003"/>`; });
+  if (kh) h += `<text x="${cx}" y="${W - 4}" text-anchor="middle" font-size="18" font-weight="800" fill="currentColor">${kh}</text>`;
+  return h + '</svg>';
+}
+
+/* 7. XƯỞNG NGUYÊN TỬ — muc: {h: đề, p, n, e, g: giải} */
+ENG.nguyentu = c => {
+  const ds = tron(c.t.muc).slice(0, c.t.so || 8); let k = 0, diemV = 0;
+  c.san.innerHTML = '<div class="cuon xg" id="xg"></div>';
+  function muc() {
+    if (k >= ds.length) return c.ket(diemV / ds.length, `Em lắp đúng ${Math.round(diemV)}/${ds.length} hạt nhân – nguyên tử.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const m = ds[k]; let v = { p: 1, n: 0, e: 1 }, lan = 0;
+    const ve = () => {
+      const z = v.p, tnt = NT[z], q = v.p - v.e;
+      $('#xg').innerHTML = `<div class="de">🔧 ${viet(m.h)}<small>Bấm + / − để thêm, bớt hạt rồi bấm Kiểm tra</small></div>
+        <div class="hinh">${veNguyenTu(v.p, v.n, v.e, '')}</div>
+        <div class="doc"><span>Z = <b>${z}</b></span><span>A = <b>${v.p + v.n}</b></span><span>${tnt ? '<b>' + tnt[0] + '</b> · ' + tnt[1] : 'Z > 20'}</span><span>Điện tích: <b>${q ? (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '−') : '0 (trung hoà)'}</b></span></div>
+        <div class="dk">${[['p', 'Proton (p)', '#ef4444'], ['n', 'Neutron (n)', '#94a3b8'], ['e', 'Electron (e)', '#0ea5e9']].map(([k2, t, mau]) =>
+          `<div class="dong"><span class="tn"><i style="background:${mau}"></i>${t}</span><button data-k="${k2}" data-d="-1">−</button><b>${v[k2]}</b><button data-k="${k2}" data-d="1">+</button></div>`).join('')}</div>
+        <div class="hang"><button class="nut to" id="kt">Kiểm tra ✔</button></div>`;
+      document.querySelectorAll('.dong button').forEach(b => b.onclick = () => { const k2 = b.dataset.k; v[k2] = Math.max(k2 === 'p' ? 1 : 0, Math.min(k2 === 'n' ? 24 : 20, v[k2] + +b.dataset.d)); am('cham'); ve(); });
+      $('#kt').onclick = kiem;
+    };
+    const kiem = () => {
+      const sai = []; if (v.p !== m.p) sai.push('proton'); if (v.n !== m.n) sai.push('neutron'); if (v.e !== m.e) sai.push('electron');
+      lan++;
+      if (!sai.length) { const d = lan === 1 ? 1 : 0.5; diemV += d; am('dung'); c.cong(lan === 1 ? 10 : 5, lan === 1); k++; c.giai(true, '✔ Lắp đúng rồi!', viet(m.g), muc); }
+      else if (lan < 2) { am('sai'); rungMay(80); c.hong(); c.giai(false, '✘ Số ' + sai.join(', ') + ' chưa đúng', 'Em đọc lại đề và thử thêm một lần nhé.', null, 'Thử lại'); }
+      else { am('sai'); c.hong(); k++; c.ghiSai(m.h, `p = ${m.p}, n = ${m.n}, e = ${m.e}`, m.g); c.giai(false, '✘ Chưa đúng', `Đáp án: <b>p = ${m.p}, n = ${m.n}, e = ${m.e}</b><br>${viet(m.g)}`, muc); }
+    };
+    ve();
+  }
+  muc();
+};
+
+/* 8. ĐIỀN ORBITAL — z: [Z…] (Z ≤ 20) */
+ENG.orbital = c => {
+  const ds = tron(c.t.z).slice(0, c.t.so || 6); let k = 0, dungV = 0;
+  c.san.innerHTML = '<div class="cuon xg" id="xg"></div>';
+  function muc() {
+    if (k >= ds.length) return c.ket(dungV / ds.length, `Em điền đúng ${Math.round(dungV)}/${ds.length} nguyên tử.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const z = ds[k], pl = phanLop(z), can = PL.slice(0, pl.length); let lan = 0;
+    const o = can.map(([t, n]) => Array(n / 2).fill(0));
+    const ve = (to) => {
+      const tong = o.flat().reduce((a, b) => a + b, 0);
+      $('#xg').innerHTML = `<div class="de">⚛️ Điền electron cho nguyên tử <b>${NT[z][1]}</b> (${NT[z][0]}, Z = ${z})<small>Chạm một ô: trống → ↑ → ↑↓ → trống. Điền theo thứ tự năng lượng, đúng quy tắc Hund.</small></div>
+        <div class="doc"><span>Đã điền: <b>${tong}</b> / ${z} electron</span></div>
+        <div class="orb">${can.map(([t], i) => `<div class="ph ${to ? to[i] : ''}"><b>${t}</b><span class="bx">${o[i].map((x, j) => `<button data-i="${i}" data-j="${j}" class="${x ? 'co' : ''}">${['', '↑', '↑↓'][x]}</button>`).join('')}</span></div>`).reverse().join('')}</div>
+        <div class="hang"><button class="nut to" id="kt">Kiểm tra ✔</button></div>`;
+      document.querySelectorAll('.orb button').forEach(b => b.onclick = () => { const i = +b.dataset.i, j = +b.dataset.j; o[i][j] = (o[i][j] + 1) % 3; am('cham'); ve(); });
+      $('#kt').onclick = kiem;
+    };
+    const kiem = () => {
+      lan++; const to = [], loi = [];
+      can.forEach(([t, cap], i) => {
+        const muon = pl[i][1], co = o[i].reduce((a, b) => a + b, 0), m = cap / 2;
+        const doi = o[i].filter(x => x === 2).length, don = o[i].filter(x => x === 1).length;
+        const doiDung = Math.max(0, muon - m), donDung = muon - 2 * doiDung;
+        if (co !== muon) { to[i] = 'sai'; loi.push(`phân lớp ${t} cần ${muon} electron (em điền ${co})`); }
+        else if (doi !== doiDung || don !== donDung) { to[i] = 'sai'; loi.push(`phân lớp ${t} chưa đúng quy tắc Hund (electron phải ghép đôi sau khi mỗi ô đã có 1 electron)`); }
+        else to[i] = 'dung';
+      });
+      ve(to);
+      const docThan = o.flat().filter(x => x === 1).length;
+      if (!loi.length) { dungV += lan === 1 ? 1 : 0.5; am('dung'); c.cong(lan === 1 ? 10 : 5, lan === 1); k++;
+        c.giai(true, '✔ Chuẩn rồi!', `Cấu hình electron: <b>${cauHinh(z)}</b><br>Số electron độc thân: <b>${docThan}</b> · Lớp ngoài cùng có <b>${lop(z).slice(-1)[0]}</b> electron.`, muc); }
+      else if (lan < 2) { am('sai'); rungMay(80); c.hong(); c.giai(false, '✘ Chưa đúng', loi.map(x => '• ' + x).join('<br>'), null, 'Sửa lại'); }
+      else { am('sai'); c.hong(); k++; c.ghiSai(`Điền electron cho ${NT[z][1]} (Z = ${z})`, cauHinh(z), 'Điền theo thứ tự 1s 2s 2p 3s 3p 4s; trong phân lớp p, mỗi ô 1 electron trước rồi mới ghép đôi.');
+        c.giai(false, '✘ Chưa đúng', `Cấu hình đúng: <b>${cauHinh(z)}</b><br>${loi.map(x => '• ' + x).join('<br>')}`, muc); }
+    };
+    ve();
+  }
+  muc();
+};
+
+/* 9. TRUY TÌM Ô NGUYÊN TỐ — goi: [[goiY, Z, giai]] trên bảng Z = 1–20 */
+ENG.bangth = c => {
+  const ds = []; tron(c.t.goi).forEach(g => { if (ds.length < (c.t.so || 10) && !ds.some(x => x[1] === g[1])) ds.push(g); }); let k = 0, dung = 0, lan = 0; const mo = new Set(c.t.moSan || []);   // mỗi ô chỉ hỏi một lần const mo = new Set(c.t.moSan || []);
+  c.san.innerHTML = '<div class="cuon bt" id="bt"></div>';
+  const oCua = z => { const v = viTri(z); return { r: v.ck, col: z === 1 ? 1 : v.nhom }; };
+  function ve(dang) {
+    let h = '<span class="ck"></span>' + [1, 2, 3, 4, 5, 6, 7, 8].map(g => `<span class="nh">${LA[g]}A</span>`).join('');
+    h = '<div class="luoi" style="grid-template-columns:22px repeat(8,1fr)">' + h;
+    for (let r = 1; r <= 4; r++) { h += `<span class="ck">${r}</span>`;
+      for (let col = 1; col <= 8; col++) { const z = NT.findIndex((x, zz) => x && zz <= 20 && oCua(zz).r === r && oCua(zz).col === col);
+        if (z < 1) { h += '<span class="trong"></span>'; continue; }
+        const m = mo.has(z); h += `<button data-z="${z}" class="${m ? loaiNT(z) : ''}">${m ? `<b>${NT[z][0]}</b><small>${z}</small>` : '<b style="opacity:.35">?</b>'}</button>`; } }
+    h += '</div>';
+    $('#bt').innerHTML = `<div class="cl">🔍 ${viet(dang[0])}<small>Chạm vào ô của nguyên tố đó trong bảng (Z = 1–20)</small></div>${h}
+      <p class="ghi" style="text-align:center">🟧 kim loại · 🟩 phi kim · 🟪 khí hiếm</p>`;
+    document.querySelectorAll('.luoi button').forEach(b => b.onclick = () => chon(+b.dataset.z, b));
+  }
+  function goi() { if (k >= ds.length) return c.ket(dung / ds.length, `Em tìm đúng ${dung}/${ds.length} nguyên tố.`); c.phu((k + 1) + '/' + ds.length); lan = 0; ve(ds[k]); }
+  function chon(z, b) {
+    const q = ds[k], v = viTri(z);
+    if (z === q[1]) { mo.add(z); if (lan === 0) { dung++; c.cong(10, true); } else c.cong(4); am('dung'); k++; ve(q);
+      c.giai(true, `✔ Đúng: ${NT[z][1]} (${NT[z][0]}, Z = ${z})`, viet(q[2] || ''), goi); }
+    else { lan++; am('sai'); rungMay(80); c.hong(); b.classList.add('rung', loaiNT(z)); b.innerHTML = `<b>${NT[z][0]}</b><small>${z}</small>`;
+      hen(() => { if (!mo.has(z)) { b.classList.remove('rung', loaiNT(z)); b.innerHTML = '<b style="opacity:.35">?</b>'; } }, 1400);
+      if (lan >= 2) { c.ghiSai(q[0], `${NT[q[1]][1]} (${NT[q[1]][0]}, Z = ${q[1]})`, q[2]); mo.add(q[1]); k++; ve(q);
+        c.giai(false, `✘ Đó là ô của ${NT[z][0]} (chu kì ${v.ck}, nhóm ${LA[v.nhom]}A)`, `Đáp án: <b>${NT[q[1]][1]} (${NT[q[1]][0]}, Z = ${q[1]})</b><br>${viet(q[2] || '')}`, goi); } }
+  }
+  goi();
+};
+
+/* 10. LÒ ION — kieu 'tao': z: [Z…] chọn nhường/nhận bao nhiêu electron
+              kieu 'ghep': cap: [[cation, +q, anion, −q, giai]] chọn số ion để trung hoà điện */
+ENG.ion = c => {
+  if (c.t.kieu === 'ghep') return ghepIon(c);
+  const ds = tron(c.t.z).slice(0, c.t.so || 8); let k = 0, dung = 0;
+  c.san.innerHTML = '<div class="cuon xg" id="xg"></div>';
+  function muc() {
+    if (k >= ds.length) return c.ket(dung / ds.length, `Em tạo đúng ${dung}/${ds.length} ion.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const z = ds[k], l = lop(z), v = l[l.length - 1], kieuDung = v <= 3 ? 'nhuong' : 'nhan', soDung = v <= 3 ? v : 8 - v;
+    let kieu = '', so = 0;
+    const ve = () => {
+      const e = kieu === 'nhuong' ? z - so : kieu === 'nhan' ? z + so : z, q = z - e;
+      $('#xg').innerHTML = `<div class="de">⚡ Giúp nguyên tử <b>${NT[z][1]}</b> (Z = ${z}) đạt octet!<small>Lớp ngoài cùng có ${v} electron (chấm màu vàng) — nên nhường hay nhận mấy electron?</small></div>
+        <div class="hinh">${veNguyenTu(z, 0, e, NT[z][0] + (q ? mu(q) : ''), true)}</div>
+        <div class="doc"><span>Cấu hình: <b>${cauHinh(e)}</b></span><span>Lớp ngoài: <b>${lop(e).slice(-1)[0] || 0}</b> e</span></div>
+        <div class="xg"><div class="chon"><button data-c="nhuong" class="${kieu === 'nhuong' ? 'on' : ''}">⬆ Nhường e</button><button data-c="nhan" class="${kieu === 'nhan' ? 'on' : ''}">⬇ Nhận e</button></div>
+        <div class="dong" style="margin-top:8px"><span class="tn">Số electron</span><button data-d="-1">−</button><b>${so}</b><button data-d="1">+</button></div></div>
+        <div class="hang"><button class="nut to" id="kt" ${kieu && so ? '' : 'disabled'}>Tạo ion ✔</button></div>`;
+      document.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { kieu = b.dataset.c; if (!so) so = 1; am('cham'); ve(); });
+      document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { if (!kieu) kieu = 'nhuong'; so = Math.max(1, Math.min(4, so + +b.dataset.d)); am('cham'); ve(); });
+      $('#kt').onclick = () => {
+        const ok = kieu === kieuDung && so === soDung, ion = NT[z][0] + mu(kieuDung === 'nhuong' ? soDung : -soDung), kh = NT[z > 10 ? (z > 18 ? 18 : 10) : 2][0];
+        const khDung = kieuDung === 'nhuong' ? NT[[2, 10, 18].filter(x => x < z).pop()] : NT[[2, 10, 18].find(x => x > z)];
+        const g = `${NT[z][0]} có ${v} electron lớp ngoài cùng → ${kieuDung === 'nhuong' ? 'nhường' : 'nhận'} ${soDung} electron tạo ion <b>${ion}</b>, có cấu hình electron giống khí hiếm <b>${khDung[1]}</b>.`;
+        k++;
+        if (ok) { dung++; am('dung'); c.cong(10, true); c.giai(true, '✔ Đạt octet!', g, muc); }
+        else { am('sai'); rungMay(80); c.hong(); c.ghiSai(`Nguyên tử ${NT[z][1]} (Z = ${z}) tạo ion`, ion, g.replace(/<\/?b>/g, '')); c.giai(false, '✘ Chưa đạt cấu hình khí hiếm', g, muc); }
+      };
+    };
+    ve();
+  }
+  muc();
+};
+function ghepIon(c) {
+  const ds = tron(c.t.cap).slice(0, c.t.so || 8); let k = 0, dung = 0;
+  c.san.innerHTML = '<div class="cuon xg" id="xg"></div>';
+  const tenIon = (s, q) => ctf(s) + mu(q);
+  function muc() {
+    if (k >= ds.length) return c.ket(dung / ds.length, `Em lập đúng ${dung}/${ds.length} công thức.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const [ca, qc, an, qa, g] = ds[k]; let x = 1, y = 1, lan = 0;
+    const ve = () => {
+      const d = x * qc + y * qa, tongDuong = x * qc, tongAm = -y * qa, mx = Math.max(tongDuong, tongAm, 1);
+      $('#xg').innerHTML = `<div class="de">🧲 Ghép ion <b>${tenIon(ca, qc)}</b> và <b>${tenIon(an, qa)}</b> thành hợp chất trung hoà điện<small>Chọn số ion mỗi loại sao cho tổng điện tích bằng 0 (số nhỏ nhất)</small></div>
+        <div class="hinh"><svg viewBox="0 0 280 120">${Array.from({ length: x }, (_, i) => `<g transform="translate(${140 - (x - 1) * 22 + i * 44},34)"><circle r="19" fill="#f97316"/><text y="6" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">${qc}+</text></g>`).join('')}
+          ${Array.from({ length: y }, (_, i) => `<g transform="translate(${140 - (y - 1) * 22 + i * 44},88)"><circle r="21" fill="#0284c7"/><text y="6" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">${-qa}−</text></g>`).join('')}</svg></div>
+        <div class="doc"><span>Tổng (+): <b>${tongDuong}</b></span><span>Tổng (−): <b>${tongAm}</b></span><span>${d === 0 ? '⚖️ Cân bằng điện tích' : 'Lệch ' + (d > 0 ? '+' + d : '−' + -d)}</span></div>
+        <div class="can"><em style="left:${50 - tongDuong / mx * 50}%;right:50%;background:#f97316"></em><em style="left:50%;right:${50 - tongAm / mx * 50}%;background:#0284c7"></em><i></i></div>
+        <div class="dk"><div class="dong"><span class="tn"><i style="background:#f97316"></i>${tenIon(ca, qc)}</span><button data-a="x" data-d="-1">−</button><b>${x}</b><button data-a="x" data-d="1">+</button></div>
+        <div class="dong"><span class="tn"><i style="background:#0284c7"></i>${tenIon(an, qa)}</span><button data-a="y" data-d="-1">−</button><b>${y}</b><button data-a="y" data-d="1">+</button></div></div>
+        <div class="hang"><button class="nut to" id="kt">Lập công thức ✔</button></div>`;
+      document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (b.dataset.a === 'x') x = Math.max(1, Math.min(6, x + +b.dataset.d)); else y = Math.max(1, Math.min(6, y + +b.dataset.d)); am('cham'); ve(); });
+      $('#kt').onclick = () => {
+        const gc = (a, b) => b ? gc(b, a % b) : a, ox = -qa / gc(qc, -qa), oy = qc / gc(qc, -qa);
+        const nhom = (s, n) => n === 1 ? ctf(s) : (/[A-Z].*[A-Z]/.test(s) ? '(' + ctf(s) + ')' : ctf(s)) + [...String(n)].map(t => SUB[+t]).join('');
+        const ct = nhom(ca, ox) + nhom(an, oy); lan++;
+        if (x === ox && y === oy) { dung += lan === 1 ? 1 : 0; am('dung'); c.cong(lan === 1 ? 10 : 5, lan === 1); k++; c.giai(true, '✔ ' + ct, viet(g || ''), muc); }
+        else if (lan < 2) { am('sai'); rungMay(80); c.hong(); c.giai(false, x * qc + y * qa ? '✘ Điện tích chưa cân bằng' : '✘ Cân rồi nhưng chưa phải số nhỏ nhất', 'Em chỉnh lại số ion rồi thử lần nữa nhé.', null, 'Thử lại'); }
+        else { am('sai'); c.hong(); k++; c.ghiSai(`Ghép ${tenIon(ca, qc)} và ${tenIon(an, qa)}`, ct, g); c.giai(false, '✘ Đáp án: ' + ct, `Cần ${ox} ion ${tenIon(ca, qc)} và ${oy} ion ${tenIon(an, qa)}.<br>${viet(g || '')}`, muc); }
+      };
+    };
+    ve();
+  }
+  muc();
+}
+
+/* 11. THỢ SĂN SỐ OXI HOÁ — muc: [congThuc, dienTich, nguyenTo, soOxiHoa, giai] (90 giây) */
+ENG.sooxh = c => {
+  const ds = tron(c.t.muc); let k = 0, dung = 0, lam = 0, con = c.t.giay || 90, dung0 = false; const tong = con;
+  c.san.innerHTML = '<div class="cuon xg" id="xg"></div>';
+  lap(() => { if (dung0) return; con--; c.phu('⏱ ' + Math.max(0, con) + 's'); if (con <= 0) het(); }, 1000); c.phu('⏱ ' + con + 's');
+  const het = () => { dung0 = true; c.ket(lam ? (dung / lam) * Math.min(1, lam / 10) : 0, `Em làm ${lam} câu, đúng ${dung} câu.`); };
+  function muc() {
+    if (k >= ds.length) return het();
+    const [ct, q, nt, so, g] = ds[k];
+    const hien = ctf(ct).replace(new RegExp(nt + '(?![a-z])'), `<span class="hl">${nt}</span>`) + (q ? mu(q) : '');
+    $('#xg').innerHTML = `<div class="de">🎯 Số oxi hoá của nguyên tử được gạch chân là bao nhiêu?<small>Trả lời nhanh — đúng liên tiếp được thưởng chuỗi!</small></div>
+      <div class="cthh">${hien}</div><div class="phimso">${[-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7].map(v => `<button data-v="${v}">${dauSo(v)}</button>`).join('')}</div>`;
+    document.querySelectorAll('.phimso button').forEach(b => b.onclick = () => {
+      if (dung0) return; const v = +b.dataset.v; lam++; k++;
+      if (v === so) { dung++; b.classList.add('dung'); am('dung'); c.cong(10, true); hen(muc, 350); }
+      else { b.classList.add('sai'); document.querySelector(`.phimso [data-v="${so}"]`).classList.add('dung'); am('sai'); rungMay(90); c.hong(); dung0 = true;
+        c.ghiSai(`Số oxi hoá của ${nt} trong ${ctf(ct)}${q ? mu(q) : ''}`, dauSo(so), g);
+        c.giai(false, '✘ Số oxi hoá của ' + nt + ' là ' + dauSo(so), viet(g || ''), () => { dung0 = false; muc(); }, 'Chơi tiếp →'); }
+    });
+  }
+  muc();
+};
+
+/* 12. CÂN BẰNG PHẢN ỨNG — pt: [[vế trái…], [vế phải…], [hệ số đúng…], chấtKhử, chấtOxiHoá, giai] */
+function demNT(s) {   // "Fe2(SO4)3" → {Fe:2,S:3,O:12}
+  const st = [{}]; let i = 0;
+  while (i < s.length) {
+    if (s[i] === '(') { st.push({}); i++; continue; }
+    if (s[i] === ')') { i++; let m = ''; while (/\d/.test(s[i] || '')) m += s[i++]; const t = st.pop(), n = +(m || 1); for (const k in t) st[st.length - 1][k] = (st[st.length - 1][k] || 0) + t[k] * n; continue; }
+    const r = /^([A-Z][a-z]?)(\d*)/.exec(s.slice(i)); if (!r) { i++; continue; } i += r[0].length; st[st.length - 1][r[1]] = (st[st.length - 1][r[1]] || 0) + +(r[2] || 1);
+  }
+  return st[0];
+}
+ENG.canbang = c => {
+  const ds = tron(c.t.pt).slice(0, c.t.so || 5); let k = 0, diemV = 0;
+  c.san.innerHTML = '<div class="cuon xg cb" id="cb"></div>';
+  function muc() {
+    if (k >= ds.length) return c.ket(diemV / ds.length, `Em cân bằng đúng ${Math.round(diemV * 10) / 10}/${ds.length} phản ứng.`);
+    c.phu((k + 1) + '/' + ds.length);
+    const [tr, ph, hsDung, khu, oxh, g] = ds[k], cs = tr.concat(ph); let hs = cs.map(() => 1), lan = 0, buoc = 1;
+    const ve = () => {
+      const nt = [...new Set(cs.flatMap(s => Object.keys(demNT(s))))], dem = (a, o) => a.reduce((t, s, i) => t + (demNT(s)[nt[0]] || 0) * 0, 0);
+      const tong = (vt, lech) => nt.map(e => vt.reduce((t, s, i) => t + (demNT(s)[e] || 0) * hs[i + lech], 0));
+      const L = tong(tr, 0), R = tong(ph, tr.length);
+      const chu = (s, i) => `<span class="ch ${buoc === 2 ? '' : ''}" data-s="${i}"><span class="hs"><button data-i="${i}" data-d="-1">−</button><b>${hs[i]}</b><button data-i="${i}" data-d="1">+</button></span><span class="f">${ctf(s)}</span></span>`;
+      $('#cb').innerHTML = `<div class="de">⚖️ Cân bằng phản ứng<small>Chỉnh hệ số (số nhỏ nhất) cho số nguyên tử mỗi nguyên tố hai vế bằng nhau</small></div>
+        <div class="pt2">${tr.map((s, i) => chu(s, i)).join('<span class="mt">+</span>')}<span class="mt">→</span>${ph.map((s, i) => chu(s, i + tr.length)).join('<span class="mt">+</span>')}</div>
+        <table><tr><td>Nguyên tố</td><td>Vế trái</td><td>Vế phải</td></tr>${nt.map((e, i) => `<tr class="${L[i] === R[i] ? 'ok' : 'lech'}"><td>${e}</td><td>${L[i]}</td><td>${R[i]}</td></tr>`).join('')}</table>
+        <div class="hang"><button class="nut to" id="kt">Kiểm tra ✔</button></div>`;
+      document.querySelectorAll('.hs button').forEach(b => b.onclick = () => { const i = +b.dataset.i; hs[i] = Math.max(1, Math.min(20, hs[i] + +b.dataset.d)); am('cham'); ve(); });
+      $('#kt').onclick = () => {
+        lan++; const ok = hs.every((h, i) => h === hsDung[i]);
+        if (ok) { am('dung'); c.cong(lan === 1 ? 10 : 5, lan === 1); hoiKhu(lan === 1 ? 0.7 : 0.35); }
+        else if (lan < 3) { am('sai'); rungMay(80); c.hong(); c.giai(false, '✘ Chưa cân bằng', L.some((x, i) => x !== R[i]) ? 'Còn nguyên tố lệch (dòng đỏ). Gợi ý: cân bằng electron cho – nhận trước, rồi mới cân các nguyên tố còn lại.' : 'Số nguyên tử đã bằng nhau nhưng chưa phải bộ hệ số nhỏ nhất.', null, 'Thử lại'); }
+        else { am('sai'); c.hong(); hs = hsDung.slice(); c.ghiSai(cs.join(' , '), hsDung.join(' : '), g); ve(); c.giai(false, '✘ Hệ số đúng: ' + hsDung.join(' : '), viet(g || ''), () => hoiKhu(0)); }
+      };
+    };
+    function hoiKhu(d0) {   // bước 2: chỉ ra chất khử, chất oxi hoá
+      buoc = 2; let hoi = 'khu';
+      const hien = () => {
+        $('#cb').querySelector('.de').innerHTML = `${hoi === 'khu' ? '🔻 Chạm vào <b>CHẤT KHỬ</b>' : '🔺 Chạm vào <b>CHẤT OXI HOÁ</b>'}<small>${hoi === 'khu' ? 'Chất khử nhường electron (số oxi hoá tăng)' : 'Chất oxi hoá nhận electron (số oxi hoá giảm)'}</small>`;
+        document.querySelectorAll('.hs button').forEach(b => b.disabled = true); const kt = $('#kt'); if (kt) kt.remove();
+        document.querySelectorAll('.ch').forEach(s => s.onclick = () => {
+          const ten = cs[+s.dataset.s], dung2 = hoi === 'khu' ? khu : oxh;
+          if (ten === dung2) { s.classList.add('chon'); am('dung'); if (hoi === 'khu') { d0 += 0.15; hoi = 'oxh'; hien(); } else { d0 += 0.15; diemV += d0; c.cong(5, true); k++; c.giai(true, '✔ Hoàn thành phản ứng!', viet(g || ''), muc); } }
+          else { am('sai'); c.hong(); rungMay(80); s.classList.add('rung'); hen(() => s.classList.remove('rung'), 400); c.ghiSai(`${hoi === 'khu' ? 'Chất khử' : 'Chất oxi hoá'} trong phản ứng ${cs.map(ctf).join(', ')}`, ctf(dung2), g);
+            if (hoi === 'khu') { hoi = 'oxh'; hien(); } else { diemV += d0; k++; c.giai(false, `Chất khử: ${ctf(khu)} · Chất oxi hoá: ${ctf(oxh)}`, viet(g || ''), muc); } }
+        });
+      };
+      hien();
+    }
+    ve();
+  }
+  muc();
+};
+
+/* ---------- khởi động ---------- */
+function CHOI_NAP(d) { D = d; const t = Q.get('tro'); if (t !== null && D.tro[+t]) vaoTro(+t); else trangBai(); }
+if (!MA) trangChu();
+else {
+  const s = document.createElement('script'); s.src = 'du-lieu/bai' + String(+MA).padStart(2, '0') + '.js';
+  s.onerror = () => { $('#app').innerHTML = '<div class="wrap"><p class="bao">Không tải được trò chơi. Em kiểm tra mạng rồi tải lại trang nhé.</p></div>'; };
+  document.head.appendChild(s); $('#app').innerHTML = '<div class="wrap"><p class="ghi" style="margin-top:30px;text-align:center">Đang tải trò chơi…</p></div>';
+}
+</script>
+</body>
+</html>
