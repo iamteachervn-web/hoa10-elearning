@@ -27,7 +27,23 @@ b,strong{font-weight:800}
 header{position:relative;color:#fff;padding:44px 0 14px;border-bottom:7px solid var(--goban);
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='40'%3E%3Cpath d='M-5 4 Q280 30 565 4' fill='none' stroke='%23e8d3b0' stroke-width='1.6' opacity='.8'/%3E%3Cg font-family='Arial' font-weight='900' font-size='11' fill='%23fff' text-anchor='middle'%3E%3Cg transform='translate(20 6)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23d9580f'/%3E%3Ctext y='15'%3EH%3C/text%3E%3C/g%3E%3Cg transform='translate(80 12)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%231d6fb8'/%3E%3Ctext y='15'%3EC%3C/text%3E%3C/g%3E%3Cg transform='translate(140 16)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%2316804f'/%3E%3Ctext y='15'%3EN%3C/text%3E%3C/g%3E%3Cg transform='translate(200 18)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23e9a100'/%3E%3Ctext y='15'%3EO%3C/text%3E%3C/g%3E%3Cg transform='translate(260 19)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23c2185b'/%3E%3Ctext y='15'%3ENa%3C/text%3E%3C/g%3E%3Cg transform='translate(320 19)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%237c3aed'/%3E%3Ctext y='15'%3EMg%3C/text%3E%3C/g%3E%3Cg transform='translate(380 18)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23d9580f'/%3E%3Ctext y='15'%3EAl%3C/text%3E%3C/g%3E%3Cg transform='translate(440 15)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%231d6fb8'/%3E%3Ctext y='15'%3ES%3C/text%3E%3C/g%3E%3Cg transform='translate(500 11)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%2316804f'/%3E%3Ctext y='15'%3ECl%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0/560px 40px repeat-x,
   radial-gradient(120% 160% at 20% 0%,var(--bang2),var(--bang) 70%)}
-header .wrap{padding-bottom:0}
+header .wrap{position:relative;padding-bottom:0;padding-right:96px}
+header .lv{position:absolute;right:12px;bottom:-4px;width:74px;animation:nhun 2.6s ease-in-out infinite}
+@keyframes nhun{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes hien{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.the.hang{display:flex;gap:14px;align-items:center;animation:hien .35s backwards;transition:transform .12s,border-color .12s}
+.the.hang:hover{transform:translateY(-2px)}
+.the .gi{flex:1;min-width:0}
+.the .ic{flex:0 0 58px;height:62px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;color:#fff;box-shadow:inset 0 -5px 0 #0002;background:var(--pri)}
+.the .ic b{font-size:24px;font-weight:900;color:#fff}
+.the .ic em{font-style:normal;font-size:9.5px;font-weight:800;opacity:.92;margin-top:3px;letter-spacing:.3px}
+.the .ic.c1{background:#d9580f}.the .ic.c2{background:#1d6fb8}.the .ic.c3{background:#7c3aed}.the .ic.c4{background:#16804f}.the .ic.c5{background:#b45309}.the .ic.c6{background:#d6336c}.the .ic.c7{background:#0e7490}
+.the .ic.gio{background:var(--bang);font-size:28px}
+.the .di{flex:0 0 auto;background:var(--pri);color:var(--pri-ink);border-radius:14px;padding:7px 11px;font-weight:900;font-size:14.5px;box-shadow:0 3px 0 var(--gopri)}
+.the .sao{color:#e9a100;letter-spacing:1px}
+@media (max-width:430px){.the .di{display:none}header .wrap{padding-right:76px}header .lv{width:60px}}
+.chuong{margin:22px 0 4px;font-size:15px;font-weight:900;color:var(--mute);display:flex;align-items:center;gap:8px}
+.chuong::after{content:"";flex:1;height:2px;background:var(--line)}
 [hidden]{display:none!important}
 header .k{font-size:13px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#ffd8a8}
 header h1{margin:2px 0 0;font-size:clamp(21px,4.8vw,28px);line-height:1.2;font-weight:900}
@@ -83,7 +99,7 @@ header h1{margin:2px 0 0;font-size:clamp(21px,4.8vw,28px);line-height:1.2;font-w
 </style>
 </head>
 <body>
-<header><div class="wrap"><button class="ve" id="ve" hidden>← Quay lại</button><div class="k" id="k">Hoá học 10 · cô Thơi</div><h1 id="td">Luyện dạng bài tập</h1></div></header>
+<header><div class="wrap"><button class="ve" id="ve" hidden>← Quay lại</button><div class="k" id="k">Hoá học 10 · cô Thơi</div><h1 id="td">Luyện dạng bài tập</h1><span id="lvDau"></span></div></header>
 <div id="dongGio"></div>
 <main class="wrap" id="noi"></main>
 <script>
@@ -95,6 +111,9 @@ const BAI = [['1','Thành phần của nguyên tử'],['2','Nguyên tố hoá h�
   ['15','Phản ứng oxi hoá – khử'],['16','Ôn tập chương 4'],
   ['17','Biến thiên enthalpy trong các phản ứng hoá học'],['18','Ôn tập chương 5'],['19','Tốc độ phản ứng'],['20','Ôn tập chương 6'],
   ['21','Nhóm halogen'],['22','Hydrogen halide. Muối halide'],['23','Ôn tập chương 7']];
+const CHUONG = [[1, 4, 'Cấu tạo nguyên tử'], [5, 9, 'Bảng tuần hoàn các nguyên tố hoá học'], [10, 14, 'Liên kết hoá học'], [15, 16, 'Phản ứng oxi hoá – khử'],
+  [17, 18, 'Năng lượng hoá học'], [19, 20, 'Tốc độ phản ứng'], [21, 23, 'Nguyên tố nhóm VIIA']];
+const chuongCua = m => Math.max(0, CHUONG.findIndex(c => +m >= c[0] && +m <= c[1]));
 const $ = s => document.querySelector(s);
 const Q = new URLSearchParams(location.search);
 const MA = Q.get('bai'), ID = (Q.get('id') || '').replace(/[^a-z0-9-]/g, '');
@@ -116,7 +135,7 @@ const so4 = s => String(s).trim().replace(/\s+/g, '').replace(/[–−]/g, '-').
 const bangSo = (a, b) => { const x = so4(a), y = so4(b); if (x === y) return true; const p = parseFloat(x.replace(',', '.')), q = parseFloat(y.replace(',', '.')); return !isNaN(p) && !isNaN(q) && Math.abs(p - q) < 1e-9; };
 function gui(d) { if (TRONG_KHUNG && ID) try { window.parent.postMessage(Object.assign({ nguon: 'triway-luyen', id: ID }, d), '*'); } catch (e) {} }
 let D = null, gioTat = null;
-function datTieuDe(k, t, ve) { $('#k').textContent = k; $('#td').textContent = t; $('#ve').hidden = !ve; $('#ve').onclick = ve || null; document.title = t + ' – Hoá 10'; }
+function datTieuDe(k, t, ve) { const lvd = document.getElementById('lvDau'); if (lvd) lvd.innerHTML = ''; $('#k').textContent = k; $('#td').textContent = t; $('#ve').hidden = !ve; $('#ve').onclick = ve || null; document.title = t + ' – Hoá 10'; }
 function linhVat(t) {
   return `<svg class="lv ${t}" viewBox="0 0 100 114" aria-hidden="true"><rect x="38" y="8" width="24" height="34" rx="4" fill="#eaf7fb" stroke="#2b2118" stroke-width="3"/><rect x="33" y="3" width="34" height="9" rx="4.5" fill="#d9580f" stroke="#2b2118" stroke-width="3"/><circle cx="50" cy="72" r="37" fill="#eaf7fb" stroke="#2b2118" stroke-width="3"/><path d="M15.5 74 Q30 66 50 74 T84.5 74 A35 35 0 0 1 15.5 74Z" fill="#2bb3a3"/><path d="M27 58 Q31 46 42 41" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"/><ellipse cx="29" cy="79" rx="6" ry="4" fill="#ff9e80" opacity=".75"/><ellipse cx="71" cy="79" rx="6" ry="4" fill="#ff9e80" opacity=".75"/><g fill="#2b2118"><circle cx="38" cy="66" r="5.2"/><circle cx="62" cy="66" r="5.2"/></g><g fill="#fff"><circle cx="39.8" cy="64.2" r="1.8"/><circle cx="63.8" cy="64.2" r="1.8"/></g><path class="mat-vui" d="M40 79 Q50 90 60 79" fill="#c23a1f" stroke="#2b2118" stroke-width="3" stroke-linejoin="round"/><path class="mat-buon" d="M41 86 Q50 78 59 86" fill="none" stroke="#2b2118" stroke-width="3" stroke-linecap="round"/><ellipse class="mat-wow" cx="50" cy="83" rx="6" ry="7.5" fill="#c23a1f" stroke="#2b2118" stroke-width="3"/></svg>`;
 }
@@ -127,7 +146,8 @@ if (!MA) {
   datTieuDe('Hoá học 10 · cô Thơi', 'Luyện dạng bài tập — Bài 1 đến 23');
   const t = tienDo();
   $('#noi').innerHTML = '<p class="bao">Các em nên vào từ <b>web lớp Hoá 10</b> (mục ✍️ Bài tập) để bài 15 phút được gửi điểm cho cô.</p>' +
-    BAI.map(([m, ten]) => `<a class="the" href="?bai=${m}"><b>Bài ${m}. ${esc(ten)}</b><span class="m">Các dạng bài điển hình · bài luyện 15 phút${t['b' + m + '-15'] ? ' · điểm cao nhất ' + (t['b' + m + '-15'] / 10).toFixed(1).replace('.', ',') : ''}</span></a>`).join('');
+    BAI.map(([m, ten], j) => { const ch = chuongCua(m); return `${CHUONG[ch][0] === +m ? `<div class="chuong">⚗️ Chương ${ch + 1}. ${CHUONG[ch][2]}</div>` : ''}<a class="the hang" href="?bai=${m}" style="animation-delay:${Math.min(j, 10) * 0.03}s"><span class="ic c${ch + 1}"><b>${m}</b><em>BÀI</em></span><span class="gi"><b>Bài ${m}. ${esc(ten)}</b><span class="m">Các dạng bài điển hình · bài luyện 15 phút${t['b' + m + '-15'] ? ' · điểm cao nhất ' + (t['b' + m + '-15'] / 10).toFixed(1).replace('.', ',') : ''}</span></span><span class="di">Luyện ›</span></a>`; }).join('');
+  $('#lvDau').innerHTML = linhVat('vui');
 } else {
   const s = document.createElement('script');
   s.src = 'du-lieu/bai' + String(+MA).padStart(2, '0') + '.js';
@@ -141,10 +161,10 @@ function LUYEN_NAP(d) { D = d; gui({ viec: 'mo' }); trangBai(); }
 function trangBai() {
   tatGio(); $('#dongGio').innerHTML = '';
   datTieuDe('Luyện dạng · Bài ' + D.ma, 'Bài ' + D.ma + '. ' + D.ten, TRONG_KHUNG ? null : () => { location.href = '?'; });
-  const t = tienDo();
+  const t = tienDo(); $('#lvDau').innerHTML = linhVat('vui');
   $('#noi').innerHTML = '<p class="ghi" style="margin-top:14px">Chọn một dạng để luyện: mỗi dạng 10 câu, chọn xong là thấy ngay đáp án và lời giải. Làm hết các dạng rồi làm bài luyện 15 phút nhé.</p>' +
-    D.dang.map((x, i) => { const v = t['b' + D.ma + '-d' + i] || 0; return `<button class="the" data-d="${i}"><b>${esc(x.ten)}</b><span class="m">10 câu · ${v ? 'đúng nhiều nhất ' + v + '/10' : 'chưa làm'}</span><div class="thanh"><i style="width:${v * 10}%"></i></div></button>`; }).join('') +
-    `<button class="the de" id="moDe"><b>⏱ Bài luyện 15 phút</b><span class="m">8 câu nhiều lựa chọn · 2 câu đúng/sai · 2 câu trả lời ngắn · thang điểm 10${t['b' + D.ma + '-15'] ? ' · điểm cao nhất ' + (t['b' + D.ma + '-15'] / 10).toFixed(1).replace('.', ',') : ''}</span></button>`;
+    D.dang.map((x, i) => { const v = t['b' + D.ma + '-d' + i] || 0, sao = v >= 9 ? '⭐⭐⭐' : v >= 7 ? '⭐⭐' : v >= 5 ? '⭐' : ''; return `<button class="the hang" data-d="${i}" style="animation-delay:${i * 0.05}s"><span class="ic c${chuongCua(D.ma) + 1}"><b>${i + 1}</b><em>DẠNG</em></span><span class="gi"><b>${esc(x.ten.replace(/^Dạng\s*\d+\.\s*/, ''))}</b><span class="m">10 câu · ${v ? 'đúng nhiều nhất ' + v + '/10' : 'chưa làm'} <span class="sao">${sao}</span></span><div class="thanh"><i style="width:${v * 10}%"></i></div></span><span class="di">${v ? 'Làm lại' : 'Luyện'} ›</span></button>`; }).join('') +
+    `<button class="the de hang" id="moDe" style="animation-delay:${D.dang.length * 0.05}s"><span class="ic gio">⏱</span><span class="gi"><b>Bài luyện 15 phút</b><span class="m">8 câu nhiều lựa chọn · 2 câu đúng/sai · 2 câu trả lời ngắn · thang điểm 10${t['b' + D.ma + '-15'] ? ' · điểm cao nhất ' + (t['b' + D.ma + '-15'] / 10).toFixed(1).replace('.', ',') : ''}</span></span><span class="di">Làm bài ›</span></button>`;
   document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => trangDang(+b.dataset.d));
   $('#moDe').onclick = moDe; len();
 }
