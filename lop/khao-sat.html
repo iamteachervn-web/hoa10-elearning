@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="48x48" href="logo/favicon-48.png">
+<link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-title" content="Hoá 10">
+<meta name="application-name" content="Hoá 10">
+<title>Khảo sát – Hoá học 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chung.css">
+<style>
+.tien{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
+.thanh{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.thanh i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),#22d3ee);width:0;transition:width .3s}
+.gio{font-variant-numeric:tabular-nums;font-weight:700;color:var(--pri);min-width:58px;text-align:right}
+.cau{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0;box-shadow:var(--shadow)}
+.cau .dau{display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:14px;color:var(--mute)}
+.mucnhan{font-size:12px;font-weight:700;border-radius:99px;padding:1px 9px;color:#fff}
+.mB{background:var(--mB)}.mH{background:var(--mH)}.mV{background:var(--mV)}
+.cau .de{font-size:17px;font-weight:600;margin-bottom:10px}
+.pa{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 12px;margin:6px 0;cursor:pointer;transition:border-color .12s,background .12s}
+.pa:hover{border-color:var(--pri)}
+.pa .ch{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--soft);font-size:14px}
+.pa.chon{border-color:var(--pri);background:var(--pri2)}
+.pa.chon .ch{background:var(--pri);color:var(--pri-ink)}
+.pa.dung{border-color:var(--dung);background:var(--dungbg)}
+.pa.dung .ch{background:var(--dung);color:#fff}
+.pa.sai{border-color:var(--sai);background:var(--saibg)}
+.pa.sai .ch{background:var(--sai);color:#fff}
+.giai{margin-top:8px;font-size:15px;background:var(--soft);border-radius:10px;padding:8px 12px}
+.ketqua{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+@media (max-width:560px){.ketqua{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.cot3 .dong{display:grid;grid-template-columns:90px 1fr 46px;gap:8px;align-items:center;margin:8px 0;font-size:15px}
+.cot3 .ong{height:14px;border-radius:99px;background:var(--line);overflow:hidden}
+.cot3 .ong i{display:block;height:100%;border-radius:99px;transition:width .8s}
+@keyframes noi{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+.noi{animation:noi .5s ease-out}
+/* câu hai bậc: bước 2 «chắc chắn / đoán» + ô «vì sao» */
+.bac2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--mute)}
+.tc{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tc.on[data-t="c"]{border-color:var(--dung);background:var(--dungbg);color:var(--dung)}
+.tc.on[data-t="d"]{border-color:var(--vang);background:var(--vangbg);color:var(--vang)}
+.vs{width:100%;margin-top:8px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;background:var(--card);color:var(--ink);min-height:44px;resize:vertical}
+.tcghi{font-size:13px;font-weight:700;border-radius:99px;padding:1px 9px;background:var(--soft)}
+.saichac{border:1.5px solid var(--sai)}
+</style>
+</head>
+<body>
+<div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
+<div class="topbar"><div class="wrap"><a class="ve" href="index.html">← Trang chủ</a><h1 id="tieuDe">Khảo sát</h1></div></div>
+<main class="wrap" id="noi" style="padding-top:16px"></main>
+
+<script src="cai-dat.js"></script>
+<script src="du-lieu.js"></script>
+<script src="khao-sat-du-lieu.js"></script>
+<script src="chan-doan-du-lieu.js"></script>
+<script src="chung.js"></script>
+<script>
+khungChung();
+const MA_BAI = new URLSearchParams(location.search).get('bai') || (location.hash.match(/bai=([\w-]+)/) || [])[1];
+const KS = KHAO_SAT[MA_BAI];
+const TEN_MUC = { B: 'Biết', H: 'Hiểu', V: 'Vận dụng' };
+let tl = [], thuTu = [], batDau = 0, hetGio = null;
+const HB = !!(KS && KS.haiBac);          // câu hai bậc: bước 2 «chắc chắn / đoán»
+let tc = [], vs = [];                    // tc[i] = 'c' | 'd' | null · vs[i] = «vì sao em chọn»
+const xongCau = i => tl[i] !== null && (!HB || tc[i]);
+
+function rand(seed) { let h = 1779033703 ^ seed.length; for (const c of seed) { h = Math.imul(h ^ c.charCodeAt(0), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
+function tron(n, r) { const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function batDauTrang() {
+  if (!KS) { $('#noi').innerHTML = '<div class="rong">Không tìm thấy bài khảo sát này.</div>'; return; }
+  document.title = KS.ten + ' – Hoá học 10'; $('#tieuDe').textContent = KS.ten;
+  if (!KS.mo) { $('#noi').innerHTML = '<div class="khung"><h3>🔒 Cô chưa mở bài này</h3><p>Khi tới lúc làm, cô sẽ mở và báo trên lớp nhé.</p></div>'; return; }
+  const hs = hsLay();
+  if (!hs) { hopVao($('#noi'), batDauTrang); $('#noi').insertAdjacentHTML('afterbegin', '<p class="phu">Em vào lớp trước để cô ghi nhận kết quả.</p>'); return; }
+  if (!moChoEm(MA_BAI)) { $('#noi').innerHTML = '<div class="khung"><h3>🔒 Bài này làm SAU giờ học</h3><p>Cô sẽ giao bài này cho lớp em sau tiết học trên lớp. Em quay lại khi cô dặn nhé.</p></div>'; return; }
+  const dem = { B: 0, H: 0, V: 0 }; KS.cau.forEach(c => dem[c.muc]++);
+  const daLam = +kho.get('hoa10_ks_' + MA_BAI + '_' + hs.ma, '0');
+  $('#noi').innerHTML = `<div class="khung noi">
+    <h3>📋 ${esc(KS.ten)}</h3>
+    <p>${esc(KS.loiDan)}</p>
+    ${HB ? `<div class="bao" style="margin:8px 0">🧭 Mỗi câu có <b>2 bước</b>: ① chọn đáp án · ② bấm <b>✅ Em chắc chắn</b> hoặc <b>🤔 Em đoán</b>. Trả lời thật lòng giúp cô biết chính xác chỗ lớp còn hiểu nhầm — đoán không bị trừ gì cả.</div>` : ''}
+    <div class="so-to"><div class="o"><b>${KS.cau.length}</b><span>${HB ? 'câu hai bước' : 'câu nhiều lựa chọn'}</span></div><div class="o"><b>${KS.phut}′</b><span>thời gian gợi ý</span></div>
+      <div class="o"><b>${dem.B}·${dem.H}·${dem.V}</b><span>Biết · Hiểu · Vận dụng</span></div></div>
+    <p class="ghi">Em đang vào với mã <b>${hs.ma}</b> (<a href="#" id="doiMa">không phải em?</a>).${daLam ? ` Em đã làm ${daLam} lần — cô tính tiến bộ theo <b>lần làm đầu tiên</b>, các lần sau để em tự ôn.` : ''}</p>
+    <button class="nut" id="nutBD">Bắt đầu làm bài</button></div>`;
+  $('#doiMa').onclick = e => { e.preventDefault(); hsThoat(); batDauTrang(); };
+  $('#nutBD').onclick = lamBai;
+}
+
+function lamBai() {
+  const hs = hsLay(), r = rand(hs.ma + MA_BAI);
+  thuTu = KS.cau.map(c => tron(c.chon.length, r)); tl = KS.cau.map(() => null); tc = KS.cau.map(() => null); vs = KS.cau.map(() => ''); batDau = Date.now();
+  guiNgam('hd', { ma: hs.ma, pin: hs.pin, hl: 'ks-' + MA_BAI, loai: 'mo' });
+  $('#noi').innerHTML = `<div class="tien"><span id="daLam">0/${KS.cau.length}</span><div class="thanh"><i id="thanh"></i></div><span class="gio" id="gio"></span></div>
+    ${KS.cau.map((c, i) => `<div class="cau" id="c${i}"><div class="dau">Câu ${i + 1} <span class="mucnhan m${c.muc}">${TEN_MUC[c.muc]}</span></div>
+      <div class="de">${hoa(c.de)}</div>
+      ${thuTu[i].map((g, k) => `<button class="pa" data-i="${i}" data-g="${g}"><span class="ch">${'ABCD'[k]}</span><span>${hoa(c.chon[g])}</span></button>`).join('')}
+      ${HB ? `<div class="bac2"><span>② Em chọn đáp án đó vì:</span><button class="tc" data-i="${i}" data-t="c">✅ Em chắc chắn</button><button class="tc" data-i="${i}" data-t="d">🤔 Em đoán</button></div>
+        ${c.viSao ? `<textarea class="vs" data-i="${i}" maxlength="200" placeholder="Vì sao em chọn đáp án đó? (không bắt buộc — viết ngắn theo suy nghĩ của em)"></textarea>` : ''}` : ''}</div>`).join('')}
+    <div style="text-align:center;margin:20px 0"><button class="nut" id="nutNop">📤 Nộp bài</button></div>`;
+  const capNhat = () => { const n = KS.cau.filter((c, i) => xongCau(i)).length; $('#daLam').textContent = n + '/' + KS.cau.length; $('#thanh').style.width = n / KS.cau.length * 100 + '%'; };
+  $$('.pa').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; tl[i] = +b.dataset.g;
+    $$(`.pa[data-i="${i}"]`).forEach(x => x.classList.toggle('chon', x === b));
+    capNhat();
+  });
+  $$('.tc').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; tc[i] = b.dataset.t;
+    $$(`.tc[data-i="${i}"]`).forEach(x => x.classList.toggle('on', x === b));
+    capNhat();
+  });
+  $$('.vs').forEach(t => t.oninput = () => { vs[+t.dataset.i] = t.value; });
+  $('#nutNop').onclick = () => {
+    const thieu = tl.filter(x => x === null).length, thieuTC = HB ? KS.cau.filter((c, i) => tl[i] !== null && !tc[i]).length : 0;
+    if (thieu && !confirm(`Em còn ${thieu} câu chưa chọn. Vẫn nộp bài?`)) return;
+    if (thieuTC && !confirm(`Em còn ${thieuTC} câu chưa bấm «chắc chắn / đoán». Vẫn nộp bài?`)) return;
+    nop();
+  };
+  const het = batDau + KS.phut * 60000;
+  hetGio = setInterval(() => {
+    const con = Math.max(0, het - Date.now()), p = Math.floor(con / 60000), s = Math.floor(con / 1000) % 60;
+    $('#gio').textContent = `⏱ ${p}:${String(s).padStart(2, '0')}`;
+    if (!con) { clearInterval(hetGio); alert('Hết giờ — máy nộp bài giúp em.'); nop(); }
+  }, 500);
+}
+
+async function nop() {
+  clearInterval(hetGio);
+  const hs = hsLay(), dung = KS.cau.map((c, i) => tl[i] === c.dung), muc = { B: [0, 0], H: [0, 0], V: [0, 0] };
+  KS.cau.forEach((c, i) => { muc[c.muc][1]++; if (dung[i]) muc[c.muc][0]++; });
+  const pt = k => muc[k][1] ? Math.round(muc[k][0] / muc[k][1] * 100) : null;
+  const soDung = dung.filter(Boolean).length, diem = Math.round(soDung / KS.cau.length * 100);
+  const lan = +kho.get('hoa10_ks_' + MA_BAI + '_' + hs.ma, '0') + 1; kho.set('hoa10_ks_' + MA_BAI + '_' + hs.ma, String(lan));
+  const loiKhen = diem >= 80 ? 'Rất tốt! Em nắm chắc kiến thức chương này 🎉' : diem >= 50 ? 'Khá rồi! Xem lại các câu sai bên dưới để chắc hơn nhé 💪' : 'Không sao — đây là bước đầu. Đọc lời giải và học cùng cô, lần sau em sẽ tiến bộ 🌱';
+  const mauMuc = { B: 'var(--mB)', H: 'var(--mH)', V: 'var(--mV)' };
+  const saiChac = HB ? KS.cau.filter((c, i) => tl[i] !== null && !dung[i] && tc[i] === 'c').length : 0;
+  const dungDoan = HB ? KS.cau.filter((c, i) => dung[i] && tc[i] === 'd').length : 0;
+  const nhanTC = i => HB && tc[i] ? `<span class="tcghi">${tc[i] === 'c' ? '✅ em chắc chắn' : '🤔 em đoán'}</span>` : '';
+  const loiHB = !HB ? '' : `<div class="bao" style="margin-top:10px">${saiChac ? `🔍 Có <b>${saiChac}</b> câu em <b>sai mà rất chắc chắn</b> (viền đỏ bên dưới) — đây chính là chỗ hiểu nhầm cô sẽ cùng lớp làm rõ trên lớp. Em đọc kĩ lời giải những câu này nhé.` : '🌟 Không có câu nào em sai mà chắc chắn — tuyệt!'}${dungDoan ? ` Có <b>${dungDoan}</b> câu em đúng nhưng còn đoán — xem lại lời giải để chắc hơn.` : ''}</div>`;
+  $('#noi').innerHTML = `<div class="khung noi" style="margin-top:6px"><div class="ketqua">${vong(diem, diem >= 80 ? 'var(--dung)' : diem >= 50 ? 'var(--acc)' : 'var(--sai)', 130)}
+    <div><h3 style="margin:0">${soDung}/${KS.cau.length} câu đúng</h3><p style="margin:4px 0 10px">${loiKhen}</p>
+    <div class="cot3">${['B', 'H', 'V'].map(k => `<div class="dong"><span>${TEN_MUC[k]}</span><span class="ong"><i style="width:0;background:${mauMuc[k]}" data-w="${pt(k)}"></i></span><b>${muc[k][0]}/${muc[k][1]}</b></div>`).join('')}</div>
+    <p class="ghi" id="trangThai">Đang gửi kết quả cho cô…</p></div></div>${loiHB}</div>
+    <h3 style="margin:22px 0 4px">Xem lại từng câu</h3>
+    ${KS.cau.map((c, i) => `<div class="cau${HB && tl[i] !== null && !dung[i] && tc[i] === 'c' ? ' saichac' : ''}"><div class="dau">Câu ${i + 1} <span class="mucnhan m${c.muc}">${TEN_MUC[c.muc]}</span> ${dung[i] ? '<span class="da">✔ Đúng</span>' : `<span style="color:var(--sai);font-weight:700">✘ ${tl[i] === null ? 'Chưa chọn' : 'Sai'}</span>`} ${nhanTC(i)}</div>
+      <div class="de">${hoa(c.de)}</div>
+      ${thuTu[i].map((g, k) => `<div class="pa ${g === c.dung ? 'dung' : g === tl[i] ? 'sai' : ''}"><span class="ch">${'ABCD'[k]}</span><span>${hoa(c.chon[g])}</span></div>`).join('')}
+      <div class="giai">💡 ${hoa(c.giai)}</div></div>`).join('')}
+    <div style="text-align:center;margin:20px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="nut" href="lop.html?l=${lopCua(hs.ma)}">📊 Về Góc lớp ${lopCua(hs.ma)}</a><button class="nut phu" onclick="lamBai()">🔁 Làm lại để ôn</button></div>`;
+  requestAnimationFrame(() => setTimeout(() => $$('.cot3 .ong i').forEach(x => x.style.width = (x.dataset.w || 0) + '%'), 60));
+  scrollTo(0, 0);
+  try {
+    const them = !HB ? {} : {   // hb: mỗi câu 2 kí tự = số thứ tự GỐC của phương án đã chọn (0 = đáp án đúng) + c/d; vs: «vì sao»
+      hb: KS.cau.map((c, i) => (tl[i] === null ? '-' : tl[i]) + (tc[i] || '-')).join(''),
+      vs: JSON.stringify(Object.fromEntries(vs.map((t, i) => [i, t.trim().slice(0, 200)]).filter(([, t]) => t))) };
+    const r = await goi('nop', { ma: hs.ma, pin: hs.pin, bai: MA_BAI, diem, b: pt('B'), h: pt('H'), v: pt('V'), ct: dung.map(x => x ? 1 : 0).join(''), ...them });
+    $('#trangThai').innerHTML = `✅ Đã gửi cho cô (lần ${r.lan}${r.lan > 1 ? ' — cô tính tiến bộ theo lần đầu' : ''}).`;
+  } catch (e) { $('#trangThai').textContent = '⚠ ' + e.message + ' Em chụp màn hình phần này gửi cô nhé.'; }
+  guiNgam('hd', { ma: hs.ma, pin: hs.pin, hl: 'ks-' + MA_BAI, loai: 'xong', giay: Math.round((Date.now() - batDau) / 1000) });
+}
+
+batDauTrang();
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="48x48" href="logo/favicon-48.png">
+<link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-title" content="Hoá 10">
+<meta name="application-name" content="Hoá 10">
+<meta name="robots" content="noindex">
+<title>Trang cô – Hoá học 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chung.css">
+<style>
+.bang{width:100%;border-collapse:collapse;font-size:14.5px}
+.bang th,.bang td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.bang th:first-child,.bang td:first-child{text-align:left}
+.bang th{position:sticky;top:0;background:var(--card);font-size:13px;color:var(--mute)}
+.bang tr.lang td{color:var(--mute)}
+.cuon{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:12px}
+.thap{color:var(--sai);font-weight:700}.cao{color:var(--dung);font-weight:700}
+.cauhang{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;margin:4px 0;font-size:14px}
+.cauhang .ong{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.cauhang .ong i{display:block;height:100%}
+.the-cl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.the-cl .o{background:var(--soft);border-radius:12px;padding:10px 12px}
+.the-cl .o b{display:block;font-size:22px;color:var(--pri);font-variant-numeric:tabular-nums}
+.the-cl .o span{font-size:13px;color:var(--mute)}
+.co{display:inline-block;border-radius:6px;padding:0 6px;font-size:12.5px;font-weight:700}
+.co.tot{background:var(--dungbg);color:var(--dung)}.co.xem{background:var(--vangbg);color:var(--vang)}.co.loi{background:var(--saibg);color:var(--sai)}
+.bang td.trai,.bang th.trai{text-align:left;white-space:normal}
+.tab-gv{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+</style>
+</head>
+<body>
+<div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
+<div class="topbar"><div class="wrap"><a class="ve" href="index.html">← Trang chủ</a><h1>👩‍🏫 Trang cô — số liệu chi tiết</h1></div></div>
+<main class="wrap" id="noi" style="padding-top:16px"></main>
+
+<script src="cai-dat.js"></script>
+<script src="du-lieu.js"></script>
+<script src="khao-sat-du-lieu.js"></script>
+<script src="chan-doan-du-lieu.js"></script>
+<script src="chung.js"></script>
+<script src="giao-bai.js"></script>
+<script>
+khungChung();
+const KS_DS = ['c3-dau', 'c3-cuoi', 'c4-dau', 'c4-cuoi'], TEN = { 'c3-dau': 'Đầu C3', 'c3-cuoi': 'Cuối C3', 'c4-dau': 'Đầu C4', 'c4-cuoi': 'Cuối C4' };
+const EL = HOC_LIEU.filter(h => h.muc === 'elearning' && !h.an).sort((a, b) => a.bai - b.bai)
+  .concat(HOC_LIEU.filter(h => h.luyen && !h.an).sort((a, b) => a.bai - b.bai));   // + cột bài luyện 15 phút (điểm cao nhất, thang 10)
+const tenCot = h => h.luyen ? `15′ Bài ${h.bai}` : `EL Bài ${h.bai}`;
+const oCot = (h, v) => v === '' || !h.luyen ? v : (v / 10).toFixed(1).replace('.', ',');
+let D = null, lopXem = Object.keys(SI_SO)[0], che = 'hs';
+/* % HOÀN THÀNH THEO CHƯƠNG: trên bài cô đã giao (GIAO_TRUOC + NHIEM_VU của lớp), «xong» = em đã nộp bài (không xét điểm).
+   Chỉ tính học liệu máy biết em đã làm xong: e-learning, luyện dạng 15′, khảo sát. */
+const coKQ = h => h && (h.ks || h.luyen || h.muc === 'elearning');
+const chCua = h => (BAI.find(b => b.ma === String(h.bai)) || {}).ch;
+const maKQ = h => h.ks || h.id;
+function giaoCua(lop) {
+  const truoc = typeof GIAO_TRUOC === 'object' ? GIAO_TRUOC[lop] || [] : [];
+  return [...new Set(truoc.concat(NHIEM_VU[lop] || []))].map(timHL).filter(coKQ);
+}
+function chGiao(lop) {   // { ch: [học liệu] } theo thứ tự chương
+  const m = {}; giaoCua(lop).forEach(h => { const c = chCua(h); if (c != null) (m[c] = m[c] || []).push(h); }); return m;
+}
+function htCua(bai, lop) {
+  const m = chGiao(lop), r = {};
+  Object.keys(m).forEach(c => { const n = m[c].length, xong = m[c].filter(h => bai[maKQ(h)]).length; r[c] = { n, xong, p: Math.round(xong / n * 100) }; });
+  return r;
+}
+
+function moKhoa() {
+  $('#noi').innerHTML = `<div class="khung" style="max-width:420px"><h3>🔒 Mật khẩu của cô</h3>
+    <p class="ghi">Lần đầu vào: mật khẩu cô gõ sẽ được lưu làm mật khẩu (ít nhất 4 kí tự). Trang này có mã từng em nên chỉ cô xem.</p>
+    <input class="o" id="mk" type="password" autocomplete="current-password"><div class="loi" id="mkLoi"></div>
+    <button class="nut" id="mkNut" style="width:100%">Xem số liệu</button></div>`;
+  $('#mkNut').onclick = () => tai($('#mk').value);
+  $('#mk').onkeydown = e => { if (e.key === 'Enter') tai($('#mk').value); };
+}
+async function tai(mk) {
+  if (!MAY_CHU) { $('#noi').innerHTML = '<div class="bao vang">Chưa nối máy chủ (cai-dat.js → MAY_CHU).</div>'; return; }
+  try { D = await goi('gv', { mk }); D.ds = (D.ds || []).filter(x => !laThu(x.ma)); try { sessionStorage.setItem('hoa10_mk', mk); } catch (e) {} ve(); }
+  catch (e) { if ($('#mkLoi')) $('#mkLoi').textContent = e.message; else moKhoa(); }
+}
+const pt = x => x == null || x === '' || isNaN(x) ? '' : Math.round(x);
+const toMau = v => v === '' ? '' : v < 50 ? 'thap' : v >= 80 ? 'cao' : '';
+
+function dongHS(x) {
+  const o = k => x.bai[k] ? x.bai[k].dau : '';
+  const tang = c => o(c + '-dau') !== '' && o(c + '-cuoi') !== '' ? o(c + '-cuoi') - o(c + '-dau') : '';
+  return { ma: x.ma, luot: x.luot, phut: x.phut, soHL: x.soHL, c3d: o('c3-dau'), c3c: o('c3-cuoi'), c3t: tang('c3'), c4d: o('c4-dau'), c4c: o('c4-cuoi'), c4t: tang('c4'),
+    el: EL.map(h => x.bai[h.id] ? x.bai[h.id].cao : ''), cuoi: x.cuoi, ht: htCua(x.bai, x.lop || lopCua(x.ma)) };
+}
+function ve() {
+  const tab = `<div class="tab-gv"><button class="chip${che === 'hs' ? ' on' : ''}" data-che="hs">📋 Từng em</button>
+    <button class="chip${che === 'cl' ? ' on' : ''}" data-che="cl">🔬 Kiểm chứng chất lượng</button>
+    <button class="chip${che === 'hb' ? ' on' : ''}" data-che="hb">🧭 Chẩn đoán 2 bậc</button>${typeof veGiao === 'function' ? `
+    <button class="chip${che === 'giao' ? ' on' : ''}" data-che="giao">📌 Giao bài tuần</button>` : ''}</div>`;
+  if (che === 'giao' && typeof veGiao === 'function') { veGiao(tab); return; }
+  if (che === 'cl') { veChatLuong(tab); return; }
+  if (che === 'hb') { veHaiBac(tab); return; }
+  const so = D.luot, lopHS = l => D.ds.filter(x => x.lop === l);
+  $('#noi').innerHTML = tab + `<div class="so-to" style="margin-bottom:14px">
+      <div class="o"><b>${soVN(so.tong)}</b><span>lượt truy cập trang chủ</span></div><div class="o"><b>${soVN(so.homNay)}</b><span>hôm nay</span></div>
+      ${Object.keys(SI_SO).map(l => `<div class="o"><b>${lopHS(l).filter(x => x.luot || Object.keys(x.bai).length).length}/${SI_SO[l]}</b><span>${l} đã học trên web</span></div>`).join('')}</div>
+    <div class="loc" style="position:static"><div class="chips">${Object.keys(SI_SO).map(l => `<button class="chip${l === lopXem ? ' on' : ''}" data-l="${l}">${l}</button>`).join('')}</div>
+      <button class="nut phu" id="csv1">⬇ CSV từng em (${lopXem})</button><button class="nut phu" id="csv2">⬇ CSV tỉ lệ đúng từng câu</button>
+      <span class="ghi">Cập nhật ${esc(D.capNhat)}</span></div>
+    <div class="khung" style="margin:14px 0"><h3>📋 Từng em lớp ${lopXem}</h3><div class="cuon" id="bang"></div>
+      <p class="ghi">✅ C<i>n</i> = % hoàn thành Chương <i>n</i>: số việc cô đã giao của chương mà em đã nộp bài (rê chuột để xem x/y việc), không xét điểm. Điểm khảo sát = % đúng ở <b>lần làm đầu tiên</b>. ± = cuối chương trừ đầu chương. EL = % đúng cao nhất của bài e-learning. 15′ = điểm cao nhất bài luyện 15 phút (thang 10). Dòng mờ: em chưa học trên web.</p></div>
+    <div class="khung" style="margin:0 0 14px"><h3>✅ Hoàn thành nhiệm vụ theo chương · lớp ${lopXem}</h3><div id="htCh"></div></div>
+    <div class="luoi2" id="cauLop"></div>
+    <div class="khung" style="margin-top:14px"><h3>💡 Gợi ý nhóm cần cô hỗ trợ thêm</h3><div id="goiY"></div>
+      <p class="ghi">Máy chỉ gợi ý theo số liệu trên web; cô quyết định nhóm và cách hỗ trợ.</p></div>`;
+  $$('.chip[data-l]').forEach(b => b.onclick = () => { lopXem = b.dataset.l; ve(); });
+  $$('.chip[data-che]').forEach(b => b.onclick = () => { che = b.dataset.che; ve(); });
+  const ds = lopHS(lopXem).map(dongHS);
+  // thêm các số thứ tự chưa vào web để cô thấy đủ sĩ số
+  for (let i = 1; i <= SI_SO[lopXem]; i++) { const ma = lopXem + '-' + String(i).padStart(2, '0'); if (!ds.some(x => x.ma === ma)) ds.push({ ma, luot: 0, phut: 0, soHL: 0, c3d: '', c3c: '', c3t: '', c4d: '', c4c: '', c4t: '', el: EL.map(() => ''), cuoi: '', ht: htCua({}, lopXem) }); }
+  ds.sort((a, b) => a.ma.localeCompare(b.ma));
+  const CH = Object.keys(chGiao(lopXem)).map(Number).sort((a, b) => a - b);
+  const oHT = (x, c) => { const t = x.ht[c]; return t ? `<td class="${toMau(t.p)}" title="${t.xong}/${t.n} việc">${t.p}%</td>` : '<td></td>'; };
+  $('#bang').innerHTML = `<table class="bang"><thead><tr><th>Mã HS</th><th>Lượt</th><th>Phút</th><th>Học liệu</th>${CH.map(c => `<th title="${esc(CHUONG[c])}">✅ C${c}</th>`).join('')}<th>Đầu C3</th><th>Cuối C3</th><th>±</th><th>Đầu C4</th><th>Cuối C4</th><th>±</th>${EL.map(h => `<th>${tenCot(h)}</th>`).join('')}<th>Lần cuối</th></tr></thead><tbody>
+    ${ds.map(x => `<tr class="${x.luot || x.c3d !== '' || x.c4d !== '' ? '' : 'lang'}"><td>${x.ma}</td><td>${x.luot}</td><td>${x.phut}</td><td>${x.soHL}</td>${CH.map(c => oHT(x, c)).join('')}
+      ${['c3d', 'c3c'].map(k => `<td class="${toMau(x[k])}">${x[k]}</td>`).join('')}<td>${x.c3t === '' ? '' : (x.c3t > 0 ? '+' : '') + x.c3t}</td>
+      ${['c4d', 'c4c'].map(k => `<td class="${toMau(x[k])}">${x[k]}</td>`).join('')}<td>${x.c4t === '' ? '' : (x.c4t > 0 ? '+' : '') + x.c4t}</td>
+      ${x.el.map((v, i) => `<td class="${toMau(v)}">${oCot(EL[i], v)}</td>`).join('')}<td>${esc(x.cuoi)}</td></tr>`).join('')}</tbody></table>`;
+  // hoàn thành theo chương
+  const mG = chGiao(lopXem), siSo = ds.length;
+  $('#htCh').innerHTML = CH.length ? CH.map(c => {
+    const p = ds.map(x => x.ht[c].p), tbP = Math.round(p.reduce((a, b) => a + b, 0) / siSo);
+    const du = p.filter(v => v === 100).length, chua = p.filter(v => v === 0).length;
+    const doDang = ds.filter(x => x.ht[c].p > 0 && x.ht[c].p < 100).map(x => `${x.ma.slice(5)} (${x.ht[c].p}%)`), chuaLam = ds.filter(x => x.ht[c].p === 0).map(x => x.ma.slice(5));
+    return `<h3 style="margin-top:6px;font-size:16px">${esc(CHUONG[c])}</h3>
+      <div class="the-cl"><div class="o"><b>${tbP}%</b><span>hoàn thành trung bình của lớp</span></div>
+        <div class="o"><b>${du}/${siSo}</b><span>em xong hết (100%)</span></div><div class="o"><b>${chua}/${siSo}</b><span>em chưa làm việc nào</span></div></div>
+      ${mG[c].map(h => { const n = ds.filter(x => D.ds.some(y => y.ma === x.ma && y.bai[maKQ(h)])).length, q = Math.round(n / siSo * 100);
+        return `<div class="cauhang" style="grid-template-columns:minmax(0,1fr) 120px 70px"><span>${MUC[h.muc].icon} ${hoa(h.ten)}</span><span class="ong"><i style="width:${q}%;background:var(--pri)"></i></span><b>${n}/${siSo}</b></div>`; }).join('')}
+      <p class="ghi" style="margin-top:8px"><b>Đang làm dở (${doDang.length}):</b> ${doDang.join(', ') || '—'}</p>
+      <p class="ghi" style="margin:2px 0"><b>Chưa làm việc nào (${chuaLam.length}):</b> ${chuaLam.join(', ') || '—'}</p>`;
+  }).join('') : '<p class="ghi">Lớp này chưa được giao e-learning, luyện dạng hay khảo sát nào (sửa NHIEM_VU trong du-lieu.js).</p>';
+  // tỉ lệ đúng từng câu
+  $('#cauLop').innerHTML = KS_DS.map(k => {
+    const c = D.cau[k + '|' + lopXem]; if (!c) return '';
+    const cau = KHAO_SAT[k].cau, hang = cau.map((q, i) => ({ i, q, p: Math.round((c.dung[i] || 0) / c.n * 100) }));
+    const yeu = [...hang].sort((a, b) => a.p - b.p).slice(0, 3);
+    return `<div class="khung"><h3>${TEN[k]} · ${c.n} bài</h3>${hang.map(h => `<div class="cauhang"><span>Câu ${h.i + 1}</span><span class="ong"><i style="width:${h.p}%;background:var(--m${h.q.muc})"></i></span><b>${h.p}%</b></div>`).join('')}
+      <p class="ghi" style="margin-top:10px"><b>3 câu sai nhiều nhất:</b></p>${yeu.map(h => `<p class="ghi" style="margin:2px 0">• Câu ${h.i + 1} (${h.p}% đúng): ${hoa(h.q.de)}</p>`).join('')}</div>`;
+  }).join('') || '<div class="khung"><p class="ghi">Lớp này chưa có bài khảo sát nào.</p></div>';
+  // gợi ý nhóm
+  const moiNhat = [...KS_DS].reverse().find(k => ds.some(x => x[{ 'c3-dau': 'c3d', 'c3-cuoi': 'c3c', 'c4-dau': 'c4d', 'c4-cuoi': 'c4c' }[k]] !== ''));
+  if (!moiNhat) $('#goiY').innerHTML = '<p class="ghi">Chưa có khảo sát để gợi ý.</p>';
+  else {
+    const f = { 'c3-dau': 'c3d', 'c3-cuoi': 'c3c', 'c4-dau': 'c4d', 'c4-cuoi': 'c4c' }[moiNhat];
+    const nhom = [['Cần hỗ trợ (dưới 50%)', x => x[f] !== '' && x[f] < 50], ['Đang vững (50–79%)', x => x[f] !== '' && x[f] >= 50 && x[f] < 80], ['Nâng cao (từ 80%)', x => x[f] !== '' && x[f] >= 80], ['Chưa làm', x => x[f] === '']];
+    $('#goiY').innerHTML = `<p class="ghi">Theo bài <b>${TEN[moiNhat]}</b>:</p>` + nhom.map(([t, fn]) => { const m = ds.filter(fn).map(x => x.ma.slice(5)); return `<p style="margin:4px 0"><b>${t}</b> (${m.length}): <span class="ghi">${m.join(', ') || '—'}</span></p>`; }).join('');
+  }
+  $('#csv1').onclick = () => taiCSV(`web-hoa10-${lopXem}-tung-em.csv`, [['Mã HS', 'Lượt học', 'Phút', 'Số học liệu', ...CH.map(c => `Hoàn thành C${c} %`), ...CH.map(c => `Hoàn thành C${c} (số việc)`), 'Đầu C3 %', 'Cuối C3 %', '± C3', 'Đầu C4 %', 'Cuối C4 %', '± C4', ...EL.map(h => h.luyen ? `Bài luyện 15 phút Bài ${h.bai} (điểm 10)` : `E-learning Bài ${h.bai} %`), 'Lần cuối'],
+    ...ds.map(x => [x.ma, x.luot, x.phut, x.soHL, ...CH.map(c => x.ht[c].p), ...CH.map(c => `${x.ht[c].xong} trên ${x.ht[c].n}`), x.c3d, x.c3c, x.c3t, x.c4d, x.c4c, x.c4t, ...x.el.map((v, i) => oCot(EL[i], v)), x.cuoi])]);
+  $('#csv2').onclick = () => { const r = [['Bài', 'Lớp', 'Câu', 'Mức', 'Số bài', '% đúng', 'Đề']];
+    Object.entries(D.cau).forEach(([k, c]) => { const [b, l] = k.split('|'), ks = KHAO_SAT[b]; if (!ks) return; ks.cau.forEach((q, i) => r.push([b, l, i + 1, q.muc, c.n, Math.round((c.dung[i] || 0) / c.n * 100), q.de])); });
+    taiCSV('web-hoa10-ti-le-dung-tung-cau.csv', r); };
+}
+/* ================= KIỂM CHỨNG CHẤT LƯỢNG =================
+   1. Tiến bộ ghép cặp: chỉ em làm cả bài đầu và cuối chương, lấy lần làm đầu
+   2. Chất lượng câu hỏi: độ khó p, độ phân biệt D (27% cao – 27% thấp), độ tin cậy KR-20
+   3. Học liệu: lượt mở, số em, phút, học sinh nhận xét
+   Máy tính số, cô đọc và quyết. */
+const tbc = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const dlc = a => { const m = tbc(a); return a.length > 1 ? Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / (a.length - 1)) : null; };
+const so1 = (x, n) => x == null || isNaN(x) ? '—' : (+x).toFixed(n == null ? 0 : n).replace('.', ',');
+const KS_TEN = { c3: 'Chương 3 (Liên kết hoá học)', c4: 'Chương 4 (Phản ứng oxi hoá – khử)' };
+let phamVi = 'all';
+
+function capTienBo(ch, ds) {
+  const cap = ds.map(x => ({ a: x.bai[ch + '-dau'], z: x.bai[ch + '-cuoi'] })).filter(c => c.a && c.z && !isNaN(c.a.dau) && !isNaN(c.z.dau));
+  const d = cap.map(c => c.z.dau - c.a.dau), sd = dlc(d);
+  const muc = k => { const a = cap.map(c => +c.a[k]).filter(v => !isNaN(v) && c_ok(v)), z = cap.map(c => +c.z[k]).filter(v => !isNaN(v) && c_ok(v)); return [tbc(a), tbc(z)]; };
+  return { n: cap.length, dau: tbc(cap.map(c => c.a.dau)), cuoi: tbc(cap.map(c => c.z.dau)), tang: tbc(d), sd,
+    dz: sd ? tbc(d) / sd : null, phanTang: cap.length ? d.filter(x => x > 0).length / cap.length * 100 : null,
+    b: muc('b'), h: muc('h'), v: muc('v') };
+}
+function c_ok(v) { return v !== '' && v != null; }
+function docD(dz) {
+  if (dz == null) return '';
+  const a = Math.abs(dz), t = a < 0.2 ? 'rất nhỏ' : a < 0.5 ? 'nhỏ' : a < 0.8 ? 'vừa' : 'lớn';
+  return `${dz < 0 ? 'giảm' : 'tiến bộ'} mức <b>${t}</b>`;
+}
+function phanTichCau(k, ds) {
+  const bai = ds.map(x => x.bai[k]).filter(b => b && b.ct && /^[01]+$/.test(b.ct));
+  const sc = KHAO_SAT[k] ? KHAO_SAT[k].cau.length : 0;
+  if (!bai.length || !sc) return null;
+  const tong = bai.map(b => [...b.ct.slice(0, sc)].filter(c => c === '1').length);
+  const thuTu = bai.map((b, i) => ({ b, t: tong[i] })).sort((x, y) => y.t - x.t);
+  const g = Math.max(1, Math.round(bai.length * 0.27)), cao = thuTu.slice(0, g), thap = thuTu.slice(-g);
+  const cau = KHAO_SAT[k].cau.map((q, i) => {
+    const p = bai.filter(b => b.ct[i] === '1').length / bai.length;
+    const D = bai.length >= 10 ? cao.filter(x => x.b.ct[i] === '1').length / g - thap.filter(x => x.b.ct[i] === '1').length / g : null;
+    let nx = ['tot', 'Dùng tốt'];
+    if (D != null && D < 0) nx = ['loi', 'Em giỏi lại sai nhiều hơn — soát đáp án'];
+    else if (p < 0.2) nx = ['loi', 'Quá khó — soát đáp án, lời dẫn'];
+    else if (p > 0.9) nx = ['xem', 'Quá dễ'];
+    else if (D != null && D < 0.2) nx = ['xem', 'Phân biệt kém — xem lại phương án nhiễu'];
+    return { i, q, p, D, nx };
+  });
+  // KR-20
+  const pq = cau.reduce((x, c) => x + c.p * (1 - c.p), 0), vt = dlc(tong) ** 2;
+  const kr = sc > 1 && vt > 0 ? sc / (sc - 1) * (1 - pq / vt) : null;
+  return { n: bai.length, cau, kr };
+}
+
+function veChatLuong(tab) {
+  const ds = phamVi === 'all' ? D.ds : D.ds.filter(x => x.lop === phamVi);
+  const ten = phamVi === 'all' ? 'cả 3 lớp' : 'lớp ' + phamVi;
+  const tienBo = ['c3', 'c4'].map(ch => {
+    const t = capTienBo(ch, ds);
+    if (!t.n) return `<div class="khung"><h3>📈 ${KS_TEN[ch]}</h3><p class="ghi">Chưa có em nào làm đủ cả bài đầu và bài cuối chương.</p></div>`;
+    return `<div class="khung"><h3>📈 ${KS_TEN[ch]} · ${ten}</h3>
+      <div class="the-cl"><div class="o"><b>${t.n}</b><span>em làm đủ 2 bài</span></div>
+        <div class="o"><b>${so1(t.dau)}% → ${so1(t.cuoi)}%</b><span>điểm TB đầu → cuối chương</span></div>
+        <div class="o"><b>${t.tang >= 0 ? '+' : ''}${so1(t.tang, 1)}</b><span>điểm % tăng TB mỗi em</span></div>
+        <div class="o"><b>${so1(t.phanTang)}%</b><span>số em tiến bộ</span></div>
+        <div class="o"><b>${so1(t.dz, 2)}</b><span>hệ số ảnh hưởng d (ghép cặp)</span></div></div>
+      <table class="bang"><thead><tr><th>Mức</th><th>Đầu chương</th><th>Cuối chương</th><th>±</th></tr></thead><tbody>
+        ${[['Biết', t.b], ['Hiểu', t.h], ['Vận dụng', t.v]].map(([m, [a, z]]) => `<tr><td>${m}</td><td>${so1(a)}%</td><td>${so1(z)}%</td><td>${a == null || z == null ? '' : (z - a >= 0 ? '+' : '') + so1(z - a)}</td></tr>`).join('')}</tbody></table>
+      <p class="ghi">Đọc: ${docD(t.dz)}${t.n < 15 ? ' · <b>mẫu nhỏ (dưới 15 em), chưa nên kết luận</b>' : ''}. d = điểm tăng TB ÷ độ lệch chuẩn của điểm tăng (dưới 0,2 rất nhỏ · 0,2–0,5 nhỏ · 0,5–0,8 vừa · từ 0,8 lớn).</p></div>`;
+  }).join('');
+
+  const cauHoi = KS_DS.map(k => {
+    const a = phanTichCau(k, ds);
+    if (!a) return `<div class="khung"><h3>🧪 Câu hỏi ${TEN[k]}</h3><p class="ghi">Chưa có bài làm.</p></div>`;
+    const canXem = a.cau.filter(c => c.nx[0] !== 'tot').length;
+    return `<div class="khung"><h3>🧪 Câu hỏi ${TEN[k]} · ${a.n} bài · ${ten}</h3>
+      <p class="ghi">Độ tin cậy KR-20: <b>${so1(a.kr, 2)}</b> ${a.kr == null ? '' : a.kr >= 0.7 ? '<span class="co tot">tốt</span>' : a.kr >= 0.5 ? '<span class="co xem">chấp nhận được với bài 12 câu</span>' : '<span class="co loi">thấp — xem lại các câu đánh dấu</span>'}
+        ${a.n < 10 ? ' · cần ít nhất 10 bài để tính độ phân biệt' : ''} · ${canXem} câu nên xem lại</p>
+      <div class="cuon" style="max-height:none"><table class="bang"><thead><tr><th>Câu</th><th>Mức</th><th>Độ khó p</th><th>Phân biệt D</th><th class="trai">Nhận xét</th></tr></thead><tbody>
+      ${a.cau.map(c => `<tr><td>Câu ${c.i + 1}</td><td>${({ B: 'Biết', H: 'Hiểu', V: 'Vận dụng' })[c.q.muc] || c.q.muc}</td><td>${so1(c.p, 2)}</td><td>${so1(c.D, 2)}</td><td class="trai"><span class="co ${c.nx[0]}">${c.nx[1]}</span></td></tr>`).join('')}</tbody></table></div>
+      <p class="ghi">p = tỉ lệ làm đúng (0,2–0,9 là vừa). D = tỉ lệ đúng nhóm 27% điểm cao trừ nhóm 27% điểm thấp (từ 0,3 tốt · 0,2–0,3 được · dưới 0,2 nên sửa).</p></div>`;
+  }).join('');
+
+  const hl = HOC_LIEU.filter(h => !h.an && !h.ks).map(h => {
+    const x = (D.hl || {})[h.id] || {}, g = (D.dg || {})[h.id] || { 1: 0, 2: 0, 3: 0, ghi: [] }, n = g[1] + g[2] + g[3];
+    return { h, luot: x.luot || 0, hs: x.hs || 0, phut: x.phutTB, g, n, de: n ? g[3] / n * 100 : null };
+  }).sort((a, b) => b.luot - a.luot);
+  const chuaDung = hl.filter(r => !r.luot && !(r.h.muc === 'clip' && !r.h.video)).length;
+  const khoHieu = hl.filter(r => r.n >= 3 && r.g[1] / r.n >= 0.3);
+  const hocLieu = `<div class="khung"><h3>📚 Học liệu được dùng thế nào · cả ${Object.keys(SI_SO).length} lớp</h3>
+    <p class="ghi">${chuaDung} học liệu chưa em nào mở · ${khoHieu.length} học liệu có từ 30% nhận xét «Khó hiểu» (cần cô sửa): ${khoHieu.map(r => esc(r.h.ten)).join('; ') || '—'}</p>
+    <div class="cuon"><table class="bang"><thead><tr><th class="trai">Học liệu</th><th>Lượt mở</th><th>Số em</th><th>Phút/lượt</th><th>👍</th><th>👌</th><th>🤔</th><th class="trai">Em góp ý gần đây</th></tr></thead><tbody>
+    ${hl.map(r => `<tr class="${r.luot ? '' : 'lang'}"><td class="trai"><a href="${encodeURI(linkHL(r.h))}" target="_blank">${MUC[r.h.muc].icon} ${hoa(r.h.ten)}</a></td><td>${r.luot}</td><td>${r.hs}</td><td>${so1(r.phut, 1)}</td>
+      <td>${r.g[3] || ''}</td><td>${r.g[2] || ''}</td><td class="${r.n >= 3 && r.g[1] / r.n >= 0.3 ? 'thap' : ''}">${r.g[1] || ''}</td><td class="trai ghi">${r.g.ghi.slice(-3).map(esc).join(' · ')}</td></tr>`).join('')}</tbody></table></div>
+    <p class="ghi">Bấm tên học liệu để mở thử. Phút/lượt tính từ lúc mở đến lúc rời trang.</p></div>`;
+
+  $('#noi').innerHTML = tab + `<div class="loc" style="position:static"><div class="chips">
+      ${['all', ...Object.keys(SI_SO)].map(l => `<button class="chip${l === phamVi ? ' on' : ''}" data-pv="${l}">${l === 'all' ? 'Cả ' + Object.keys(SI_SO).length + ' lớp' : l}</button>`).join('')}</div>
+      <button class="nut phu" id="inBC">🖨 In / lưu PDF làm minh chứng</button><button class="nut phu" id="csv3">⬇ CSV chất lượng câu hỏi</button>
+      <span class="ghi">Cập nhật ${esc(D.capNhat)}</span></div>
+    <div class="bao" style="margin:12px 0">Số liệu lấy từ bài làm thật của học sinh trên web (lần làm đầu). Đây là <b>thống kê mô tả, không có lớp đối chứng</b> — khi báo cáo, cô ghi rõ thời điểm làm bài và số em tham gia.</div>
+    <div class="luoi2">${tienBo}</div><div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:14px">${cauHoi}</div><div style="margin-top:14px">${hocLieu}</div>`;
+  $$('.chip[data-che]').forEach(b => b.onclick = () => { che = b.dataset.che; ve(); });
+  $$('.chip[data-pv]').forEach(b => b.onclick = () => { phamVi = b.dataset.pv; ve(); });
+  $('#inBC').onclick = () => print();
+  $('#csv3').onclick = () => {
+    const r = [['Phạm vi', 'Bài', 'Số bài', 'KR-20', 'Câu', 'Mức', 'Độ khó p', 'Phân biệt D', 'Nhận xét', 'Đề']];
+    KS_DS.forEach(k => { const a = phanTichCau(k, ds); if (a) a.cau.forEach(c => r.push([ten, k, a.n, so1(a.kr, 2), c.i + 1, c.q.muc, so1(c.p, 2), so1(c.D, 2), c.nx[1], c.q.de])); });
+    taiCSV('web-hoa10-chat-luong-cau-hoi.csv', r);
+  };
+}
+
+/* =========================================================
+   CHẨN ĐOÁN HAI BẬC — bậc 1 đáp án (phương án sai gắn mã quan niệm sai QNS) · bậc 2 «chắc chắn / đoán».
+   Chỉ tính LẦN LÀM ĐẦU; cô có thể đặt «chỉ tính bài nộp trước» = giờ vào tiết để bỏ bài làm muộn.
+   ========================================================= */
+const HB_DS = Object.keys(KHAO_SAT).filter(k => KHAO_SAT[k].haiBac);
+let hbBo = null;
+const O4 = { dc: ['Hiểu thật', 'đúng · chắc chắn', 'var(--dung)'], dd: ['Hiểu chưa vững', 'đúng · đoán', 'var(--acc)'],
+             sc: ['Sai mà tin chắc', 'sai · chắc chắn', 'var(--sai)'], sd: ['Thiếu kiến thức', 'sai · đoán', 'var(--vang)'] };
+const docHB = hb => { const a = []; for (let i = 0; i + 1 < hb.length; i += 2) a.push({ g: hb[i] === '-' ? null : +hb[i], t: hb[i + 1] === '-' ? null : hb[i + 1] }); return a; };
+const oCua = x => !x || x.g === null ? null : (x.g === 0 ? 'd' : 's') + (x.t || '?');
+const lucDate = s => { const m = String(s || '').match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/); return m ? new Date(+m[3], m[2] - 1, +m[1], +m[4], +m[5]) : null; };
+const hanCua = k => { try { return localStorage.getItem('hoa10_hb_han_' + k) || ''; } catch (e) { return ''; } };
+function baiHB(k, lop) {   // [{ma, tl:[{g,t}], vs:{}, luc}] lần đầu của lớp, lọc theo hạn cô đặt
+  const han = hanCua(k), hanD = han ? new Date(han) : null;
+  return D.ds.filter(x => x.lop === lop && x.bai[k] && x.bai[k].hb).map(x => {
+    let vsj = {}; try { vsj = JSON.parse(x.bai[k].vs || '{}'); } catch (e) {}
+    return { ma: x.ma, tl: docHB(x.bai[k].hb), vs: vsj, luc: x.bai[k].luc };
+  }).filter(r => !hanD || !lucDate(r.luc) || (KHAO_SAT[k].loai === 'sau' ? lucDate(r.luc) >= hanD : lucDate(r.luc) <= hanD));   // trước tiết: nộp trước giờ học · sau tiết: nộp sau giờ học
+}
+function giuQNS(k, r) {    // { mã QNS: 'c' | 'd' } em này đã chọn phương án mang mã đó (ưu tiên «chắc»)
+  const o = {};
+  KHAO_SAT[k].cau.forEach((c, i) => { const x = r.tl[i]; if (!x || x.g === null || x.g === 0) return; const m = c.ma[x.g]; if (!m || m === 'X') return; if (o[m] !== 'c') o[m] = x.t === 'c' ? 'c' : 'd'; });
+  return o;
+}
+const tyLe = (a, n) => n ? Math.round(a / n * 100) : 0;
+function veHaiBac(tab) {
+  if (!HB_DS.length) { $('#noi').innerHTML = tab + '<div class="khung"><p class="ghi">Chưa có bộ câu hai bậc nào.</p></div>'; return; }
+  const coBai = k => baiHB(k, lopXem).length;
+  if (!hbBo || !KHAO_SAT[hbBo]) hbBo = HB_DS.find(coBai) || HB_DS[0];
+  const KS = KHAO_SAT[hbBo], ds = baiHB(hbBo, lopXem), n = ds.length;
+  const chon = `<div class="loc" style="position:static"><div class="chips">${Object.keys(SI_SO).map(l => `<button class="chip${l === lopXem ? ' on' : ''}" data-l="${l}">${l}</button>`).join('')}</div></div>
+    <div class="chips" style="margin:8px 0">${HB_DS.map(k => `<button class="chip${k === hbBo ? ' on' : ''}" data-hb="${k}">${KHAO_SAT[k].loai === 'sau' ? '⏩ Sau' : '⏪ Trước'} · Bài ${KHAO_SAT[k].bai}${KHAO_SAT[k].tiet ? ' · ' + esc(KHAO_SAT[k].tiet) : ''} (${coBai(k)})</button>`).join('')}</div>
+    <div class="bao" style="margin:8px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span>⏱ Chỉ tính bài nộp ${KS.loai === 'sau' ? 'SAU' : 'TRƯỚC'} giờ học:</span><input class="o" type="datetime-local" id="han" value="${esc(hanCua(hbBo))}" style="width:auto">
+      <button class="nut phu" id="hanXoa">Tính tất cả</button><span class="ghi">${KS.loai === 'sau' ? 'Đặt = giờ kết thúc tiết để bỏ các bài làm trước khi học trên lớp' : 'Đặt = giờ vào tiết để bỏ các bài làm sau khi đã học trên lớp'} (chỉ nhớ trên máy này).</span></div>`;
+  let than = '';
+  if (!n) than = `<div class="khung"><h3>${esc(KS.ten)} · ${lopXem}</h3><p class="ghi">Chưa có bài làm hai bậc của lớp này. Nếu học sinh đã làm mà vẫn trống: máy chủ (Apps Script) chưa dán bản mới — xem mục «Câu hai bậc» trong 00 - HUONG DAN CO THOI.md.</p></div>`;
+  else {
+    // 4 ô
+    const dem = { dc: 0, dd: 0, sc: 0, sd: 0 }; let tong = 0;
+    ds.forEach(r => r.tl.forEach(x => { const o = oCua(x); if (o && dem[o] != null) { dem[o]++; tong++; } }));
+    const o4 = `<div class="the-cl">${Object.keys(O4).map(k => `<div class="o" style="border-left:5px solid ${O4[k][2]}"><b>${tyLe(dem[k], tong)}%</b><span><b style="display:inline;font-size:14px;color:var(--ink)">${O4[k][0]}</b> — ${O4[k][1]}</span></div>`).join('')}</div>
+      <p class="ghi">${n}/${SI_SO[lopXem]} em làm · ${tong} lượt trả lời có bấm «chắc chắn / đoán».</p>`;
+    // bản đồ quan niệm sai
+    const giu = ds.map(r => ({ ma: r.ma, q: giuQNS(hbBo, r) }));
+    const maCo = [...new Set(KS.cau.flatMap(c => c.ma).filter(m => m !== 'DUNG' && m !== 'X'))];
+    const qns = maCo.map(m => { const ai = giu.filter(x => x.q[m]), chac = ai.filter(x => x.q[m] === 'c');
+      return { m, p: tyLe(ai.length, n), pc: tyLe(chac.length, n), chac: chac.map(x => x.ma.slice(5)) }; })
+      .sort((a, b) => b.pc - a.pc || b.p - a.p);
+    const bangQ = `<table class="bang"><thead><tr><th class="trai">Quan niệm sai</th><th>Em mắc</th><th>Trong đó tin chắc</th><th class="trai">Số thứ tự HS tin chắc</th></tr></thead><tbody>
+      ${qns.map((q, i) => `<tr><td class="trai">${i < 3 && q.p ? '⭐ ' : ''}<b>${q.m}</b> ${esc(QNS[q.m] || '')}</td><td class="${q.p >= 30 ? 'thap' : ''}">${q.p}%</td><td class="${q.pc >= 20 ? 'thap' : ''}">${q.pc}%</td><td class="trai" style="font-size:13px">${q.chac.join(', ') || '—'}</td></tr>`).join('')}</tbody></table>
+      <p class="ghi">⭐ = 3 quan niệm sai nổi bật nhất (xếp theo tỉ lệ «tin chắc») → gợi ý điểm vào cho KHBD lần 2: mở tiết bằng tình huống làm lộ quan niệm sai đó, cho HS dự đoán – lấy bằng chứng – tự giải thích.</p>`;
+    // từng câu
+    const tungCau = KS.cau.map((c, i) => {
+      const tl = ds.map(r => r.tl[i]).filter(x => x && x.g !== null), m = tl.length;
+      const dung = tl.filter(x => x.g === 0).length, sc = tl.filter(x => x.g !== 0 && x.t === 'c').length;
+      const pa = c.chon.map((t, g) => { const a = tl.filter(x => x.g === g), ac = a.filter(x => x.t === 'c').length;
+        return `<div class="cauhang" style="grid-template-columns:minmax(0,1fr) 110px 86px"><span style="font-size:13px">${g === 0 ? '✅' : '<b>' + c.ma[g] + '</b>'} ${hoa(t.length > 70 ? t.slice(0, 68) + '…' : t)}</span><span class="ong"><i style="width:${tyLe(a.length, m)}%;background:${g === 0 ? 'var(--dung)' : 'var(--sai)'}"></i></span><b style="font-size:13px">${tyLe(a.length, m)}%${a.length ? ` <span class="ghi">(${ac} chắc)</span>` : ''}</b></div>`; }).join('');
+      const lyDo = c.viSao ? ds.filter(r => r.vs[i]).slice(0, 12).map(r => { const x = r.tl[i] || {}; return `<p class="ghi" style="margin:2px 0">• <b>${x.g === 0 ? '✅' : x.g == null ? '—' : c.ma[x.g]}${x.t === 'c' ? ' · chắc' : x.t === 'd' ? ' · đoán' : ''}</b>: «${esc(r.vs[i])}»</p>`; }).join('') : '';
+      return `<div class="khung"><h3 style="font-size:15.5px">Câu ${i + 1} · ${tyLe(dung, m)}% đúng · <span style="color:var(--sai)">${tyLe(sc, m)}% sai mà tin chắc</span></h3><p style="margin:4px 0 8px">${hoa(c.de)}</p>${pa}
+        ${lyDo ? `<p style="margin:10px 0 2px"><b>✎ Vì sao các em chọn</b> (ẩn danh, tối đa 12):</p>${lyDo}` : ''}</div>`;
+    }).join('');
+    // nhóm
+    const nhom = ds.map(r => { const o = r.tl.map(oCua); return { ma: r.ma.slice(5), sc: o.filter(x => x === 'sc').length, dd: o.filter(x => x === 'dd').length, dc: o.filter(x => x === 'dc').length, sd: o.filter(x => x === 'sd').length, sl: KS.cau.length }; });
+    const N = [['🔴 Cần đối chất (≥ 2 câu sai mà tin chắc)', x => x.sc >= 2], ['🟠 Có 1 câu sai mà tin chắc', x => x.sc === 1],
+               ['🟡 Còn đoán / thiếu kiến thức (không sai mà chắc)', x => !x.sc && x.dc < x.sl], ['🟢 Hiểu thật (mọi câu đúng và chắc chắn)', x => x.dc === x.sl]];
+    const nhomH = N.map(([t, f]) => { const a = nhom.filter(f).map(x => x.ma); return `<p style="margin:5px 0"><b>${t}</b> (${a.length}): ${a.join(', ') || '—'}</p>`; }).join('');
+    // trước → sau
+    let tsH = '';
+    if (KS.loai === 'sau' && KS.truoc.length) {
+      const truoc = {};
+      KS.truoc.forEach(k => baiHB(k, lopXem).forEach(r => { const q = giuQNS(k, r); truoc[r.ma] = truoc[r.ma] || {}; Object.entries(q).forEach(([m, t]) => { if (truoc[r.ma][m] !== 'c') truoc[r.ma][m] = t; }); }));
+      const cung = ds.filter(r => truoc[r.ma]), nc = cung.length, sauQ = Object.fromEntries(cung.map(r => [r.ma, giuQNS(hbBo, r)]));
+      const maTruoc = new Set(KS.truoc.flatMap(k => KHAO_SAT[k] ? KHAO_SAT[k].cau.flatMap(c => c.ma) : []));   // chỉ so quan niệm sai có ở CẢ bài trước và bài sau
+      const hang = maCo.filter(m => maTruoc.has(m)).map(m => { const t = cung.filter(r => truoc[r.ma][m]).length, tc = cung.filter(r => truoc[r.ma][m] === 'c').length;
+        const s = cung.filter(r => sauQ[r.ma][m]).length, scn = cung.filter(r => sauQ[r.ma][m] === 'c').length;
+        return `<tr><td class="trai"><b>${m}</b> ${esc(QNS[m] || '')}</td><td>${tyLe(t, nc)}%</td><td>${tyLe(s, nc)}%</td><td>${tyLe(tc, nc)}%</td><td class="${scn < tc ? 'cao' : scn > tc ? 'thap' : ''}">${tyLe(scn, nc)}%</td></tr>`; }).join('');
+      tsH = `<div class="khung" style="margin-top:14px"><h3>📉 Trước tiết → sau tiết (${nc} em làm cả hai)</h3>
+        ${nc ? `<div class="cuon" style="max-height:none"><table class="bang"><thead><tr><th class="trai">Quan niệm sai</th><th>Mắc · trước</th><th>Mắc · sau</th><th>Tin chắc · trước</th><th>Tin chắc · sau</th></tr></thead><tbody>${hang}</tbody></table></div>
+        <p class="ghi">Chỉ tính các em làm cả bài trước tiết (${KS.truoc.map(k => 'Bài ' + KHAO_SAT[k].bai + (KHAO_SAT[k].tiet ? ' ' + KHAO_SAT[k].tiet : '')).join(', ')}) và bài sau tiết. Chỉ số chính cho báo cáo: <b>tỉ lệ «tin chắc» giảm</b>. Thống kê mô tả, không có lớp đối chứng.</p>` : '<p class="ghi">Chưa có em nào làm cả bài trước và bài sau tiết.</p>'}</div>`;
+    }
+    than = `<div class="khung"><h3>${esc(KS.ten)} · lớp ${lopXem}</h3>${o4}</div>
+      <div class="khung" style="margin-top:14px"><h3>🧩 Bản đồ quan niệm sai của lớp</h3><div class="cuon" style="max-height:none">${bangQ}</div></div>${tsH}
+      <div class="khung" style="margin-top:14px"><h3>👥 Gợi ý chia nhóm cho tiết học</h3>${nhomH}<p class="ghi">Máy chỉ gợi ý theo bài làm trên web; cô quyết định nhóm.</p>
+        <button class="nut phu" id="csvHB">⬇ CSV từng em (bộ này)</button></div>
+      <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:14px">${tungCau}</div>`;
+  }
+  $('#noi').innerHTML = tab + chon + than;
+  $$('.chip[data-che]').forEach(b => b.onclick = () => { che = b.dataset.che; ve(); });
+  $$('.chip[data-l]').forEach(b => b.onclick = () => { lopXem = b.dataset.l; ve(); });
+  $$('.chip[data-hb]').forEach(b => b.onclick = () => { hbBo = b.dataset.hb; ve(); });
+  $('#han').onchange = e => { try { localStorage.setItem('hoa10_hb_han_' + hbBo, e.target.value); } catch (x) {} ve(); };
+  $('#hanXoa').onclick = () => { try { localStorage.removeItem('hoa10_hb_han_' + hbBo); } catch (x) {} ve(); };
+  if ($('#csvHB')) $('#csvHB').onclick = () => {
+    const r = [['Mã HS', 'Lúc nộp', 'Số câu', 'Đúng · chắc', 'Đúng · đoán', 'Sai · chắc', 'Sai · đoán', 'Quan niệm sai đã chọn (c = chắc, d = đoán)']];
+    ds.forEach(x => { const o = x.tl.map(oCua), q = giuQNS(hbBo, x); r.push([x.ma, x.luc, KS.cau.length, ...['dc', 'dd', 'sc', 'sd'].map(k => o.filter(v => v === k).length), Object.entries(q).map(([m, t]) => m + t).join(' ')]); });
+    taiCSV(`web-hoa10-hai-bac-${hbBo}-${lopXem}.csv`, r);
+  };
+}
+
+function taiCSV(ten, hang) {
+  const s = '﻿' + hang.map(r => r.map(v => { v = String(v ?? ''); return /[",;\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], { type: 'text/csv;charset=utf-8' })); a.download = ten; a.click();
+}
+let mk0 = ''; try { mk0 = sessionStorage.getItem('hoa10_mk') || ''; } catch (e) {}
+if (mk0) tai(mk0); else moKhoa();
+</script>
+</body>
+</html>

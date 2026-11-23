@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="48x48" href="logo/favicon-48.png">
+<link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-title" content="Hoá 10">
+<meta name="application-name" content="Hoá 10">
+<title>Hoá học 10 – Lớp học</title>
+<meta name="description" content="E-learning, clip, bài tập, mô phỏng, trò chơi Hoá học 10 – THPT Lạng Giang số 1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chung.css">
+</head>
+<body>
+<div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
+<header class="hero">
+  <div id="dayCo"></div>
+  <div class="wrap">
+    <div>
+      <div class="k">THPT Lạng Giang số 1 · Năm học 2026–2027</div>
+      <h1>Phòng thí nghiệm Hoá 10<span class="phan">Lớp học của <span class="tenGV">thầy cô</span></span></h1>
+      <p>Bài giảng e-learning, clip, bài tập, mô phỏng, trò chơi — học mọi lúc trên điện thoại. Mỗi lớp có góc riêng để theo dõi mình đã tiến bộ đến đâu.</p>
+      <div id="lamNgay"></div>
+      <div class="dem" id="dem">
+        <div class="o"><i>👀 Lượt</i><b id="dTong">—</b><span>lượt truy cập</span></div>
+        <div class="o"><i>📅 Nay</i><b id="dHom">—</b><span>hôm nay</span></div>
+        <div class="o"><i>📚 Kho</i><b id="dHL">—</b><span>học liệu</span></div>
+      </div>
+    </div>
+    <div class="mat" id="linhVat"></div>
+  </div>
+  <div id="banTN"></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2 class="tieu">Học theo mục</h2>
+    <p class="phu">Chạm một mục để xem học liệu bên dưới.</p>
+    <div class="luoi6" id="cacMuc"></div>
+  </section>
+
+  <section id="gocLop">
+    <h2 class="tieu">Góc lớp</h2>
+    <p class="phu">Vào bằng <b>lớp – số thứ tự</b> và mật mã 4 số em tự đặt. Xem nhiệm vụ tuần, tiến độ của em và kết quả chung của lớp.</p>
+    <div class="luoi3" id="cacLop"></div>
+  </section>
+
+  <section id="kho">
+    <h2 class="tieu">Kho học liệu</h2>
+    <p class="phu" id="ghiKho"></p>
+    <div class="loc">
+      <div class="chips" id="locMuc"></div>
+      <select class="o-tim" id="locChuong" aria-label="Chọn chương" style="flex:0 1 240px"></select>
+      <input class="o-tim" id="tim" type="search" placeholder="🔍 Tìm: octet, liên kết ion, orbital…" aria-label="Tìm học liệu">
+    </div>
+    <div class="hoc-tiep" id="hocTiep"></div>
+    <div id="ds"></div>
+  </section>
+</main>
+
+<script src="cai-dat.js"></script>
+<script src="du-lieu.js"></script>
+<script src="khao-sat-du-lieu.js"></script>
+<script src="chan-doan-du-lieu.js"></script>
+<script src="chung.js"></script>
+<script>
+khungChung();
+const hien = HOC_LIEU.filter(h => !h.an);
+const KS_MO = Object.fromEntries(Object.keys(KHAO_SAT).map(k => [k, moChoEm(k)]));   // bài «sau tiết» hai bậc: chỉ mở khi cô đã giao cho lớp em
+let muc = 'all', chuong = 'all', tim = '';
+const q = new URLSearchParams(location.hash.slice(1));
+if (q.get('muc') && MUC[q.get('muc')]) muc = q.get('muc');
+
+$('#dHL').textContent = soVN(hien.length);
+
+/* đầu trang: dây cờ nguyên tố, linh vật chào theo buổi, bàn thí nghiệm */
+$('#dayCo').innerHTML = dayCo();
+$('#banTN').innerHTML = banThiNghiem();
+(function () {
+  const g = new Date().getHours(), hs = hsLay();
+  const chao = g < 11 ? 'Chào buổi sáng' : g < 13 ? 'Chào buổi trưa' : g < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
+  const loi = [chao + (hs ? ' bạn ' + hs.ma + '!' : '!') + ' Hôm nay mình làm thí nghiệm gì nào? 🧪',
+    'Mỗi ngày một chút — 15 phút là đủ để tiến bộ! ⚗️', 'Chọn một ô nguyên tố bên dưới để bắt đầu nhé! 👇'];
+  $('#linhVat').innerHTML = `<div class="bong">${esc(loi[new Date().getDate() % loi.length])}</div>${linhVat('vui')}`;
+})();
+
+/* 6 mục: thẻ ô nguyên tố (số ở góc = số học liệu, kí hiệu = tên mục) */
+const KI = { elearning: 'El', clip: 'Cp', baitap: 'Bt', mophong: 'Mp', trochoi: 'Tc', tailieu: 'Tl' };
+function veMuc() {
+  $('#cacMuc').innerHTML = Object.entries(MUC).map(([k, m]) => {
+    const n = hien.filter(h => h.muc === k).length;
+    return `<button class="muc ${m.mau}${muc === k ? ' on' : ''}" data-m="${k}"><span class="ong"><i class="z">${n}</i><span class="ki">${KI[k] || m.icon}</span><span class="em">${m.icon}</span></span>
+      <b>${m.ten}</b><small>${m.mo}</small><span class="sl">${n} học liệu →</span></button>`;
+  }).join('');
+  $$('#cacMuc .muc').forEach(b => b.onclick = () => { muc = muc === b.dataset.m ? 'all' : b.dataset.m; veMuc(); veLoc(); ve(); $('#kho').scrollIntoView({ behavior: 'smooth' }); });
+}
+function veLoc() {
+  $('#locMuc').innerHTML = [['all', '📌 Việc bắt buộc'],...Object.entries(MUC).map(([k, m]) => [k, m.icon + ' ' + m.ten])]
+    .map(([k, t]) => `<button class="chip${muc === k ? ' on' : ''}" data-m="${k}">${t}</button>`).join('');
+  $$('#locMuc .chip').forEach(b => b.onclick = () => { muc = b.dataset.m; veMuc(); veLoc(); ve(); });
+}
+$('#locChuong').innerHTML = '<option value="all">Mọi chương</option>' + Object.entries(CHUONG).filter(([k]) => BAI.some(b => b.ch == k)).map(([k, t]) => `<option value="${k}">${esc(t)}</option>`).join('');
+$('#locChuong').onchange = e => { chuong = e.target.value; ve(); };
+$('#tim').oninput = e => { tim = e.target.value; ve(); };
+
+const boDau = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+const DA = daHoc();
+function the(h) {
+  const m = MUC[h.muc], cho = h.muc === 'clip' && !h.video;
+  const meta = [DA[h.id] ? '<span class="da">✓ Đã học</span>' : '', moi(h.ngay) ? '<span class="moi">MỚI</span>' : '', `<span class="nh">${m.ten}</span>`, h.tg ? `⏱ ${esc(h.tg)}` : '',
+    /\.pdf$/i.test(h.nguon || '') ? '📄 PDF' : '', cho ? '⏳ Cô sắp đăng' : '', h.ks && KS_MO[h.ks] === false ? '🔒 Cô chưa mở' : ''].filter(Boolean).join(' · ');
+  const noi = `<span class="ic">${m.icon}</span><span><h5>${hoa(h.ten)}</h5>${h.mo ? `<p>${hoa(h.mo)}</p>` : ''}<span class="meta">${meta}</span></span>`;
+  return cho ? `<div class="the ${m.mau} cho">${noi}</div>` : `<a class="the ${m.mau}" href="${encodeURI(linkHL(h))}" data-id="${h.id}">${noi}</a>`;
+}
+/* Mỗi bài mặc định chỉ hiện việc BẮT BUỘC: khảo sát (đầu/cuối chương, câu trước – sau tiết), e-learning, luyện dạng + 15′.
+   Clip, mô phỏng, trò chơi, phiếu, poster chỉ hiện khi em chạm vào mục chung hoặc gõ tìm (sếp chốt 23/11/2026). */
+const batBuoc = h => h.muc === 'elearning' || !!h.ks || !!h.luyen;
+function ve() {
+  const t = boDau(tim.trim()), chiBB = muc === 'all' && !t;
+  $('#ghiKho').innerHTML = chiBB
+    ? 'Mỗi bài chỉ hiện <b>việc em phải làm</b>: khảo sát, e-learning, luyện dạng + bài 15 phút, câu hỏi trước – sau tiết. Clip, mô phỏng, trò chơi, phiếu bài tập: chạm vào ô mục ở trên hoặc gõ tìm.'
+    : 'Đang xem theo mục. Chạm <b>📌 Việc bắt buộc</b> để quay về danh sách việc phải làm của từng bài.';
+  const hop = hien.filter(h => (chiBB ? batBuoc(h) : muc === 'all' || h.muc === muc) && (!t || boDau(h.ten + ' ' + (h.mo || '')).includes(t))
+    && (chuong === 'all' || (timBai(h.bai) || {}).ch == chuong));
+  let html = '', ch = null;
+  BAI.forEach(b => {
+    // khảo sát chương đang mở đứng đầu bài; còn lại theo trình tự học (sếp chốt 23/11/2026):
+    // khảo sát đầu chương → e-learning → câu chẩn đoán trước tiết → luyện dạng → sau tiết → cuối chương
+    const haiBac = h => h.ks && KHAO_SAT[h.ks] && KHAO_SAT[h.ks].haiBac;
+    const thu = h => haiBac(h) ? (/sau/.test(h.ks) ? 4 : 2) : h.ks ? (/cuoi/.test(h.ks) ? 5 : 0) : h.muc === 'elearning' ? 1 : h.luyen ? 3 : 6;
+    const dauMo = h => h.ks && KS_MO[h.ks] && !haiBac(h) ? 1 : 0;   // câu hai bậc không nhảy lên trước e-learning
+    const cua = hop.filter(h => h.bai === b.ma).sort((x, y) => (dauMo(y) - dauMo(x)) || (thu(x) - thu(y)));
+    if (!cua.length) return;
+    if (b.ch !== ch) { ch = b.ch; html += `<h3 class="chuong ch${ch}"><span class="ong-nghiem"></span>${esc(CHUONG[ch])}</h3>`; }
+    const daXong = cua.filter(h => DA[h.id]).length;
+    html += `<h4 class="bai ch${b.ch}"><span class="so">${b.ma}</span>Bài ${b.ma}. ${esc(b.ten)}${daXong ? `<span class="tien-do">em đã học ${daXong}/${cua.length}</span>` : ''}</h4><div class="ds">${cua.map(the).join('')}</div>`;
+  });
+  $('#ds').innerHTML = html || '<div class="rong">Không tìm thấy học liệu phù hợp.</div>';
+  // đánh dấu đã học; học liệu mở thẳng (mô phỏng, trò chơi, bài tập) thì lúc quay về hỏi em thấy thế nào
+  $$('#ds a.the').forEach(a => a.addEventListener('click', () => {
+    const h = timHL(a.dataset.id); ghiDaHoc(h.id);
+    if (/^hoc-lieu\//.test(linkHL(h))) kho.set('hoa10_vua_hoc', h.id);
+    const hs = hsLay();   // PDF mở thẳng không tự ghi lượt nên ghi khi bấm
+    if (hs && /\.pdf$/i.test(linkHL(h))) guiNgam('hd', { ma: hs.ma, pin: hs.pin, hl: h.id, loai: 'mo' });
+  }));
+}
+
+/* Góc lớp */
+function veLop(so) {
+  $('#cacLop').innerHTML = Object.keys(SI_SO).map(l => {
+    const x = so && so[l], pt = x ? x.thamGia / x.siSo * 100 : null;
+    return `<a class="lopthe" href="lop.html?l=${l}">${coc(pt, 70)}<span><span class="ten">${l}</span>
+      <small>${x ? `${x.thamGia}/${x.siSo} bạn đã học trên web · tuần này ${x.thamGiaTuan}` : `Sĩ số ${SI_SO[l]} · bấm để vào góc lớp`}</small></span></a>`;
+  }).join('');
+}
+veMuc(); veLoc(); ve(); veLop(null);
+
+/* Việc cần làm ngay: khảo sát cô đang mở — nút to ngay đầu trang (19/11/2026) */
+(function () {
+  const ks = hien.filter(h => h.ks && KS_MO[h.ks] && !KHAO_SAT[h.ks].haiBac);   // câu hai bậc (trước/sau tiết) nằm ở nhiệm vụ tuần, không đưa lên nút to
+  if (!ks.length) return;
+  const hs = hsLay();
+  $('#lamNgay').innerHTML = ks.map(h => {
+    const k = KHAO_SAT[h.ks], daLam = hs && +kho.get('hoa10_ks_' + h.ks + '_' + hs.ma, '0') > 0;
+    return daLam
+      ? `<a class="lam-ngay xong" href="${encodeURI(linkHL(h))}"><span class="ic">✅</span><span><b>Em đã làm ${hoa(h.ten)}</b><small>Cảm ơn em! Cô tính tiến bộ theo lần làm đầu.</small></span></a>`
+      : `<a class="lam-ngay" href="${encodeURI(linkHL(h))}"><span class="ic">📋</span><span><span class="nhan">VIỆC CẦN LÀM NGAY</span><b>${hoa(h.ten)}</b>
+          <small>${k.cau.length} câu · ${k.phut} phút · không lấy điểm · làm một mình, chỉ tính lần đầu</small></span><span class="di">Làm ngay →</span></a>`;
+  }).join('');
+  $$('#lamNgay a').forEach(a => a.addEventListener('click', () => ghiDaHoc(ks[0].id)));
+})();
+
+/* Học tiếp: học liệu em mở gần nhất + học liệu mới chưa học */
+(function () {
+  const gan = timHL(kho.get('hoa10_gan_nhat', '')), moiChuaHoc = hien.filter(h => moi(h.ngay) && !DA[h.id] && !(h.muc === 'clip' && !h.video)).slice(0, 2);
+  const nut = [];
+  if (gan) nut.push(`<a class="nut" href="${encodeURI(linkHL(gan))}">▶ Học tiếp: ${hoa(gan.ten)}</a>`);
+  moiChuaHoc.forEach(h => nut.push(`<a class="nut phu" href="${encodeURI(linkHL(h))}">🆕 ${hoa(h.ten)}</a>`));
+  const n = Object.keys(DA).filter(id => timHL(id)).length;
+  if (nut.length || n) $('#hocTiep').innerHTML = nut.join('') + (n ? `<span class="tien-do">Em đã học ${n}/${hien.length} học liệu trên máy này</span>` : '');
+})();
+
+/* Quay về từ mô phỏng / trò chơi / bài tập: hỏi nhanh em thấy học liệu đó thế nào */
+(function () {
+  const id = kho.get('hoa10_vua_hoc', ''); kho.del('hoa10_vua_hoc');
+  const h = timHL(id); if (!h || kho.get('hoa10_dg_' + id, '')) return;
+  document.body.insertAdjacentHTML('beforeend', `<div class="nhac-dg" id="nhacDg" role="dialog" aria-label="Nhận xét học liệu"><button class="dong" aria-label="Đóng">×</button>
+    <p class="ghi" style="margin:0 0 6px">Em vừa học: <b>${hoa(h.ten)}</b></p><div id="nhacDgNoi"></div></div>`);
+  const dong = () => { const x = $('#nhacDg'); if (x) x.remove(); };
+  $('#nhacDg .dong').onclick = dong;
+  hopDanhGia($('#nhacDgNoi'), id, true, dong);
+})();
+
+/* đếm lượt truy cập: mỗi lần mở trang trong một phiên chỉ đếm 1 lần */
+(async () => {
+  if (!MAY_CHU) return;
+  try {
+    let daDem = false; try { daDem = sessionStorage.getItem('hoa10_dem') === '1'; } catch (e) {}
+    const hs = hsLay(), r = await goi(daDem ? 'so' : 'dem', { lop: hs ? lopCua(hs.ma) : '' });
+    try { sessionStorage.setItem('hoa10_dem', '1'); } catch (e) {}
+    $('#dTong').textContent = soVN(r.tong); $('#dHom').textContent = soVN(r.homNay);
+  } catch (e) {}
+  try {
+    const so = {};
+    await Promise.all(Object.keys(SI_SO).map(async l => { so[l] = await goi('lop', { lop: l }); }));
+    veLop(so);
+  } catch (e) {}
+})();
+</script>
+<script>document.querySelectorAll(".tenGV").forEach(e => e.textContent = TEN_GV);</script>
+</body>
+</html>

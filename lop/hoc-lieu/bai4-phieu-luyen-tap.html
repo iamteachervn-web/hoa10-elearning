@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phiếu luyện tập Bài 4</title>
+<meta name="description" content="Phiếu luyện tập tương tác Hoá học 10 — Bài 4. Ôn tập chương 1 (8 câu, tự chấm). Bản nháp của GV.">
+<style>
+:root{
+  --bg:#eef4f7; --bg2:#dfeef0; --card:#ffffff; --ink:#15263a; --muted:#5b6b7c; --line:#d5e0e7;
+  --pri:#0f766e; --pri2:#14b8a6; --priSoft:#d8f3ef; --acc:#f59e0b; --accSoft:#fff3d6;
+  --ok:#15803d; --okSoft:#dcfce7; --bad:#c2410c; --badSoft:#ffedd5; --shadow:0 6px 24px rgba(16,40,60,.10);
+  --nuc:#e11d48; --e:#2563eb;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a24; --bg2:#10252b; --card:#172633; --ink:#e6eef5; --muted:#9db0c0; --line:#2a3d4d;
+    --pri:#2dd4bf; --pri2:#14b8a6; --priSoft:#123d3a; --acc:#fbbf24; --accSoft:#3a2f12;
+    --ok:#4ade80; --okSoft:#14361f; --bad:#fb923c; --badSoft:#3d2414; --shadow:0 6px 24px rgba(0,0,0,.35);
+    --nuc:#fb7185; --e:#60a5fa;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a24; --bg2:#10252b; --card:#172633; --ink:#e6eef5; --muted:#9db0c0; --line:#2a3d4d;
+  --pri:#2dd4bf; --pri2:#14b8a6; --priSoft:#123d3a; --acc:#fbbf24; --accSoft:#3a2f12;
+  --ok:#4ade80; --okSoft:#14361f; --bad:#fb923c; --badSoft:#3d2414; --shadow:0 6px 24px rgba(0,0,0,.35);
+  --nuc:#fb7185; --e:#60a5fa;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:linear-gradient(160deg,var(--bg),var(--bg2));min-height:100vh;color:var(--ink);
+  font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+.wrap{overflow-x:hidden;max-width:600px;margin:0 auto;padding:16px 16px 40px}
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+h1{font-size:1.45rem;line-height:1.25;margin:.2em 0 .3em}
+h2{font-size:1.15rem;margin:0 0 .5em}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+.btn{appearance:none;border:0;border-radius:14px;padding:14px 18px;font:inherit;font-weight:700;cursor:pointer;
+  background:var(--pri);color:#fff;min-height:50px;transition:transform .08s,opacity .2s}
+:root[data-theme="dark"] .btn, .btn{color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#062b27}}
+:root[data-theme="dark"] .btn{color:#062b27}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn.ghost{background:transparent;color:var(--pri);border:2px solid var(--pri)}
+.btn.soft{background:var(--priSoft);color:var(--pri)}
+.btn.acc{background:var(--acc);color:#3b2600}
+.btn.block{width:100%}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>.grow{flex:1}
+label.f{display:block;font-weight:600;margin:12px 0 6px}
+input.t,select.t{width:100%;font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:12px;border:2px solid var(--line);
+  background:var(--card);color:var(--ink);outline:none}
+input.t:focus,select.t:focus{border-color:var(--pri)}
+.err{color:var(--bad);font-size:.9rem;min-height:1.2em;margin-top:6px}
+.hero{text-align:center}
+.hero svg{width:150px;height:150px}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.02em;padding:4px 10px;border-radius:999px;background:var(--priSoft);color:var(--pri)}
+.tag.acc{background:var(--accSoft);color:var(--acc)}
+ol.steps{padding-left:1.2em;margin:.4em 0} ol.steps li{margin:.25em 0}
+.draft{font-size:.78rem;color:var(--muted);text-align:center;margin-top:10px}
+/* atom animation */
+.spin{transform-origin:75px 75px;animation:spin 6s linear infinite}
+.spin.r{animation-duration:9s;animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin,.shellSpin{animation:none!important}}
+/* quiz top */
+.top{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg),var(--bg) 80%,transparent);padding:10px 0 8px}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--pri2),var(--pri));border-radius:99px;transition:width .3s}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--muted);
+  font-weight:700;font-size:.9rem;cursor:pointer;display:grid;place-items:center;padding:0}
+.dot.done{background:var(--priSoft);border-color:var(--pri);color:var(--pri)}
+.dot.cur{outline:3px solid var(--acc);outline-offset:1px}
+.qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qnum{font-weight:800;font-size:1.05rem}
+.qtext{font-size:1.12rem;margin:.2em 0 1em}
+.nuc{display:inline-flex;align-items:center;white-space:nowrap}
+.nuc .az{display:inline-flex;flex-direction:column;font-size:.62em;line-height:1.05;text-align:right;margin-right:1px}
+.big{font-size:2rem;font-weight:800;text-align:center;letter-spacing:.02em}
+.numIn{display:flex;gap:10px;align-items:center;justify-content:center}
+.numIn input{max-width:180px;text-align:center;font-size:1.6rem;font-weight:800}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;padding:14px;border-radius:14px;
+  border:2px solid var(--line);background:var(--card);color:var(--ink);margin-bottom:10px;cursor:pointer;min-height:56px}
+.opt b{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--priSoft);color:var(--pri)}
+.opt.sel{border-color:var(--pri);background:var(--priSoft)}
+.opt.sel b{background:var(--pri);color:var(--card)}
+.hint{margin-top:12px}
+.hintBox{background:var(--accSoft);border-radius:12px;padding:10px 14px;margin-top:8px;font-size:.95rem}
+.nav{display:flex;gap:10px;margin-top:6px}
+.nav .btn{flex:1}
+/* bohr */
+.bohr{display:block;margin:0 auto;width:100%;max-width:300px}
+.shellSpin{transform-origin:150px 150px;animation:spin 18s linear infinite}
+.shellCtl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.sc{border:2px solid var(--line);border-radius:14px;padding:8px 4px;min-width:0;text-align:center}
+.sc .nm{font-weight:700;font-size:.9rem}
+.sc .ct{font-size:1.5rem;font-weight:800;color:var(--e)}
+.sc .pm{display:flex;gap:4px;justify-content:center}
+.sc button{flex:1;max-width:44px;min-width:0;height:40px;border-radius:10px;border:0;background:var(--priSoft);color:var(--pri);font-size:1.3rem;font-weight:800;cursor:pointer}
+/* orbital boxes */
+.orbs{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:6px 0 4px}
+.og{text-align:center}
+.og .bx{display:flex}
+.box{width:48px;height:54px;border:2.5px solid var(--ink);margin-left:-2.5px;background:var(--card);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:2px;font-size:1.7rem;font-weight:700;color:var(--e);padding:0}
+.og .bx .box:first-child{margin-left:0}
+.og .lb{font-weight:700;margin-top:4px}
+.mini{font-size:.88rem;color:var(--muted);text-align:center}
+/* results */
+.ring{display:block;margin:0 auto}
+.score{text-align:center}
+.score .s{font-size:2.6rem;font-weight:900;color:var(--pri)}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.95rem;margin:12px 0}
+.meta div span{color:var(--muted)}
+.stars{font-size:1.8rem;letter-spacing:4px}
+.code{font-family:Consolas,Menlo,monospace;font-weight:700;background:var(--bg);border:2px dashed var(--line);border-radius:12px;
+  padding:10px;text-align:center;word-break:break-all}
+.rv{border-left:6px solid var(--line);padding:10px 12px;border-radius:12px;background:var(--bg);margin-bottom:10px}
+.rv.ok{border-color:var(--ok)} .rv.no{border-color:var(--bad)}
+.rv .h{font-weight:800}
+.rv .why{background:var(--badSoft);border-radius:10px;padding:8px 10px;margin-top:6px}
+.rv .sol{margin-top:6px}
+.fb{border-radius:12px;padding:10px 14px;margin-top:12px;font-weight:600}
+.fb.ok{background:var(--okSoft);color:var(--ok)} .fb.no{background:var(--badSoft);color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 18px;border-radius:999px;
+  font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:40}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall 2.6s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+textarea.t{width:100%;min-height:150px;font-family:Consolas,Menlo,monospace;font-size:.9rem;padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+table.st{width:100%;border-collapse:collapse;font-size:.95rem}
+table.st td,table.st th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+.sbar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;min-width:80px}
+.sbar i{display:block;height:100%;background:var(--pri)}
+tr.low td{background:var(--badSoft)}
+.hide{display:none!important}
+#print{display:none}
+@media print{
+  body{background:#fff;color:#000;font-size:12.5pt}
+  .wrap,.toast,.confetti{display:none!important}
+  #print{display:block}
+  .pq{margin:0 0 10pt;page-break-inside:avoid}
+  .pline{border-bottom:1px dotted #000;height:20pt}
+  .pbx{display:inline-block;width:28pt;height:28pt;border:1.5pt solid #000;margin-left:-1.5pt}
+  .pgrp{display:inline-block;text-align:center;margin-right:16pt}
+  .pbreak{page-break-before:always}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="print"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   PHIẾU LUYỆN TẬP TƯƠNG TÁC — HOÁ 10 · BÀI 4. ÔN TẬP CHƯƠNG 1
+   = Phiếu nhiệm vụ ở nhà số 2 trong KHBD Bài 4 (8 câu).
+   Chạy không cần mạng; không gửi dữ liệu đi đâu; chỉ dùng mã HS.
+   Trang giáo viên: thêm #gv vào cuối đường link.
+   ✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng.
+   ========================================================= */
+const KEY = 'hoa10_b4_phieu_v1';
+const LOPS = ['10A2','10A3','10A4'];
+const nuc = (A,Z,X) => `<span class="nuc"><span class="az"><span>${A}</span><span>${Z}</span></span>${X}</span>`;
+
+/* ---------- 8 câu hỏi ---------- */
+const Q = [
+ { id:1, topic:'Hạt nhân', type:'num',
+   text:`Số neutron trong nguyên tử ${nuc(56,26,'Fe')} là bao nhiêu?`,
+   unit:'hạt neutron', ans:30,
+   hint:'Số khối A = số proton (Z) + số neutron (N).',
+   sol:`N = A − Z = 56 − 26 = <b>30</b>.`,
+   why:v => v==26?'26 là số proton (Z), chưa phải số neutron.'
+          : v==56?'56 là số khối A (proton + neutron).'
+          : v==82?'Em đã cộng A + Z; số neutron phải lấy A − Z.'
+          : 'Nhớ công thức N = A − Z.',
+   branch:'Hạt nhân' },
+ { id:2, topic:'Vỏ nguyên tử', type:'bohr',
+   text:`Nguyên tử fluorine (Z = 9). Bấm <b>+</b> / <b>−</b> để xếp electron vào các lớp, rồi cho biết lớp ngoài cùng có mấy electron.`,
+   Z:9, ans:[2,7,0],
+   hint:'Lớp K (n = 1) chứa tối đa 2 electron; lớp L (n = 2) tối đa 8 electron. Xếp lớp trong đầy rồi mới sang lớp ngoài.',
+   sol:`F (Z = 9): 1s²2s²2p⁵ → lớp K: 2, lớp L: 7 → <b>7 electron lớp ngoài cùng</b>.`,
+   why:v => { const [k,l,m]=v, t=k+l+m;
+     if(t!==9) return `Fluorine có 9 electron, em đang xếp ${t} electron.`;
+     if(k>2) return 'Lớp K chỉ chứa tối đa 2 electron.';
+     if(k<2) return 'Phải xếp đầy lớp K (2 electron) trước khi sang lớp L.';
+     if(m>0) return 'Lớp L còn chỗ (tối đa 8) — chưa cần sang lớp M.';
+     return 'Xem lại cách xếp electron theo lớp.'; },
+   branch:'Vỏ nguyên tử — cấu hình electron' },
+ { id:3, topic:'Vỏ nguyên tử', type:'num',
+   text:`Nguyên tử magnesium (Z = 12) ở trạng thái cơ bản có bao nhiêu <b>orbital</b> chứa electron?`,
+   unit:'orbital', ans:6,
+   hint:'Viết cấu hình electron trước. Mỗi phân lớp s có 1 AO, mỗi phân lớp p có 3 AO.',
+   sol:`Mg: 1s²2s²2p⁶3s² → 1s (1) + 2s (1) + 2p (3) + 3s (1) = <b>6 orbital</b>.`,
+   why:v => v==12?'12 là số electron; mỗi orbital chứa tối đa 2 electron.'
+          : v==4?'4 là số phân lớp; riêng phân lớp 2p đã có 3 orbital.'
+          : v==3?'3 là số lớp electron, không phải số orbital.'
+          : 'Đếm số AO của từng phân lớp: s có 1 AO, p có 3 AO.',
+   branch:'Vỏ nguyên tử — orbital' },
+ { id:4, topic:'Tính chất', type:'mcq',
+   text:`Nguyên tử X có cấu hình electron 1s²2s²2p⁶3s²3p⁶4s². X là`,
+   opts:['kim loại','phi kim','khí hiếm'], ans:0,
+   hint:'Lớp ngoài cùng là lớp có n lớn nhất — ở đây là lớp 4, không phải lớp 3.',
+   sol:`Lớp ngoài cùng là lớp 4 (4s²) có 2 electron → <b>kim loại</b> (calcium, Z = 20).`,
+   why:v => v===2?'Em thấy 3p⁶ nên tưởng lớp ngoài đủ 8 electron. Nhưng lớp ngoài cùng là lớp 4 (4s²) chỉ có 2 electron.'
+          : v===1?'Nguyên tử có 1, 2, 3 electron lớp ngoài cùng thường là kim loại (trừ H, He, B).'
+          : '',
+   branch:'Vỏ nguyên tử — lớp ngoài cùng và tính chất' },
+ { id:5, topic:'Hạt nhân', type:'num',
+   text:`Tổng số hạt proton, neutron, electron trong nguyên tử X là 34; số hạt mang điện nhiều hơn số hạt không mang điện là 10. Số khối của X là bao nhiêu?`,
+   unit:'', ans:23,
+   hint:'Hạt mang điện: proton và electron (2Z). Hạt không mang điện: neutron (N). Lập hệ: 2Z + N = 34; 2Z − N = 10.',
+   sol:`2Z + N = 34; 2Z − N = 10 → 4Z = 44 → Z = 11, N = 12 → A = Z + N = <b>23</b> (sodium).`,
+   why:v => v==11?'11 là Z (số proton). Đề hỏi số khối A = Z + N.'
+          : v==12?'12 là số neutron N. Số khối A = Z + N.'
+          : v==22?'2Z = 22 là số hạt mang điện; số khối là A = Z + N.'
+          : v==34?'34 là tổng số hạt (có cả electron); số khối chỉ tính proton + neutron.'
+          : 'Nhớ: số hạt mang điện = 2Z (proton + electron).',
+   branch:'Hạt nhân — bài toán số hạt' },
+ { id:6, topic:'Nguyên tố hoá học', type:'num',
+   text:`Chlorine có 2 đồng vị ${nuc(35,'','Cl')} (chiếm 75%) và ${nuc(37,'','Cl')} (chiếm 25%). Nguyên tử khối trung bình của chlorine là bao nhiêu?`,
+   unit:'', ans:35.5, dec:true,
+   hint:'Ā = (35 · 75 + 37 · 25) / 100. Dùng dấu phẩy cho số thập phân, VD 12,5.',
+   sol:`Ā = (35 · 75 + 37 · 25)/100 = (2625 + 925)/100 = <b>35,5</b>.`,
+   why:v => v==36?'36 là trung bình cộng (35 + 37)/2 — phải tính theo phần trăm của mỗi đồng vị.'
+          : (v==35||v==37)?'Đó là số khối của một đồng vị; cần tính trung bình theo phần trăm.'
+          : v==3550?'Em quên chia cho 100.'
+          : 'Ā = (A₁ · x₁ + A₂ · x₂)/100.',
+   branch:'Nguyên tố hoá học — đồng vị, Ā' },
+ { id:7, topic:'Vỏ nguyên tử', type:'orb',
+   text:`Nguyên tử nitrogen (Z = 7). Chạm vào ô để điền electron (chạm nhiều lần: ↑ → ↑↓ → trống), rồi cho biết có bao nhiêu <b>electron độc thân</b>.`,
+   groups:[['1s',1],['2s',1],['2p',3]], ansBoxes:[2,2,1,1,1], ans:3,
+   hint:'Điền theo nguyên lí vững bền (1s → 2s → 2p). Trong phân lớp 2p, theo quy tắc Hund: mỗi ô 1 electron trước rồi mới ghép đôi.',
+   sol:`N: 1s²2s²2p³ → 2p: [↑][↑][↑] → <b>3 electron độc thân</b>.`,
+   why:v => v==1?'Nếu ghép đôi electron trong 2p sẽ chỉ còn 1 electron độc thân — sai quy tắc Hund.'
+          : v==5?'5 là số electron lớp ngoài cùng; electron độc thân là electron đứng một mình trong ô.'
+          : v==7?'7 là tổng số electron.'
+          : 'Đếm số ô chỉ có 1 mũi tên.',
+   branch:'Vỏ nguyên tử — Pauli, Hund' },
+ { id:8, topic:'Vỏ nguyên tử', type:'mcq',
+   text:`Lớp M (n = 3) chứa tối đa bao nhiêu electron?`,
+   opts:['8','9','18','32'], ans:2,
+   hint:'Số electron tối đa của lớp thứ n là 2n².',
+   sol:`2n² = 2 · 3² = <b>18</b> (3s² 3p⁶ 3d¹⁰).`,
+   why:v => v===0?'8 là số electron tối đa của lớp L (n = 2), hoặc số electron lớp ngoài cùng của khí hiếm.'
+          : v===1?'9 là số orbital của lớp M (n² = 9); mỗi orbital chứa 2 electron.'
+          : v===3?'32 là của lớp N (n = 4).'
+          : '',
+   branch:'Vỏ nguyên tử — lớp, phân lớp' },
+];
+
+/* ---------- trạng thái ---------- */
+function blank(){ return {lop:'',ma:'',ans:{},bohr:[0,0,0],orb:[0,0,0,0,0],cur:0,start:0,attempt:1,res:null,practice:null}; }
+let S = blank();
+try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(blank(), JSON.parse(raw)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+const $ = s => document.querySelector(s);
+const app = $('#app');
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('on'),1800); }
+const num = s => { if(s==null) return NaN; s=String(s).trim().replace(/\s/g,'').replace(',','.'); return s===''?NaN:Number(s); };
+const fmt = v => String(v).replace('.',',');
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); toast('Đã sao chép'); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Đã sao chép'); }catch(_){ toast('Không sao chép được — em chụp màn hình nhé'); } ta.remove(); }
+}
+
+/* ---------- chấm ---------- */
+function answered(q, st=S){
+  if(q.type==='bohr') return st.bohr.some(x=>x>0);
+  const a = st.ans[q.id]; return a!==undefined && a!=='' && a!==null;
+}
+function grade(q, st=S){
+  if(q.type==='bohr'){ const v=st.bohr; const ok = v.every((x,i)=>x===q.ans[i]); return {ok, why: ok?'':q.why(v)}; }
+  if(q.type==='mcq'){ const v=st.ans[q.id]; const ok=v===q.ans; return {ok, why: ok?'':(v===undefined?'Em chưa chọn đáp án.':q.why(v))}; }
+  const v = num(st.ans[q.id]); const ok = Math.abs(v-q.ans)<1e-9;
+  return {ok, why: ok?'': (isNaN(v)?'Em chưa trả lời câu này.':q.why(v))};
+}
+function orbCheck(st=S){
+  const b=st.orb, q=Q[6], tot=b.reduce((a,x)=>a+x,0);
+  if(b.every((x,i)=>x===q.ansBoxes[i])) return {ok:true,msg:'Ô orbital em điền đúng.'};
+  if(tot!==7) return {ok:false,msg:`Nitrogen có 7 electron, ô của em đang có ${tot} electron.`};
+  if((b[0]<2||b[1]<2) && (b[2]+b[3]+b[4])>0) return {ok:false,msg:'Chưa điền đầy 1s, 2s đã sang 2p — nhớ nguyên lí vững bền.'};
+  return {ok:false,msg:'Trong 2p em đã ghép đôi electron khi còn ô trống — sai quy tắc Hund.'};
+}
+function ansText(q, st=S){
+  if(q.type==='bohr') return `K: ${st.bohr[0]} · L: ${st.bohr[1]} · M: ${st.bohr[2]}`;
+  if(q.type==='mcq'){ const v=st.ans[q.id]; return v===undefined?'(bỏ trống)':`${'ABCD'[v]}. ${q.opts[v]}`; }
+  const v=st.ans[q.id]; const t=(v===undefined||v==='')?'(bỏ trống)':String(v); return q.type==='orb'?`${t} electron độc thân · ô 2p: ${st.orb.slice(2).map(x=>'['+(arrow(x)||' ')+']').join('')}`:t;
+}
+
+/* ---------- màn mở đầu ---------- */
+function atomSVG(){
+  return `<svg viewBox="0 0 150 150" aria-hidden="true">
+   <circle cx="75" cy="75" r="11" fill="var(--nuc)"/><text x="75" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">+</text>
+   ${[0,60,-60].map((a,i)=>`<g transform="rotate(${a} 75 75)"><ellipse cx="75" cy="75" rx="62" ry="22" fill="none" stroke="${['var(--pri)','var(--pri2)','var(--acc)'][i]}" stroke-width="2.5"/>
+     <circle r="6" fill="var(--e)"><animateMotion dur="${3+i}s" repeatCount="indefinite" begin="${-i}s" path="M137,75 A62,22 0 1,1 13,75 A62,22 0 1,1 137,75"/></circle></g>`).join('')}
+  </svg>`;
+}
+function renderStart(){
+  app.innerHTML = `
+  <div class="card hero">
+    ${atomSVG()}
+    <span class="tag">HOÁ HỌC 10 · KẾT NỐI TRI THỨC</span>
+    <h1>Bài 4. Ôn tập chương 1<br><span style="color:var(--pri)">Thử thách nguyên tử</span></h1>
+    <div class="muted">8 câu · khoảng 8 phút · tự làm, không mở sách</div>
+  </div>
+  <div class="card">
+    <label class="f" for="lop">Lớp</label>
+    <select class="t" id="lop"><option value="">— Chọn lớp —</option>${LOPS.map(l=>`<option ${S.lop===l?'selected':''}>${l}</option>`).join('')}</select>
+    <label class="f" for="ma">Mã học sinh <span class="muted small">(cô đã phát, VD HS05)</span></label>
+    <input class="t" id="ma" placeholder="HS05" autocomplete="off" autocapitalize="characters" value="${S.ma||''}">
+    <div class="err" id="err"></div>
+    <button class="btn block" id="go">Bắt đầu làm bài →</button>
+    <p class="small muted" style="margin:.8em 0 0">Không nhập họ tên. Bài làm chỉ lưu trên máy em, không gửi đi đâu.</p>
+  </div>
+  <div class="card">
+    <h2>Cách nộp bài</h2>
+    <ol class="steps">
+      <li>Làm đủ 8 câu rồi bấm <b>Nộp bài</b> — máy chấm và chỉ ra chỗ sai.</li>
+      <li><b>Chụp màn hình kết quả</b>, đặt tên <b>Lớp_Mã HS_Bai4</b> (VD 10A4_HS05_Bai4), nộp vào thư mục bài nộp của lớp.</li>
+      <li>Bấm <b>Sao chép lỗi</b> rồi dán vào nhánh <b>“Lỗi em hay mắc”</b> trong sơ đồ của nhóm.</li>
+      <li>Hạn: 20 giờ hôm trước tiết 13. Không có máy: làm bản in, nộp đầu tiết 13.</li>
+    </ol>
+  </div>
+  <div class="draft">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</div>`;
+  $('#go').onclick = () => {
+    const lop=$('#lop').value, ma=$('#ma').value.trim().toUpperCase().replace(/\s/g,'');
+    if(!lop) return $('#err').textContent='Em chọn lớp nhé.';
+    if(!/^HS\d{1,4}$/.test(ma)) return $('#err').textContent='Mã học sinh có dạng HS + số, VD HS05.';
+    S.lop=lop; S.ma=ma; if(!S.start) S.start=Date.now(); save(); renderQ();
+  };
+}
+
+/* ---------- màn câu hỏi ---------- */
+function bohrSVG(counts, Z){
+  const R=[52,88,124], cx=150, cy=150;
+  let s=`<svg class="bohr" viewBox="0 0 300 300" role="img" aria-label="Mô hình các lớp electron">`;
+  R.forEach((r,i)=>{ s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--line)" stroke-width="2.5" stroke-dasharray="${counts[i]?'0':'6 6'}"/>`;
+    s+=`<text x="${cx}" y="${cy-r-6}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--muted)">${'KLM'[i]}</text>`; });
+  s+=`<circle cx="${cx}" cy="${cy}" r="27" fill="var(--nuc)"/><text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">+${Z}</text>`;
+  R.forEach((r,i)=>{ const n=counts[i]; if(!n) return;
+    s+=`<g class="shellSpin" style="animation-duration:${14+i*6}s">`;
+    for(let k=0;k<n;k++){ const a=k*2*Math.PI/n-Math.PI/2+i*0.3; s+=`<circle cx="${(cx+r*Math.cos(a)).toFixed(1)}" cy="${(cy+r*Math.sin(a)).toFixed(1)}" r="8" fill="var(--e)" stroke="var(--card)" stroke-width="2"/>`; }
+    s+=`</g>`; });
+  return s+`</svg>`;
+}
+const arrow = v => v===0?'':v===1?'↑':'↑↓';
+function qBody(q, st, pfx=''){
+  if(q.type==='num') return `<div class="numIn"><input class="t" id="${pfx}in" inputmode="decimal" placeholder="?" value="${st.ans[q.id]??''}" autocomplete="off"><span class="muted">${q.unit}</span></div>`;
+  if(q.type==='mcq') return q.opts.map((o,i)=>`<button class="opt ${st.ans[q.id]===i?'sel':''}" data-i="${i}"><b>${'ABCD'[i]}</b><span>${o}</span></button>`).join('');
+  if(q.type==='bohr'){ const t=st.bohr.reduce((a,x)=>a+x,0);
+    return `<div id="${pfx}bohrWrap">${bohrSVG(st.bohr,q.Z)}</div>
+      <div class="mini">Đã xếp <b>${t}</b> / ${q.Z} electron</div>
+      <div class="shellCtl">${['Lớp K','Lớp L','Lớp M'].map((n,i)=>`<div class="sc"><div class="nm">${n}</div><div class="ct">${st.bohr[i]}</div>
+        <div class="pm"><button data-s="${i}" data-d="-1" aria-label="Bớt electron ${n}">−</button><button data-s="${i}" data-d="1" aria-label="Thêm electron ${n}">+</button></div></div>`).join('')}</div>
+      <div class="mini" style="margin-top:8px">→ Lớp ngoài cùng có <b>${outer(st.bohr)}</b> electron</div>`; }
+  if(q.type==='orb'){ let k=0;
+    const g=q.groups.map(([lb,n])=>`<div class="og"><div class="bx">${Array.from({length:n},()=>{const i=k++;return `<button class="box" data-b="${i}" aria-label="Ô orbital ${lb}">${arrow(st.orb[i])}</button>`;}).join('')}</div><div class="lb">${lb}</div></div>`).join('');
+    return `<div class="orbs">${g}</div><div class="mini">Đã điền <b>${st.orb.reduce((a,x)=>a+x,0)}</b> / 7 electron</div>
+      <label class="f" style="text-align:center">Số electron độc thân:</label>
+      <div class="numIn"><input class="t" id="${pfx}in" inputmode="numeric" placeholder="?" value="${st.ans[q.id]??''}" autocomplete="off"></div>`; }
+}
+function outer(b){ for(let i=2;i>=0;i--) if(b[i]>0) return b[i]; return 0; }
+function bindBody(q, st, root, onChange){
+  const inp = root.querySelector('input.t');
+  if(inp) inp.oninput = () => { st.ans[q.id]=inp.value; onChange(false); };
+  root.querySelectorAll('.opt').forEach(b=> b.onclick=()=>{ st.ans[q.id]=+b.dataset.i; onChange(true); });
+  root.querySelectorAll('.sc button').forEach(b=> b.onclick=()=>{ const i=+b.dataset.s; st.bohr[i]=Math.max(0,Math.min(18,st.bohr[i]+ +b.dataset.d)); onChange(true); });
+  root.querySelectorAll('.box').forEach(b=> b.onclick=()=>{ const i=+b.dataset.b; st.orb[i]=(st.orb[i]+1)%3; onChange(true); });
+}
+
+function renderQ(){
+  const i=S.cur, q=Q[i], done=Q.filter(x=>answered(x)).length;
+  app.innerHTML = `
+  <div class="top">
+    <div class="row"><div class="grow small muted">${S.lop} · ${S.ma}</div><div class="small"><b>${done}</b>/8 câu đã làm</div></div>
+    <div class="bar" style="margin-top:6px"><i style="width:${done/8*100}%"></i></div>
+    <div class="dots">${Q.map((x,k)=>`<button class="dot ${answered(x)?'done':''} ${k===i?'cur':''}" data-k="${k}" aria-label="Câu ${k+1}">${k+1}</button>`).join('')}</div>
+  </div>
+  <div class="card" id="qc">
+    <div class="qhead"><span class="qnum">Câu ${i+1}</span><span class="tag">${q.topic}</span></div>
+    <div class="qtext">${q.text}</div>
+    <div id="qb">${qBody(q,S)}</div>
+    <div class="hint"><button class="btn soft" id="hb">💡 Gợi ý</button><div id="hbox"></div></div>
+  </div>
+  <div class="nav">
+    <button class="btn ghost" id="prev" ${i===0?'disabled':''}>← Câu trước</button>
+    ${i<7?`<button class="btn" id="next">Câu sau →</button>`:`<button class="btn acc" id="sub">Nộp bài ✓</button>`}
+  </div>
+  ${i<7?`<div style="margin-top:10px"><button class="btn ghost block" id="sub2">Nộp bài</button></div>`:''}
+  <div class="draft">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</div>`;
+  const rebind = () => bindBody(q,S,$('#qb'),(redraw)=>{ save(); if(redraw){ $('#qb').innerHTML=qBody(q,S); rebind(); } refreshTop(); });
+  rebind();
+  $('#hb').onclick=()=>{ $('#hbox').innerHTML=`<div class="hintBox">${q.hint}</div>`; $('#hb').remove(); };
+  document.querySelectorAll('.dot').forEach(d=>d.onclick=()=>{ S.cur=+d.dataset.k; save(); renderQ(); });
+  $('#prev').onclick=()=>{ S.cur--; save(); renderQ(); };
+  if($('#next')) $('#next').onclick=()=>{ S.cur++; save(); renderQ(); window.scrollTo(0,0); };
+  [$('#sub'),$('#sub2')].forEach(b=>b&&(b.onclick=submit));
+}
+function refreshTop(){
+  const done=Q.filter(x=>answered(x)).length;
+  $('.top .bar i').style.width=(done/8*100)+'%';
+  $('.top .small b').textContent=done;
+  document.querySelectorAll('.dot').forEach((d,k)=>d.classList.toggle('done',answered(Q[k])));
+}
+function submit(){
+  const miss=Q.filter(x=>!answered(x)).map(x=>x.id);
+  if(miss.length && !confirm(`Em còn bỏ trống câu ${miss.join(', ')}. Vẫn nộp bài?`)) return;
+  const g=Q.map(q=>grade(q));
+  S.res={ bits:g.map(x=>x.ok?1:0).join(''), right:g.filter(x=>x.ok).length,
+          secs:Math.round((Date.now()-(S.start||Date.now()))/1000), at:Date.now(),
+          snap:{ans:JSON.parse(JSON.stringify(S.ans)),bohr:[...S.bohr],orb:[...S.orb]} };
+  save(); renderResult(true);
+}
+
+/* ---------- màn kết quả ---------- */
+function ring(right){
+  const r=58, c=2*Math.PI*r, p=right/8;
+  return `<svg class="ring" width="150" height="150" viewBox="0 0 150 150" aria-hidden="true">
+   <circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--line)" stroke-width="14"/>
+   <circle cx="75" cy="75" r="${r}" fill="none" stroke="${p>=.75?'var(--ok)':p>=.5?'var(--acc)':'var(--bad)'}" stroke-width="14" stroke-linecap="round"
+     stroke-dasharray="${c*p} ${c}" transform="rotate(-90 75 75)"/>
+   <text x="75" y="84" text-anchor="middle" font-size="30" font-weight="900" fill="var(--ink)">${right}/8</text></svg>`;
+}
+function resCode(){ return `B4-${S.lop}-${S.ma}-L${S.attempt}-${S.res.bits}`; }
+function errText(){
+  const st=S.res.snap; const out=[];
+  Q.forEach(q=>{ const g=grade(q,st); if(!g.ok) out.push(`Câu ${q.id}: ${g.why} → nhánh ${q.branch}`); });
+  return out.length? out.join('\n') : 'Em làm đúng cả 8 câu. Câu em thấy dễ nhầm nhất: ...';
+}
+function confetti(){
+  const c=document.createElement('div'); c.className='confetti';
+  const cols=['#14b8a6','#f59e0b','#e11d48','#2563eb','#22c55e'];
+  for(let i=0;i<60;i++){ const e=document.createElement('i'); e.style.left=Math.random()*100+'vw';
+    e.style.background=cols[i%cols.length]; e.style.animationDelay=(Math.random()*.8)+'s'; e.style.animationDuration=(2+Math.random()*1.5)+'s'; c.appendChild(e); }
+  document.body.appendChild(c); setTimeout(()=>c.remove(),4000);
+}
+function renderResult(fresh){
+  const R=S.res, st=R.snap, d=new Date(R.at);
+  const pad=n=>String(n).padStart(2,'0');
+  const stars = R.right===8?'⭐⭐⭐':R.right>=6?'⭐⭐☆':R.right>=4?'⭐☆☆':'☆☆☆';
+  const msg = R.right===8?'Xuất sắc! Em nắm chắc Chương 1.':R.right>=6?'Tốt lắm! Xem lại vài chỗ nhỏ bên dưới.':R.right>=4?'Khá rồi — đọc kĩ phần chữa để không sai lại.':'Cố lên! Đọc phần chữa và luyện lại câu sai nhé.';
+  app.innerHTML = `
+  <div class="card score">
+    <span class="tag">KẾT QUẢ · BÀI 4. ÔN TẬP CHƯƠNG 1</span>
+    ${ring(R.right)}
+    <div class="stars">${stars}</div>
+    <div style="font-weight:700;margin-top:4px">${msg}</div>
+    <div class="meta">
+      <div><span>Lớp:</span> <b>${S.lop}</b></div><div><span>Mã HS:</span> <b>${S.ma}</b></div>
+      <div><span>Nộp lúc:</span> ${pad(d.getHours())}:${pad(d.getMinutes())} ${pad(d.getDate())}/${pad(d.getMonth()+1)}</div>
+      <div><span>Thời gian:</span> ${Math.floor(R.secs/60)} phút ${R.secs%60} giây</div>
+      <div><span>Lần làm:</span> ${S.attempt}</div><div></div><div style="grid-column:1/-1;text-align:center;font-size:1.2rem"><span>Các câu:</span> ${R.bits.split('').map(b=>b==='1'?'✅':'❌').join('')}</div>
+    </div>
+    <div class="code" id="code">${resCode()}</div>
+    <p class="small muted" style="margin:.6em 0 0">📸 Chụp màn hình phần này → đặt tên <b>${S.lop}_${S.ma}_Bai4</b> → nộp vào thư mục của lớp.</p>
+  </div>
+  <div class="card">
+    <h2>Nhánh “Lỗi em hay mắc”</h2>
+    <p class="small muted" style="margin-top:0">Bấm sao chép rồi dán vào sơ đồ của nhóm (ghi thêm vì sao em sai).</p>
+    <div class="row"><button class="btn soft grow" id="cpErr">📋 Sao chép lỗi</button><button class="btn ghost grow" id="cpCode">Sao chép mã kết quả</button></div>
+  </div>
+  <div class="card">
+    <h2>Chữa từng câu</h2>
+    ${Q.map(q=>{ const g=grade(q,st); const extra = q.type==='orb'?`<div class="small" style="margin-top:4px">${orbCheck(st).ok?'✅':'⚠️'} ${orbCheck(st).msg}</div>`:'';
+      return `<div class="rv ${g.ok?'ok':'no'}"><div class="h">${g.ok?'✅':'❌'} Câu ${q.id} · ${q.topic}</div>
+        <div class="small">Em trả lời: <b>${ansText(q,st)}</b></div>${extra}
+        ${g.ok?'':`<div class="why">🔎 ${g.why}</div>`}
+        <div class="sol">✔️ ${q.sol}</div></div>`; }).join('')}
+  </div>
+  <div class="card">
+    ${R.right<8?`<button class="btn block" id="prac">🔁 Luyện lại câu sai (không đổi kết quả đã nộp)</button>`:''}
+    <button class="btn ghost block" id="again" style="margin-top:10px">Làm bài mới (lần ${S.attempt+1})</button>
+  </div>
+  <div class="draft">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</div>`;
+  $('#cpErr').onclick=()=>copy(errText());
+  $('#cpCode').onclick=()=>copy(resCode());
+  if($('#prac')) $('#prac').onclick=startPractice;
+  $('#again').onclick=()=>{ if(!confirm('Làm lại từ đầu? Kết quả lần này sẽ được thay bằng lần mới.')) return;
+    const a=S.attempt+1, lop=S.lop, ma=S.ma; S=blank(); S.lop=lop; S.ma=ma; S.attempt=a; S.start=Date.now(); save(); renderQ(); window.scrollTo(0,0); };
+  window.scrollTo(0,0);
+  if(fresh && R.right>=6) confetti();
+}
+
+/* ---------- luyện lại câu sai (chấm ngay từng câu) ---------- */
+function startPractice(){
+  const wrong=Q.filter(q=>!grade(q,S.res.snap).ok).map(q=>q.id);
+  S.practice={list:wrong,k:0,st:{ans:{},bohr:[0,0,0],orb:[0,0,0,0,0]}}; save(); renderPractice();
+}
+function renderPractice(){
+  const P=S.practice; if(P.k>=P.list.length){ S.practice=null; save(); toast('Đã luyện xong các câu sai 👏'); return renderResult(false); }
+  const q=Q.find(x=>x.id===P.list[P.k]);
+  app.innerHTML=`
+  <div class="card"><div class="qhead"><span class="qnum">Luyện lại · Câu ${q.id}</span><span class="tag acc">${P.k+1}/${P.list.length}</span></div>
+    <div class="qtext">${q.text}</div><div id="qb">${qBody(q,P.st,'p')}</div><div id="fb"></div>
+    <div class="nav" style="margin-top:14px"><button class="btn" id="chk">Kiểm tra</button><button class="btn ghost" id="skip">Câu tiếp →</button></div>
+  </div><div class="draft">Luyện thêm — không thay đổi kết quả đã nộp.</div>`;
+  const rebind=()=>bindBody(q,P.st,$('#qb'),(redraw)=>{ if(redraw){ $('#qb').innerHTML=qBody(q,P.st,'p'); rebind(); } $('#fb').innerHTML=''; });
+  rebind();
+  $('#chk').onclick=()=>{ const g=grade(q,P.st);
+    $('#fb').innerHTML = g.ok?`<div class="fb ok">✅ Chính xác! ${q.sol}</div>`:`<div class="fb no">❌ ${g.why}<br><span style="font-weight:400">💡 ${q.hint}</span></div>`;
+    if(g.ok){ $('#skip').textContent='Câu tiếp →'; $('#skip').className='btn'; } };
+  $('#skip').onclick=()=>{ P.k++; save(); renderPractice(); window.scrollTo(0,0); };
+}
+
+/* ---------- trang giáo viên (#gv) ---------- */
+function renderGV(){
+  let saved=''; try{ saved=localStorage.getItem(KEY+'_gv')||''; }catch(e){}
+  app.innerHTML=`
+  <div class="card"><span class="tag acc">DÀNH CHO GIÁO VIÊN</span>
+    <h1>Tổng hợp kết quả lớp</h1>
+    <p class="small muted">Dán các mã kết quả HS gửi (mỗi dòng một mã, dạng <b>B4-10A4-HS05-L1-10110111</b>; dán cả đoạn tin nhắn cũng được). Máy tìm 2 câu cả lớp sai nhiều nhất — dùng cho cột “Lớp mình hay sai” của trò chơi Đấu trường nguyên tử.</p>
+    <textarea class="t" id="codes" placeholder="B4-10A4-HS05-L1-10110111">${saved}</textarea>
+    <div class="row" style="margin-top:10px"><select class="t grow" id="flt" style="max-width:160px"><option value="">Mọi lớp</option>${LOPS.map(l=>`<option>${l}</option>`).join('')}</select>
+      <button class="btn grow" id="calc">Tổng hợp</button></div>
+    <div id="out" style="margin-top:14px"></div>
+  </div>
+  <div class="card"><h2>Bản giấy cho HS không có máy</h2>
+    <div class="row"><button class="btn soft grow" id="pHS">🖨️ In phiếu HS</button><button class="btn ghost grow" id="pDA">🖨️ In đáp án</button></div>
+    <p class="small muted">Gợi ý: in 2 phiếu/trang A4 (chọn “2 trang trên mỗi tờ” trong hộp thoại in).</p></div>
+  <div class="card"><button class="btn ghost block" id="back">← Về trang học sinh</button></div>
+  <div class="draft">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng · câu hỏi lấy từ KHBD Bài 4 (Phiếu nhiệm vụ ở nhà số 2)</div>`;
+  $('#calc').onclick=()=>{
+    const txt=$('#codes').value; try{ localStorage.setItem(KEY+'_gv',txt); }catch(e){}
+    const re=/B4-(10A\d+)-(HS\d+)-L(\d+)-([01]{8})/g; const map={}; let m;
+    while((m=re.exec(txt))){ const k=m[1]+'|'+m[2]; const L=+m[3];
+      if(!map[k] || L<=map[k].L) map[k]={lop:m[1],ma:m[2],L,bits:m[4]}; } // lấy lần làm đầu tiên
+    const f=$('#flt').value; const rows=Object.values(map).filter(r=>!f||r.lop===f);
+    if(!rows.length){ $('#out').innerHTML='<div class="fb no">Chưa đọc được mã nào.</div>'; return; }
+    const pct=Q.map((q,i)=>Math.round(rows.filter(r=>r.bits[i]==='1').length/rows.length*100));
+    const low=[...pct.keys()].sort((a,b)=>pct[a]-pct[b]).slice(0,2);
+    const avg=(rows.reduce((a,r)=>a+r.bits.split('').filter(x=>x==='1').length,0)/rows.length).toFixed(1).replace('.',',');
+    $('#out').innerHTML=`<div class="small"><b>${rows.length}</b> HS · trung bình <b>${avg}</b>/8 câu đúng (tính lần làm đầu tiên)</div>
+      <table class="st" style="margin-top:8px"><tr><th>Câu</th><th>Nội dung</th><th>% đúng</th></tr>
+      ${Q.map((q,i)=>`<tr class="${low.includes(i)?'low':''}"><td><b>${q.id}</b></td><td class="small">${q.branch}</td>
+        <td><div class="row" style="flex-wrap:nowrap"><div class="sbar grow"><i style="width:${pct[i]}%"></i></div><b>${pct[i]}%</b></div></td></tr>`).join('')}</table>
+      <div class="fb no">🎯 Gợi ý chọn cho “Lớp mình hay sai”: <b>Câu ${low.map(i=>i+1).join(' và Câu ')}</b></div>`;
+  };
+  $('#pHS').onclick=()=>doPrint(false);
+  $('#pDA').onclick=()=>doPrint(true);
+  $('#back').onclick=()=>{ location.hash=''; route(); };
+}
+function doPrint(key){
+  const strip=s=>s.replace(/Bấm <b>\+<\/b> \/ <b>−<\/b> để xếp electron vào các lớp, rồi/,'Viết số electron trên từng lớp và').replace(/Chạm vào ô để điền electron \(chạm nhiều lần: ↑ → ↑↓ → trống\), rồi/,'Điền electron vào các ô orbital, rồi');
+  let h=`<h3 style="margin:0">HOÁ HỌC 10 — BÀI 4. ÔN TẬP CHƯƠNG 1 · PHIẾU LUYỆN TẬP (8 câu, khoảng 8 phút)</h3>
+  <p>Lớp: ........ &nbsp; Mã HS: ........ &nbsp; Ngày: ...../...../.......</p>`;
+  Q.forEach(q=>{
+    h+=`<div class="pq"><b>Câu ${q.id}.</b> ${strip(q.text)}`;
+    if(q.type==='mcq') h+=`<div>${q.opts.map((o,i)=>`${'ABCD'[i]}. ${o}`).join(' &nbsp;&nbsp;&nbsp; ')}</div>`;
+    else if(q.type==='bohr') h+=`<div>Lớp K: ...... &nbsp;&nbsp; Lớp L: ...... &nbsp;&nbsp; Lớp M: ...... &nbsp;&nbsp; → Lớp ngoài cùng có ...... electron.</div>`;
+    else if(q.type==='orb'){ h+=`<div style="margin:6pt 0">${q.groups.map(([lb,n])=>`<span class="pgrp">${'<span class="pbx"></span>'.repeat(n)}<br>${lb}</span>`).join('')}</div><div>Số electron độc thân: ........</div>`; }
+    else h+=`<div class="pline"></div><div>Đáp số: ................</div>`;
+    h+=`</div>`; });
+  h+=`<p style="font-size:10pt">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</p>`;
+  if(key){ h=`<h3>ĐÁP ÁN — PHIẾU LUYỆN TẬP BÀI 4 (8 câu)</h3>`+Q.map(q=>`<div class="pq"><b>Câu ${q.id}.</b> ${q.sol}</div>`).join('')+`<p style="font-size:10pt">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</p>`; }
+  $('#print').innerHTML=h; window.print();
+}
+
+/* ---------- điều hướng ---------- */
+function route(){
+  if(location.hash==='#gv') return renderGV();
+  if(S.practice) return renderPractice();
+  if(S.res) return renderResult(false);
+  if(S.lop && S.ma && S.start) return renderQ();
+  renderStart();
+}
+window.addEventListener('hashchange',route);
+route();
+</script>
+<a href="../index.html" id="ve-trang-lop" style="position:fixed;left:10px;bottom:10px;z-index:9999;background:#ffffffe6;color:#0f766e;border:1px solid #0f766e55;border-radius:999px;padding:4px 12px;font:600 13px Segoe UI,Roboto,Arial,sans-serif;text-decoration:none;box-shadow:0 1px 4px #0002">← Trang chủ</a>
+<script src="../theo-doi.js"></script>
+</body>
+</html>

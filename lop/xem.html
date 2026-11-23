@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="48x48" href="logo/favicon-48.png">
+<link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-title" content="Hoá 10">
+<meta name="application-name" content="Hoá 10">
+<title>Xem – Hoá học 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chung.css">
+<style>
+.man{background:#000;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin:14px auto}
+.man iframe,.man video{display:block;width:100%;height:100%;border:0}
+.doc{aspect-ratio:9/16;max-height:78vh;max-width:min(100%,calc(78vh*9/16))}
+.ngang{aspect-ratio:16/9}
+.el{height:calc(100vh - 150px);min-height:480px;background:var(--card)}
+.el:fullscreen{height:100vh;border-radius:0}
+.choi{height:calc(100dvh - 120px);min-height:520px;max-width:560px;background:var(--card)}
+.choi:fullscreen{height:100vh;max-width:none;border-radius:0}
+.mphong{height:calc(100dvh - 120px);min-height:560px;background:var(--card)}
+.pdf{height:calc(100vh - 170px);min-height:460px;background:#fff}
+</style>
+</head>
+<body>
+<div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
+<div class="topbar"><div class="wrap"><a class="ve" href="index.html">← Trang chủ</a><h1 id="tieuDe">Xem</h1></div></div>
+<main class="wrap" id="noi"></main>
+
+<script src="cai-dat.js"></script>
+<script src="du-lieu.js"></script>
+<script src="chung.js"></script>
+<script>
+khungChung();
+const ID = new URLSearchParams(location.search).get('id') || (location.hash.match(/id=([\w-]+)/) || [])[1];
+const H = timHL(ID);
+
+/* đổi link Drive / YouTube / TikTok thành khung nhúng */
+function nhung(u) {
+  let m;
+  if ((m = /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*id=)([\w-]{10,})/.exec(u))) return { src: `https://drive.google.com/file/d/${m[1]}/preview`, doc: true };
+  if ((m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/))([\w-]{11})/.exec(u))) return { src: `https://www.youtube-nocookie.com/embed/${m[1]}?rel=0`, doc: /shorts\//.test(u) };
+  if ((m = /tiktok\.com\/.*video\/(\d+)/.exec(u))) return { src: `https://www.tiktok.com/embed/v2/${m[1]}`, doc: true };
+  if (/\.mp4(\?|$)/i.test(u)) return { video: u, doc: true };
+  return null;
+}
+
+/* SCORM 1.2 tối giản để bài e-learning báo điểm về web (bài tìm window.parent.API) */
+function scorm(id) {
+  const k = 'hoa10_el_' + id, v = JSON.parse(kho.get(k, '{}')); let daGui = false;
+  window.API = {
+    LMSInitialize: () => 'true', LMSCommit: () => { kho.set(k, JSON.stringify(v)); if (/completed|passed/.test(v['cmi.core.lesson_status'] || '')) baoXong(); return 'true'; },
+    LMSGetValue: n => v[n] || '', LMSGetLastError: () => '0', LMSGetErrorString: () => '', LMSGetDiagnostic: () => '',
+    LMSSetValue: (n, x) => { v[n] = String(x); if (n === 'cmi.core.lesson_status' && /completed|passed/.test(x)) baoXong(); return 'true'; },
+    LMSFinish: () => { kho.set(k, JSON.stringify(v)); baoXong(); return 'true'; },
+  };
+  async function baoXong() {
+    const raw = v['cmi.core.score.raw']; if (daGui || raw === undefined || raw === '') return; daGui = true;
+    const hs = hsLay(), diem = Math.round(+raw / (+v['cmi.core.score.max'] || 100) * 100);
+    $('#elKq').innerHTML = `🎉 Em đã học xong bài, đúng <b>${diem}%</b> câu hỏi. `;
+    if (!hs) { $('#elKq').innerHTML += 'Em chưa vào lớp nên cô chưa nhận được kết quả.'; return; }
+    try { await goi('nop', { ma: hs.ma, pin: hs.pin, bai: id, diem, b: '', h: '', v: '' }); $('#elKq').innerHTML += 'Đã gửi cho cô ✅'; }
+    catch (e) { $('#elKq').innerHTML += '⚠ ' + esc(e.message); }
+  }
+  /* Bài gửi điểm, tiến độ ra bằng "thư" (cau-noi-el.js) — dùng được cả khi kho bài ở tên miền khác web lớp.
+     Chỉ nhận thư của đúng khung bài đang mở và đúng mã bài. */
+  addEventListener('message', e => {
+    const d = e.data, kh = document.querySelector('.man.el iframe');
+    if (!d || d.nguon !== 'triway-el' || d.id !== id || !kh || e.source !== kh.contentWindow) return;
+    if (d.viec === 'dat' && typeof d.n === 'string' && /^cmi\.[\w.]+$/.test(d.n)) API.LMSSetValue(d.n, String(d.v == null ? '' : d.v).slice(0, 4000));
+    else if (d.viec === 'luu') API.LMSCommit(); else if (d.viec === 'xong') API.LMSFinish();
+    else if (d.viec === 'mo') document.documentElement.dataset.elNoi = '1';
+  });
+  // tiến độ học dở web lớp đang giữ → gửi vào bài qua địa chỉ (bài ở tên miền khác không đọc được kho của web lớp)
+  const giu = {}; ['cmi.core.lesson_status', 'cmi.suspend_data', 'cmi.core.lesson_location', 'cmi.core.score.raw'].forEach(n => { if (v[n]) giu[n] = v[n]; });
+  return Object.keys(giu).length ? '#tw=' + encodeURIComponent(JSON.stringify(giu)) : '';
+}
+
+(function () {
+  if (!H || (H.muc !== 'clip' && H.muc !== 'elearning' && !H.drive && !H.luyen && !H.choi && !H.mp)) { $('#noi').innerHTML = '<div class="rong">Không tìm thấy học liệu này.</div>'; return; }
+  document.title = H.ten + ' – Hoá học 10'; $('#tieuDe').textContent = (MUC[H.muc].icon) + ' ' + H.ten;
+  const b = timBai(H.bai), hs = hsLay();
+  const dau = `<p class="phu" style="margin-top:14px">Bài ${b.ma}. ${esc(b.ten)} · ${esc(CHUONG[b.ch])}</p>`;
+  const nhacVao = hs ? '' : `<p class="bao vang">Em chưa vào lớp trên máy này — vẫn xem được, nhưng cô chưa ghi nhận em đã học. <a href="lop.html">Vào Góc lớp</a></p>`;
+  if (H.mp) {                         // mô phỏng (21/11/2026): trang ở kho GitHub (mophong/index.html?bai=N), không gửi điểm
+    const goc = (typeof KHO_EL === 'string' && KHO_EL ? KHO_EL.replace(/\/*$/, '/') : '') + 'mophong/index.html?bai=' + encodeURIComponent(H.bai);
+    $('#noi').innerHTML = dau + `<div class="ke"><a class="nut" href="${esc(goc)}">🔬 Mở toàn màn hình</a></div>
+      <div class="man mphong"><iframe src="${esc(goc)}" title="${esc(H.ten)}" allow="fullscreen"></iframe></div>
+      <p class="bao">Thí nghiệm ảo, mô hình động để em tự khám phá: chạm, kéo, xoay rồi bấm <b>Xem kết luận</b>. Trên điện thoại nên bấm <b>Mở toàn màn hình</b>.</p>`;
+  } else if (H.choi) {                       // trò chơi tự luyện (21/11/2026): trang ở kho GitHub, không gửi điểm
+    const goc = (typeof KHO_EL === 'string' && KHO_EL ? KHO_EL.replace(/\/*$/, '/') : '') + 'choi/index.html?bai=' + encodeURIComponent(H.bai);
+    $('#noi').innerHTML = dau + `<div class="ke"><a class="nut" href="${esc(goc)}">🎮 Chơi toàn màn hình</a></div>
+      <div class="man choi" id="khungChoi"><iframe src="${esc(goc)}" title="${esc(H.ten)}" allow="fullscreen"></iframe></div>
+      <p class="bao">Trò chơi để em tự luyện tập sau bài học — điểm và sao chỉ lưu trên máy em, <b>không</b> gửi cho cô. Trên điện thoại nên bấm <b>Chơi toàn màn hình</b>.</p>`;
+  } else if (H.luyen) {                      // luyện dạng + bài 15 phút: trang nằm ở kho GitHub (không tính dung lượng Netlify)
+    const goc = (typeof KHO_EL === 'string' && KHO_EL ? KHO_EL.replace(/\/*$/, '/') : '') + 'luyen/index.html?bai=' + encodeURIComponent(H.bai) + '&id=' + encodeURIComponent(H.id);
+    $('#noi').innerHTML = dau + nhacVao + `<div class="man el" id="khungEl"><iframe src="${esc(goc)}" title="${esc(H.ten)}"></iframe></div>
+      <p class="bao" id="elKq">Làm xong bài luyện 15 phút, máy tự chấm và gửi điểm cho cô.<span> Màn hình nhỏ: <a href="${esc(goc)}" target="_blank" rel="noopener">mở ở trang riêng</a> (mở kiểu này điểm <b>không</b> gửi cho cô).</span></p>`;
+    addEventListener('message', async e => {
+      const d = e.data, kh = document.querySelector('#khungEl iframe');
+      if (!d || d.nguon !== 'triway-luyen' || d.id !== H.id || !kh || e.source !== kh.contentWindow || d.viec !== 'nop') return;
+      const tra = chu => { try { kh.contentWindow.postMessage({ nguon: 'triway-luyen-tra', chu }, '*'); } catch (x) {} };
+      const diem = Math.max(0, Math.min(100, Math.round(+d.diem || 0))), hs = hsLay();
+      $('#elKq').innerHTML = `📝 Bài luyện 15 phút: em được <b>${(diem / 10).toFixed(1).replace('.', ',')} điểm</b>. `;
+      if (!hs) { tra('Em chưa vào Góc lớp trên máy này nên cô chưa nhận được điểm.'); $('#elKq').innerHTML += 'Em chưa vào lớp nên cô chưa nhận được điểm.'; return; }
+      if (!MAY_CHU) { tra('Web chưa nối máy chủ nên điểm chưa gửi được.'); return; }
+      try { await goi('nop', { ma: hs.ma, pin: hs.pin, bai: H.id, diem, b: '', h: '', v: '' }); tra('Đã gửi điểm cho cô ✅'); $('#elKq').innerHTML += 'Đã gửi cho cô ✅'; }
+      catch (x) { tra('⚠ Chưa gửi được: ' + x.message); $('#elKq').innerHTML += '⚠ ' + esc(x.message); }
+    });
+  } else if (H.muc === 'elearning') {
+    const tienDo = scorm(H.id), link = encodeURI(linkHocLieu(H));
+    $('#noi').innerHTML = dau + nhacVao + `<div class="man el" id="khungEl"><iframe src="${link}${tienDo}" title="${esc(H.ten)}" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+      <div class="ke"><button class="nut phu" id="toanMan" hidden>⛶ Xem toàn màn hình</button></div>
+      <p class="bao" id="elKq">Học hết bài, máy tự ghi điểm và gửi cô.<span id="moRieng"> Màn hình nhỏ: <a href="${link}" target="_blank" rel="noopener">mở bài ở trang riêng</a> (mở kiểu này máy <b>không</b> ghi điểm).</span></p>`;
+    const khung = $('#khungEl'), toan = khung.requestFullscreen || khung.webkitRequestFullscreen;
+    if (toan && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+      $('#toanMan').hidden = false; $('#moRieng').hidden = true;
+      $('#toanMan').onclick = () => { try { const p = toan.call(khung); if (p && p.catch) p.catch(() => { $('#moRieng').hidden = false; }); } catch (e) { $('#moRieng').hidden = false; } };
+    }
+  } else if (H.drive) {               // PDF để trên Google Drive: xem ngay, tải về để in
+    const ma = maDrive(H.drive);
+    $('#noi').innerHTML = dau + `<div class="man pdf"><iframe src="https://drive.google.com/file/d/${ma}/preview" title="${esc(H.ten)}" allow="fullscreen"></iframe></div>
+      <div class="ke"><a class="nut" href="https://drive.google.com/uc?export=download&id=${ma}" target="_blank" rel="noopener">⬇ Tải về để in</a>
+      <a class="nut phu" href="https://drive.google.com/file/d/${ma}/view" target="_blank" rel="noopener">Mở trên Google Drive ↗</a></div>`;
+  } else {
+    const n = H.video ? nhung(H.video) : null;
+    // Clip có bản trong kho GitHub (clip/<id>.mp4): phát bằng trình phát gọn của máy — khung xem của Google Drive
+    // trên iPhone chồng hai lớp nút che kín hình (17/11/2026). Kho không có tệp → tự quay về khung Drive như cũ.
+    const khoClip = n && n.src && maDrive(H.video) && typeof KHO_EL === 'string' && KHO_EL
+      ? KHO_EL.replace(/\/*$/, '/') + 'clip/' + encodeURIComponent(H.id) + '.mp4' : '';
+    const khungDrive = n && n.src ? `<iframe src="${esc(n.src)}" title="${esc(H.ten)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>` : '';
+    $('#noi').innerHTML = dau + nhacVao + (n
+      ? `<div class="man ${n.doc && !H.ngang ? 'doc' : 'ngang'}" id="manClip">${khoClip ? `<video id="clipKho" src="${esc(khoClip)}#t=0.1" controls playsinline preload="metadata" style="background:#000"></video>` : n.video ? `<video src="${esc(n.video)}" controls playsinline></video>` : khungDrive}</div>`
+      : '<div class="khung"><h3>⏳ Cô sắp đăng clip này</h3><p>Em quay lại sau nhé.</p></div>')
+      + (n && maDrive(H.video) ? `<p class="ghi" style="text-align:center">Clip không chạy? <a href="https://drive.google.com/file/d/${maDrive(H.video)}/view" target="_blank" rel="noopener">Mở trên Google Drive ↗</a> · Xem bằng Wi-Fi cho đỡ tốn dữ liệu.</p>` : '');
+    const vk = $('#clipKho');
+    if (vk) vk.addEventListener('error', () => { const m = $('#manClip'); if (m && khungDrive) m.innerHTML = khungDrive; }, { once: true });
+  }
+  if (H.muc !== 'clip' || H.video) {
+    $('#noi').insertAdjacentHTML('beforeend', '<div class="khung" id="dgHop" style="margin:14px 0"></div>');
+    hopDanhGia($('#dgHop'), H.id);
+  }
+  {
+    const cungBai = HOC_LIEU.filter(x => x.bai === H.bai && x.id !== H.id && !x.an).slice(0, 6);
+    if (cungBai.length) $('#noi').insertAdjacentHTML('beforeend', `<h3>Học tiếp Bài ${b.ma}</h3><div class="ds">${cungBai.map(x =>
+      `<a class="the ${MUC[x.muc].mau}" href="${encodeURI(linkHL(x))}"><span class="ic">${MUC[x.muc].icon}</span><span><h5>${hoa(x.ten)}</h5><span class="meta">${daHoc()[x.id] ? '<span class="da">✓ Đã học</span> · ' : ''}<span class="nh">${MUC[x.muc].ten}</span></span></span></a>`).join('')}</div>`);
+  }
+  ghiDaHoc(H.id);
+  theoDoi(H.id);
+})();
+function linkHocLieu(h) {
+  if (!/\.zip$/i.test(h.nguon || '')) return 'hoc-lieu/' + h.id + duoi(h);
+  const kho = typeof KHO_EL === 'string' && KHO_EL ? KHO_EL.replace(/\/*$/, '/') : 'hoc-lieu/';   // kho bài ở chỗ chứa khác, hoặc nằm chung web
+  return kho + h.id + '/index.html';
+}
+</script>
+</body>
+</html>

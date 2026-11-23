@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="48x48" href="logo/favicon-48.png">
+<link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-title" content="Hoá 10">
+<meta name="application-name" content="Hoá 10">
+<title>Góc lớp – Hoá học 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chung.css">
+</head>
+<body>
+<div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
+<div class="topbar"><div class="wrap"><a class="ve" href="index.html">← Trang chủ</a><h1 id="tieuDe">Góc lớp</h1>
+  <span id="chonLop" style="display:flex;gap:6px"></span></div></div>
+<main class="wrap" style="padding-top:16px">
+  <section id="khuEm" style="margin-top:0"></section>
+  <section>
+    <h2 class="tieu" id="tieuLop">Cả lớp</h2>
+    <p class="phu">Chỉ hiện số liệu chung của cả lớp — không có tên hay điểm của từng bạn. <span id="capNhat"></span></p>
+    <div id="khuLop"></div>
+  </section>
+</main>
+
+<script src="cai-dat.js"></script>
+<script src="du-lieu.js"></script>
+<script src="khao-sat-du-lieu.js"></script>
+<script src="chan-doan-du-lieu.js"></script>
+<script src="chung.js"></script>
+<script>
+khungChung();
+const LOP = (() => { const l = new URLSearchParams(location.search).get('l') || (location.hash.match(/l=([0-9A-Za-z]+)/) || [])[1]; return SI_SO[l] ? l : (kho.get('hoa10_lop', Object.keys(SI_SO)[0])); })();
+document.title = 'Góc lớp ' + LOP + ' – Hoá học 10';
+$('#tieuDe').textContent = '🏫 Góc lớp ' + LOP; $('#tieuLop').textContent = 'Cả lớp ' + LOP;
+$('#chonLop').innerHTML = Object.keys(SI_SO).map(l => `<a class="ve" href="lop.html?l=${l}" style="${l === LOP ? 'background:#ffd8a8;color:#2b2118;font-weight:900' : ''}">${l}</a>`).join('');
+const TEN_KS = { 'c3-dau': 'Đầu C3', 'c3-cuoi': 'Cuối C3', 'c4-dau': 'Đầu C4', 'c4-cuoi': 'Cuối C4' };
+
+/* ---------- biểu đồ SVG tự vẽ ---------- */
+function bdTuan(tuan) {
+  const W = 560, H = 210, L = 34, B = 30, T = 14, w = (W - L - 10) / tuan.length;
+  const max = Math.max(5, ...tuan.map(t => t.luot)), buoc = Math.ceil(max / 4);
+  const y = v => H - B - (H - B - T) * v / (buoc * 4);
+  let s = '';
+  for (let k = 0; k <= 4; k++) s += `<line class="tr" x1="${L}" x2="${W - 6}" y1="${y(k * buoc)}" y2="${y(k * buoc)}"/><text x="${L - 6}" y="${y(k * buoc) + 4}" text-anchor="end">${k * buoc}</text>`;
+  tuan.forEach((t, i) => {
+    const x = L + i * w + w * .18, h = H - B - y(t.luot), cuoi = i === tuan.length - 1;
+    s += `<rect x="${x}" y="${y(t.luot)}" width="${w * .64}" height="${Math.max(h, 0)}" rx="5" fill="${cuoi ? 'var(--acc)' : 'var(--pri)'}"><title>Tuần ${t.tuan}: ${t.luot} lượt, ${t.hs} bạn, ${t.phut} phút</title></rect>`;
+    if (t.luot) s += `<text x="${x + w * .32}" y="${y(t.luot) - 5}" text-anchor="middle" style="fill:var(--ink);font-weight:600">${t.luot}</text>`;
+    s += `<text x="${x + w * .32}" y="${H - 10}" text-anchor="middle">${t.tuan.slice(8, 10)}/${t.tuan.slice(5, 7)}</text>`;
+  });
+  return `<svg class="bd" viewBox="0 0 ${W} ${H}" role="img" aria-label="Lượt học 8 tuần">${s}</svg>`;
+}
+function bdMuc(ks) {
+  const ds = Object.keys(TEN_KS).filter(k => ks[k] && ks[k].so);
+  if (!ds.length) return '<div class="rong">Chưa có bạn nào làm khảo sát.</div>';
+  const W = 560, H = 220, L = 34, B = 34, T = 16, g = (W - L - 10) / ds.length, bw = Math.min(30, g / 4.2);
+  const y = v => H - B - (H - B - T) * v / 100;
+  let s = '';
+  [0, 25, 50, 75, 100].forEach(v => s += `<line class="tr" x1="${L}" x2="${W - 6}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`);
+  ds.forEach((k, i) => {
+    const x0 = L + i * g + (g - bw * 3.4) / 2;
+    [['b', 'var(--mB)', 'Biết'], ['h', 'var(--mH)', 'Hiểu'], ['v', 'var(--mV)', 'Vận dụng']].forEach(([m, c, t], j) => {
+      const v = ks[k][m] || 0, x = x0 + j * bw * 1.2;
+      s += `<rect x="${x}" y="${y(v)}" width="${bw}" height="${H - B - y(v)}" rx="4" fill="${c}"><title>${TEN_KS[k]} – ${t}: ${v}%</title></rect>
+        <text x="${x + bw / 2}" y="${y(v) - 4}" text-anchor="middle" style="font-size:11px;fill:var(--ink)">${v}</text>`;
+    });
+    s += `<text x="${x0 + bw * 1.7}" y="${H - 14}" text-anchor="middle" style="font-weight:600">${TEN_KS[k]}</text><text x="${x0 + bw * 1.7}" y="${H - 1}" text-anchor="middle" style="font-size:11px">${ks[k].so} bài</text>`;
+  });
+  return `<svg class="bd" viewBox="0 0 ${W} ${H}" role="img" aria-label="Tỉ lệ đúng theo mức">${s}</svg>
+    <div class="chu-thich"><span><i style="background:var(--mB)"></i>Biết</span><span><i style="background:var(--mH)"></i>Hiểu</span><span><i style="background:var(--mV)"></i>Vận dụng</span><span>(% câu đúng, tính theo lần làm đầu tiên)</span></div>`;
+}
+function bdTienBo(tb) {
+  const ch = ['c3', 'c4'].map(c => ({ c, ...tb[c] }));
+  return ch.map(x => {
+    if (!x.n) return `<div class="dong-tb"><b>Chương ${x.c[1]}</b><div class="ghi">Chưa có bạn làm đủ cả bài đầu và bài cuối chương.</div></div>`;
+    const tang = x.cuoi - x.dau;
+    return `<div style="margin:10px 0 16px"><b>Chương ${x.c[1]}</b> <span class="ghi">· ${x.n} bạn làm đủ 2 bài</span>
+      <svg class="bd" style="max-width:640px" viewBox="0 0 560 64" role="img" aria-label="Chương ${x.c[1]}: từ ${x.dau}% lên ${x.cuoi}%">
+        <line x1="20" x2="540" y1="32" y2="32" class="tr" stroke-width="10" stroke-linecap="round"/>
+        <line x1="${20 + 5.2 * x.dau}" x2="${20 + 5.2 * x.cuoi}" y1="32" y2="32" stroke="${tang >= 0 ? 'var(--dung)' : 'var(--sai)'}" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="${20 + 5.2 * x.dau}" cy="32" r="11" fill="var(--card)" stroke="var(--mute)" stroke-width="3"/>
+        <circle cx="${20 + 5.2 * x.cuoi}" cy="32" r="11" fill="${tang >= 0 ? 'var(--dung)' : 'var(--sai)'}"/>
+        <text x="${20 + 5.2 * x.dau}" y="62" text-anchor="middle">Đầu ${x.dau}%</text>
+        <text x="${20 + 5.2 * x.cuoi}" y="14" text-anchor="middle" style="font-weight:700;fill:var(--ink)">Cuối ${x.cuoi}% (${tang >= 0 ? '+' : ''}${tang})</text>
+      </svg></div>`;
+  }).join('');
+}
+
+/* ---------- khu của em ---------- */
+async function veEm() {
+  const hs = hsLay(), noi = $('#khuEm');
+  if (!hs || lopCua(hs.ma) !== LOP) {
+    hopVao(noi, () => { veEm(); veLop(); }, LOP);
+    if (hs) noi.insertAdjacentHTML('afterbegin', `<p class="bao vang">Máy này đang vào với mã ${esc(hs.ma)} (lớp khác). Vào lại bằng mã lớp ${LOP} nếu em học lớp này.</p>`);
+    return;
+  }
+  const nv = (NHIEM_VU[LOP] || []).map(timHL).filter(Boolean);
+  noi.innerHTML = `<div class="luoi2">
+    <div class="khung"><h3>👋 Chào ${esc(hs.ma)} <button class="chip" id="thoat" style="float:right;font-size:13px">Đăng xuất</button></h3>
+      <div class="so-to"><div class="o"><b id="eTuan">…</b><span>lượt học tuần này</span></div><div class="o"><b id="ePhut">…</b><span>phút đã học</span></div><div class="o"><b id="eHL">…</b><span>học liệu đã mở</span></div></div>
+      <h3 style="margin-top:16px">📈 Khảo sát của em</h3><div id="eKS" class="ghi">Đang tải…</div></div>
+    <div class="khung"><h3>🎯 Nhiệm vụ tuần ${esc(NHIEM_VU.tuan || '')}</h3>
+      ${nv.length ? nv.map(h => `<a class="nv" href="${encodeURI(linkHL(h))}" data-id="${h.id}"><span class="tick">✓</span><span>${MUC[h.muc].icon} ${hoa(h.ten)}</span></a>`).join('') : '<p class="ghi">Tuần này cô chưa giao nhiệm vụ.</p>'}</div></div>`;
+  $('#thoat').onclick = () => { hsThoat(); veEm(); };
+  if (!MAY_CHU) { $('#eKS').textContent = 'Cô chưa nối máy chủ nên chưa có số liệu.'; ['#eTuan', '#ePhut', '#eHL'].forEach(s => $(s).textContent = '—'); return; }
+  try {
+    const t = await goi('toi', hs);
+    $('#eTuan').textContent = soVN(t.luotTuan); $('#ePhut').textContent = soVN(t.phut); $('#eHL').textContent = soVN(Object.keys(t.daMo).length);
+    $$('#khuEm .nv').forEach(a => { const id = a.dataset.id, h = timHL(id); if (t.daMo[id] || (h.ks && t.bai[h.ks])) a.classList.add('xong'); });
+    const dong = Object.keys(TEN_KS).filter(k => t.bai[k]);
+    $('#eKS').innerHTML = dong.length ? dong.map(k => { const x = t.bai[k];
+      return `<div style="display:grid;grid-template-columns:70px 1fr 120px;gap:8px;align-items:center;margin:6px 0"><b>${TEN_KS[k]}</b>
+        <span style="height:14px;border-radius:99px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:${x.dau}%;background:var(--pri)"></i></span>
+        <span>${x.dau}%${x.lan > 1 ? ` · cao nhất ${x.cao}%` : ''}</span></div>`; }).join('') +
+      ['c3', 'c4'].map(c => t.bai[c + '-dau'] && t.bai[c + '-cuoi'] ? `<p class="bao">Chương ${c[1]}: em từ <b>${t.bai[c + '-dau'].dau}%</b> lên <b>${t.bai[c + '-cuoi'].dau}%</b> ${t.bai[c + '-cuoi'].dau >= t.bai[c + '-dau'].dau ? '🎉' : '— cùng cô ôn thêm nhé'}</p>` : '').join('')
+      : 'Em chưa làm khảo sát nào. Bắt đầu từ nhiệm vụ tuần nhé!';
+  } catch (e) { $('#eKS').textContent = '⚠ ' + e.message; }
+}
+
+/* ---------- khu cả lớp ---------- */
+async function veLop() {
+  const noi = $('#khuLop');
+  if (!MAY_CHU) { noi.innerHTML = '<div class="bao vang">Cô chưa nối máy chủ Google Sheet nên chưa có số liệu của lớp. Học liệu vẫn dùng bình thường.</div>'; return; }
+  noi.innerHTML = '<div class="rong">Đang tải số liệu của lớp…</div>';
+  try {
+    const x = await goi('lop', { lop: LOP }), tongLuot = x.tuan.reduce((s, t) => s + t.luot, 0), tongPhut = x.tuan.reduce((s, t) => s + t.phut, 0);
+    $('#capNhat').textContent = 'Cập nhật ' + x.capNhat + '.';
+    noi.innerHTML = `<div class="khung" style="margin-bottom:14px"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+        ${vong(x.thamGia / x.siSo * 100, null, 110)}
+        <div class="so-to" style="flex:1;min-width:260px">
+          <div class="o"><b>${x.thamGia}/${x.siSo}</b><span>bạn đã học trên web</span></div>
+          <div class="o"><b>${x.thamGiaTuan}</b><span>bạn học trong tuần này</span></div>
+          <div class="o"><b>${soVN(tongLuot)}</b><span>lượt học (8 tuần)</span></div>
+          <div class="o"><b>${soVN(tongPhut)}</b><span>phút học (8 tuần)</span></div></div></div></div>
+      <div class="luoi2">
+        <div class="khung"><h3>📅 Lượt học mỗi tuần</h3>${bdTuan(x.tuan)}<p class="ghi">Cột cam là tuần này. Một lượt = một lần mở học liệu.</p></div>
+        <div class="khung"><h3>🧠 Tỉ lệ đúng theo mức độ</h3>${bdMuc(x.ks)}</div>
+      </div>
+      <div class="khung" style="margin-top:14px"><h3>🚀 Tiến bộ đầu → cuối chương</h3>${bdTienBo(x.tienBo)}
+        <p class="ghi">Chỉ tính những bạn làm cả bài đầu và bài cuối của chương, lấy lần làm đầu tiên.</p></div>`;
+  } catch (e) { noi.innerHTML = `<div class="bao vang">⚠ Chưa tải được số liệu: ${esc(e.message)}</div>`; }
+}
+veEm(); veLop();
+</script>
+</body>
+</html>

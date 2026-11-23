@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Bắt đầu – Web Hoá 10 cho thầy cô</title>
+<link rel="icon" href="logo/favicon-48.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="chung.css">
+<style>
+  .buoc{counter-increment:b}.buoc>h3::before{content:counter(b) ". ";color:#c2410c}
+  main{counter-reset:b}
+  ol li{margin:4px 0}
+  .dong-lop{display:grid;grid-template-columns:1fr 110px 40px;gap:8px;margin:6px 0}
+  .link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  .link code{flex:1 1 260px;word-break:break-all;background:var(--soft);padding:8px 10px;border-radius:10px;font-size:13px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><h1 style="margin:0;font-size:22px">⚗️ Web Hoá học 10 — bản dùng chung cho thầy cô</h1></div></header>
+<main class="wrap" style="max-width:760px;padding:16px">
+  <div class="bao" id="hs">Em là <b>học sinh</b>? Em vào bằng <b>link thầy cô gửi</b> (link có đoạn <code>?gv=…</code>), không cần làm gì ở trang này.</div>
+  <p class="ghi" id="chuaLop" hidden>⚠ Máy chủ đã nối nhưng thầy cô chưa đặt lớp – sĩ số. Làm tiếp bước 3.</p>
+
+  <div class="khung buoc" style="margin:14px 0"><h3>Tạo máy chủ Google Sheet của thầy cô (một lần, ~5 phút)</h3>
+    <p class="ghi">Kết quả học sinh của thầy cô nằm trong Sheet của chính thầy cô — chỉ có mã <i>lớp – số thứ tự</i>, không có họ tên. Miễn phí.</p>
+    <ol>
+      <li>Mở <a href="https://sheets.new" target="_blank" rel="noopener">một Google Sheet mới</a> (đăng nhập Gmail của thầy cô).</li>
+      <li>Trên thanh menu: <b>Tiện ích mở rộng → Apps Script</b>. Xoá hết chữ có sẵn.</li>
+      <li>Bấm nút dưới đây để chép mã, rồi dán vào Apps Script, bấm 💾 <b>Lưu</b>.<br>
+        <button class="nut" id="chepMa" style="margin:6px 0">📋 Chép mã máy chủ</button> <a href="may-chu-dong-nghiep.txt" target="_blank" class="ghi">(hoặc mở mã để tự chép)</a>
+        <span class="ghi" id="chepKq"></span></li>
+      <li><b>Triển khai → Tùy chọn triển khai mới</b> → bánh răng ⚙ → <b>Ứng dụng web</b>.
+        Thực thi với tư cách: <b>Tôi</b> · Người có quyền truy cập: <b>Bất kỳ ai</b> → <b>Triển khai</b>.</li>
+      <li>Google hỏi quyền: chọn tài khoản → <b>Nâng cao</b> → <b>Đi tới … (không an toàn)</b> → <b>Cho phép</b>.
+        <span class="ghi">Đây là cảnh báo chung cho mọi mã tự viết; mã chỉ đọc – ghi Sheet này.</span></li>
+      <li>Chép <b>URL ứng dụng web</b> (đuôi <code>/exec</code>).</li>
+    </ol>
+  </div>
+
+  <div class="khung buoc" style="margin:14px 0"><h3>Dán địa chỉ máy chủ</h3>
+    <input class="o" id="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    <button class="nut" id="kiem" style="margin-top:8px">🔌 Nối máy chủ</button>
+    <div class="ghi" id="kiemKq" style="margin-top:6px"></div>
+  </div>
+
+  <div class="khung buoc" style="margin:14px 0" id="b3" hidden><h3>Mật khẩu, tên, lớp</h3>
+    <label class="nhan" for="mk">Mật khẩu trang thầy cô <span class="ghi" id="mkGhi"></span></label>
+    <input class="o" id="mk" type="password" autocomplete="new-password" placeholder="ít nhất 4 kí tự">
+    <label class="nhan" for="ten">Tên hiện trên web</label>
+    <input class="o" id="ten" maxlength="40" placeholder="VD cô Lan, thầy Hùng">
+    <label class="nhan" for="truong">Trường</label>
+    <input class="o" id="truong" maxlength="60" placeholder="VD THPT …">
+    <label class="nhan">Lớp và sĩ số <span class="ghi">(tên lớp viết liền, VD 10A2, 10C10; sĩ số tối đa 59)</span></label>
+    <div id="dsLop"></div>
+    <button class="nut phu" id="themLop">＋ Thêm lớp</button>
+    <div style="margin-top:12px"><button class="nut" id="luu">💾 Lưu</button> <span class="loi" id="luuLoi"></span></div>
+  </div>
+
+  <div class="khung buoc" style="margin:14px 0" id="b4" hidden><h3>Gửi link cho học sinh</h3>
+    <p>Link của lớp thầy cô (gửi nhóm Zalo lớp, hoặc dán vào ô tạo mã QR):</p>
+    <div class="link"><code id="lHS"></code><button class="nut phu" data-chep="lHS">Chép</button></div>
+    <p>Trang thầy cô (xem số liệu, <b>giao bài tuần</b>):</p>
+    <div class="link"><code id="lGV"></code><button class="nut phu" data-chep="lGV">Chép</button></div>
+    <p>Thử như học sinh (mã <i>lớp-60</i>, không tính vào thống kê):</p>
+    <div id="lThu"></div>
+    <p class="ghi">Mỗi em vào lớp bằng <b>lớp + số thứ tự trong danh sách + mật mã 4 số tự đặt</b>. Em quên mật mã: thầy cô xoá ô cột B dòng của em ở trang <b>HocSinh</b> trong Sheet.</p>
+    <p class="ghi">Việc đầu tiên: mở trang thầy cô → thẻ <b>📌 Giao bài tuần</b> → tích việc cho từng lớp.</p>
+  </div>
+
+  <p class="ghi" style="margin-top:20px">Web và học liệu Hoá học 10 (KNTT): cô Thơi, THPT Lạng Giang số 1 — biện pháp «câu chẩn đoán hai bậc trong dạy học 3 pha». Học liệu dùng chung, không sửa được nội dung; số liệu mỗi thầy cô riêng.</p>
+</main>
+<script src="cai-dat.js"></script>
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let maMoi = MA_GV, ch = null;
+const diaChi = id => 'https://script.google.com/macros/s/' + id + '/exec';
+const layMa = u => (/\/s\/([\w-]{20,120})\/(?:exec|dev)/.exec(u || '') || [])[1] || '';
+async function hoi(id, d) {
+  const r = await fetch(diaChi(id), { method: 'POST', body: JSON.stringify(d) });
+  let j; try { j = await r.json(); } catch (e) { throw new Error('Địa chỉ này chưa phải máy chủ Web Hoá 10 (kiểm tra: đã chọn «Bất kỳ ai» chưa, đã dán đúng bản mã chưa).'); }
+  if (j.loi) throw new Error(j.loi);
+  return j;
+}
+if (/chua=lop/.test(location.search)) $('#chuaLop').hidden = false;
+
+$('#chepMa').onclick = async () => {
+  try {
+    const s = await (await fetch('may-chu-dong-nghiep.txt')).text();
+    await navigator.clipboard.writeText(s);
+    $('#chepKq').textContent = '✅ Đã chép (' + s.split('\n').length + ' dòng). Dán vào Apps Script.';
+  } catch (e) { $('#chepKq').textContent = 'Máy không cho chép tự động — bấm «mở mã để tự chép», Ctrl+A, Ctrl+C.'; }
+};
+
+function dongLop(l, n) {
+  const d = document.createElement('div'); d.className = 'dong-lop';
+  d.innerHTML = `<input class="o" placeholder="10A2" maxlength="8" value="${esc(l || '')}"><input class="o" type="number" min="1" max="59" placeholder="sĩ số" value="${n || ''}"><button class="nut phu" title="Bỏ lớp này">✕</button>`;
+  d.querySelector('button').onclick = () => d.remove();
+  $('#dsLop').appendChild(d);
+}
+$('#themLop').onclick = () => dongLop();
+
+function moBuoc3(c) {
+  ch = c; $('#b3').hidden = false;
+  $('#mkGhi').textContent = c.coMK ? '(gõ mật khẩu thầy cô đã đặt)' : '(lần đầu: gõ gì thì đó là mật khẩu — nhớ kĩ)';
+  $('#ten').value = c.ten || ''; $('#truong').value = c.truong || '';
+  $('#dsLop').innerHTML = '';
+  const l = Object.entries(c.siSo || {}); (l.length ? l : [['', '']]).forEach(([a, b]) => dongLop(a, b));
+  if (l.length) moBuoc4();
+}
+function moBuoc4() {
+  const goc = WEB_LOP, id = maMoi;
+  $('#b4').hidden = false;
+  $('#lHS').textContent = goc + 'index.html?gv=' + id;
+  $('#lGV').textContent = goc + 'gv.html?gv=' + id;
+  $('#lThu').innerHTML = Object.keys(ch.siSo || {}).map(l => `<a class="chip" target="_blank" href="${esc(goc + 'index.html?gv=' + id + '&thu=' + encodeURIComponent(l))}">${esc(l)}</a>`).join(' ');
+}
+$$('[data-chep]').forEach(b => b.onclick = async () => {
+  try { await navigator.clipboard.writeText($('#' + b.dataset.chep).textContent); b.textContent = '✅ Đã chép'; setTimeout(() => b.textContent = 'Chép', 1500); } catch (e) {}
+});
+
+async function noi(id) {
+  $('#kiemKq').textContent = 'Đang nối…';
+  try {
+    const c = await hoi(id, { viec: 'ch' });
+    maMoi = id; try { localStorage.setItem('tw_gv', id); } catch (e) {}
+    $('#kiemKq').textContent = '✅ Đã nối máy chủ.' + (Object.keys(c.siSo || {}).length ? ' Lớp: ' + Object.keys(c.siSo).join(', ') : '');
+    moBuoc3(c);
+  } catch (e) { $('#kiemKq').textContent = '⚠ ' + e.message; }
+}
+$('#kiem').onclick = () => {
+  const id = layMa($('#url').value.trim());
+  if (!id) { $('#kiemKq').textContent = '⚠ Chưa đúng địa chỉ — phải có dạng https://script.google.com/macros/s/…/exec'; return; }
+  noi(id);
+};
+$('#luu').onclick = async () => {
+  const lop = $$('#dsLop .dong-lop').map(d => { const o = d.querySelectorAll('input'); return { lop: o[0].value.trim().toUpperCase().replace(/\s+/g, ''), siSo: +o[1].value }; }).filter(x => x.lop);
+  const loi = lop.find(x => !/^[0-9]{1,2}[A-Z0-9]{1,5}$/.test(x.lop) || !(x.siSo >= 1 && x.siSo <= 59));
+  $('#luuLoi').textContent = '';
+  if ($('#mk').value.length < 4) { $('#luuLoi').textContent = 'Mật khẩu ít nhất 4 kí tự.'; return; }
+  if (!lop.length) { $('#luuLoi').textContent = 'Cần ít nhất một lớp.'; return; }
+  if (loi) { $('#luuLoi').textContent = 'Lớp «' + loi.lop + '»: tên lớp viết liền (VD 10A2), sĩ số 1–59.'; return; }
+  $('#luu').disabled = true;
+  try {
+    const c = await hoi(maMoi, { viec: 'caidat', mk: $('#mk').value, ten: $('#ten').value.trim(), truong: $('#truong').value.trim(), lop });
+    luuCH(c, maMoi); ch = c;
+    try { sessionStorage.setItem('hoa10_mk', $('#mk').value); } catch (e) {}
+    $('#luuLoi').textContent = ''; $('#kiemKq').textContent = '✅ Đã lưu. Lớp: ' + Object.keys(c.siSo).join(', ');
+    moBuoc4(); $('#b4').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) { $('#luuLoi').textContent = e.message; }
+  finally { $('#luu').disabled = false; }
+};
+if (MA_GV) { $('#url').value = diaChi(MA_GV); noi(MA_GV); }
+</script>
+</body>
+</html>

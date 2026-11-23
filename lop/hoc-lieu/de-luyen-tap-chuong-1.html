@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đề luyện tập Chương 1 – Hoá 10</title>
+<style>
+/* =========================================================
+   KHUÔN ĐỀ LUYỆN TẬP TỰ CHẤM (3 phần dạng đề mới)
+   Làm đề mới: chép file này, sửa khối  const DE = {...}  bên dưới.
+   ========================================================= */
+:root{--bg:#f5f3fb;--card:#fff;--ink:#1d1830;--mute:#615a78;--line:#ddd7ee;--pri:#6d28d9;--pri2:#efe8fd;
+  --ok:#15803d;--okbg:#e5f6ea;--bad:#c62828;--badbg:#fdecea;--warn:#a15c00;--warnbg:#fff3df}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13101c;--card:#1c1828;--ink:#ece8f6;--mute:#a59dbd;--line:#352d4d;--pri:#b794ff;--pri2:#2b2245;--ok:#4ade80;--okbg:#12301d;--bad:#f87171;--badbg:#3a1616;--warn:#fbbf24;--warnbg:#3a2a0e}}
+:root[data-theme="dark"]{--bg:#13101c;--card:#1c1828;--ink:#ece8f6;--mute:#a59dbd;--line:#352d4d;--pri:#b794ff;--pri2:#2b2245;--ok:#4ade80;--okbg:#12301d;--bad:#f87171;--badbg:#3a1616;--warn:#fbbf24;--warnbg:#3a2a0e}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.55}
+header{background:linear-gradient(120deg,#4c1d95,#6d28d9);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+header .w{max-width:820px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{font-size:19px;margin:0;flex:1;min-width:200px}
+header a{color:#fff;font-size:14px;opacity:.9}
+.clock{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 12px;font-weight:600}
+.clock.het{background:#fbbf24;color:#3b2400}
+.draft{background:#fff4d6;color:#7a4b00;text-align:center;font-size:14px;padding:5px 12px}
+main{max-width:820px;margin:0 auto;padding:14px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+h2{font-size:18px;margin:22px 0 4px;color:var(--pri)}
+.sub{color:var(--mute);font-size:14.5px;margin:0 0 6px}
+.cau{font-weight:600}.cau b.n{color:var(--pri)}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:7px 0;cursor:pointer;background:var(--card)}
+.opt input{margin-top:5px;accent-color:var(--pri);width:18px;height:18px}
+.opt.chon{border-color:var(--pri);background:var(--pri2)}
+.opt.dung{border-color:var(--ok);background:var(--okbg)}
+.opt.sai{border-color:var(--bad);background:var(--badbg)}
+table.ds{width:100%;border-collapse:collapse;margin-top:8px}
+table.ds td{border-top:1px solid var(--line);padding:8px 4px;vertical-align:middle}
+table.ds td.y{width:100%}
+.ds .nut{display:flex;gap:6px}
+.ds label{border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer;white-space:nowrap;font-weight:600}
+.ds input{display:none}
+.ds input:checked+span{color:var(--pri)}
+.ds label:has(input:checked){border-color:var(--pri);background:var(--pri2)}
+tr.dung td.y{color:var(--ok)} tr.sai td.y{color:var(--bad)}
+input.t,select.t{font-size:17px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);width:100%;max-width:260px}
+input.t:focus,select.t:focus{outline:2px solid var(--pri);border-color:var(--pri)}
+textarea.t{width:100%;max-width:none;min-height:140px;font-family:Consolas,monospace;font-size:14px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.btn{border:1px solid var(--pri);background:var(--pri);color:#fff;border-radius:10px;padding:10px 18px;font-size:17px;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;color:var(--pri)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.giai{margin-top:8px;padding:8px 12px;border-left:4px solid var(--pri);background:var(--pri2);border-radius:6px;font-size:15.5px}
+.kq{font-size:15px;font-weight:600;margin-top:6px}
+.kq.dung{color:var(--ok)} .kq.sai{color:var(--bad)}
+.err{color:var(--bad);min-height:1.4em;font-size:15px}
+.diem{font-size:44px;font-weight:800;color:var(--pri);line-height:1}
+.ma{font-family:Consolas,monospace;font-size:18px;background:var(--pri2);border:1px dashed var(--pri);padding:8px 12px;border-radius:8px;word-break:break-all}
+.small{font-size:14.5px}.muted{color:var(--mute)}
+table.gv{border-collapse:collapse;width:100%;font-size:15px}
+table.gv th,table.gv td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.gv th{background:var(--pri2)}
+.bar{display:inline-block;height:10px;background:var(--pri);border-radius:5px;vertical-align:middle}
+sub,sup{font-size:.7em}
+.ve{position:fixed;left:10px;bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--mute);text-decoration:none;opacity:.9}
+@media print{header,.ve,.row,.draft{display:none}}
+</style>
+</head>
+<body>
+<header><div class="w"><h1 id="tieude"></h1><span class="clock" id="clock" hidden></span><a href="../index.html">← Trang chủ</a></div></header>
+<div class="draft" id="draft" hidden>✅ BẢN NHÁP — cô duyệt trước khi dùng</div>
+<main id="app"></main>
+
+<script>
+/* =========================================================
+   NỘI DUNG ĐỀ — sửa ở đây
+   Phần I  (nhiều lựa chọn): q, o[4 phương án], a = số thứ tự đáp án đúng (0 = A), e = lời giải
+   Phần II (đúng/sai)      : q, y = [[ý, true/false], ... 4 ý], e
+   Phần III (trả lời ngắn)  : q, a = [các đáp án chấp nhận], e
+   Điểm theo dạng đề mới: Phần I 0,25/câu · Phần II mỗi câu 1 điểm (đúng 1 ý 0,1 · 2 ý 0,25 · 3 ý 0,5 · 4 ý 1) · Phần III 0,25/câu
+   ========================================================= */
+const BAN_NHAP = false;
+const DE = {
+  ma: 'C1',                                   // mã ngắn, nằm đầu mã kết quả
+  ten: 'Đề luyện tập Chương 1 – Cấu tạo nguyên tử',
+  phut: 25,                                   // thời gian gợi ý (0 = không đếm giờ)
+  lop: ['10A2','10A3','10A4'],
+  p1: [
+    {q:'Trong nguyên tử, hạt mang điện tích dương là', o:['electron','proton','neutron','hạt nhân và electron'], a:1,
+     e:'Proton mang điện tích +1, electron mang điện tích −1, neutron không mang điện.'},
+    {q:'Số neutron trong nguyên tử <sup>27</sup><sub>13</sub>Al là', o:['13','14','27','40'], a:1,
+     e:'N = A − Z = 27 − 13 = 14.'},
+    {q:'Lớp electron thứ ba (lớp M, n = 3) chứa tối đa bao nhiêu electron?', o:['8','9','18','32'], a:2,
+     e:'Số electron tối đa của lớp n là 2n² = 2 · 3² = 18.'},
+    {q:'Cấu hình electron của nguyên tử sodium (Z = 11) là', o:['1s²2s²2p⁶3p¹','1s²2s²2p⁵3s²','1s²2s²2p⁶3s²','1s²2s²2p⁶3s¹'], a:3,
+     e:'11 electron điền lần lượt 1s² 2s² 2p⁶ 3s¹. Phương án 1s²2s²2p⁶3s² có 12 electron (Mg).'},
+    {q:'Nguyên tử fluorine (Z = 9) ở trạng thái cơ bản có bao nhiêu electron độc thân?', o:['1','2','3','5'], a:0,
+     e:'F: 1s²2s²2p⁵. Ba orbital 2p chứa 5 electron: [↑↓][↑↓][↑] → 1 electron độc thân.'},
+    {q:'Đồng vị là những nguyên tử của cùng một nguyên tố, có', o:['cùng số neutron, khác số proton','cùng số khối, khác số proton','cùng số proton, khác số neutron','cùng số proton và cùng số neutron'], a:2,
+     e:'Đồng vị: cùng số proton (cùng nguyên tố) nhưng khác số neutron nên khác số khối.'},
+    {q:'Nguyên tử X có 3 lớp electron, lớp ngoài cùng có 6 electron. Số hiệu nguyên tử của X là', o:['6','14','16','18'], a:2,
+     e:'Các lớp: K 2, L 8, M 6 → Z = 2 + 8 + 6 = 16 (sulfur).'},
+    {q:'Copper có hai đồng vị <sup>63</sup>Cu và <sup>65</sup>Cu; nguyên tử khối trung bình là 63,54. Phần trăm số nguyên tử <sup>63</sup>Cu là', o:['27%','50%','63%','73%'], a:3,
+     e:'Gọi x là % ⁶³Cu: 63x + 65(100 − x) = 6354 → 2x = 146 → x = 73.'},
+  ],
+  p2: [
+    {q:'Cho nguyên tử chlorine <sup>35</sup><sub>17</sub>Cl.', y:[
+      ['Hạt nhân nguyên tử có 17 proton và 18 neutron.', true],
+      ['Cấu hình electron của nguyên tử là 1s²2s²2p⁶3s²3p⁵.', true],
+      ['Ở trạng thái cơ bản, nguyên tử có 3 electron độc thân.', false],
+      ['Chlorine là kim loại vì nguyên tử có 7 electron ở lớp ngoài cùng.', false]],
+     e:'a) N = 35 − 17 = 18 → Đúng. b) Đúng. c) 3p⁵: [↑↓][↑↓][↑] chỉ có 1 electron độc thân → Sai. d) Có 7 electron lớp ngoài cùng → phi kim → Sai.'},
+    {q:'Về cấu trúc lớp vỏ electron nguyên tử:', y:[
+      ['Phân lớp p gồm 3 orbital.', true],
+      ['Mỗi orbital chứa tối đa 2 electron có chiều tự quay ngược nhau.', true],
+      ['Phân lớp 3d có mức năng lượng thấp hơn phân lớp 4s.', false],
+      ['Lớp L (n = 2) có 4 orbital.', true]],
+     e:'a) Đúng: pₓ, p_y, p_z. b) Đúng: nguyên lí Pauli. c) Sai: 4s thấp hơn 3d nên electron điền vào 4s trước. d) Đúng: n² = 4 (một orbital 2s + ba orbital 2p).'},
+  ],
+  p3: [
+    {q:'Nguyên tử aluminium (Z = 13) có tổng số electron trên các phân lớp p là bao nhiêu?', a:['7'],
+     e:'1s²2s²2p⁶3s²3p¹ → electron p = 6 + 1 = 7.'},
+    {q:'Lớp electron thứ tư (lớp N, n = 4) có tối đa bao nhiêu orbital?', a:['16'],
+     e:'Số orbital của lớp n là n² = 4² = 16.'},
+    {q:'Nguyên tử X có tổng số hạt proton, neutron, electron là 40; số hạt mang điện nhiều hơn số hạt không mang điện là 12. Số khối của X là bao nhiêu?', a:['27'],
+     e:'2Z + N = 40; 2Z − N = 12 → Z = 13, N = 14 → A = 27.'},
+    {q:'Chlorine có hai đồng vị <sup>35</sup>Cl (75,77%) và <sup>37</sup>Cl (24,23%). Nguyên tử khối trung bình của chlorine là bao nhiêu? <i>(làm tròn đến hàng phần mười)</i>', a:['35,5','35.5'],
+     e:'Ā = (35 · 75,77 + 37 · 24,23)/100 = 35,48 ≈ 35,5.'},
+  ],
+};
+
+/* =========================================================
+   PHẦN CHẠY — không cần sửa
+   ========================================================= */
+const KEY='de_'+DE.ma+'_v1';
+const $=s=>document.querySelector(s);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let S=store.get(KEY)||{lop:'',ma:'',lan:1,tl:{},batDau:0,nop:null};
+const save=()=>store.set(KEY,S);
+const N1=DE.p1.length,N2=DE.p2.length,N3=DE.p3.length;
+const DIEM_TOI_DA=N1*0.25+N2*1+N3*0.25;
+const L='ABCD';
+document.title=DE.ten; $('#tieude').textContent=DE.ten;
+if(!BAN_NHAP) $('#draft').remove();
+let timer=null;
+
+/* mã kiểm tra nhỏ để phát hiện mã kết quả bị gõ sửa (không phải bảo mật) */
+function chk(s){ let h=7; for(const c of s+'|hoa10') h=(h*31+c.charCodeAt(0))%46656; return h.toString(36).toUpperCase().padStart(3,'0'); }
+const fmt=x=>(Math.round(x*100)/100).toString().replace('.',',');
+const chuan=s=>String(s||'').trim().replace(/\s+/g,'').replace('.',',').toLowerCase();
+
+/* ---------- màn bắt đầu ---------- */
+function batDau(){
+  $('#clock').hidden=true;
+  $('#app').innerHTML=`
+  <div class="card">
+    <p style="margin-top:0">Đề gồm <b>${N1}</b> câu nhiều lựa chọn · <b>${N2}</b> câu đúng/sai · <b>${N3}</b> câu trả lời ngắn${DE.phut?` · thời gian gợi ý <b>${DE.phut} phút</b>`:''}.</p>
+    <label class="small muted" for="lop">Lớp</label><br>
+    <select class="t" id="lop"><option value="">— chọn lớp —</option>${DE.lop.map(l=>`<option ${l===S.lop?'selected':''}>${l}</option>`).join('')}</select>
+    <br><br><label class="small muted" for="ma">Mã học sinh (cô đã phát, VD HS05) — <b>không ghi họ tên</b></label><br>
+    <input class="t" id="ma" placeholder="HS05" autocomplete="off" autocapitalize="characters" value="${S.ma||''}">
+    <div class="err" id="err"></div>
+    <div class="row"><button class="btn" id="go">${Object.keys(S.tl).length?'Làm tiếp':'Bắt đầu làm bài'}</button></div>
+  </div>
+  <p class="small muted">Bài đang làm được lưu trên máy này; lỡ tắt trang, mở lại vẫn làm tiếp được.</p>`;
+  $('#go').onclick=()=>{
+    const lop=$('#lop').value, ma=$('#ma').value.trim().toUpperCase();
+    if(!lop) return $('#err').textContent='Em chọn lớp nhé.';
+    if(!/^HS\d{1,4}$/.test(ma)) return $('#err').textContent='Mã học sinh có dạng HS + số, VD HS05.';
+    S.lop=lop; S.ma=ma; if(!S.batDau) S.batDau=Date.now(); save(); lamBai();
+  };
+}
+
+/* ---------- màn làm bài ---------- */
+function lamBai(xem){
+  const kq=xem?S.nop:null;
+  let h=`<p class="small muted" style="margin:0">Lớp <b>${S.lop}</b> · <b>${S.ma}</b> · lần ${S.lan}</p>`;
+  h+=`<h2>Phần I. Câu trắc nghiệm nhiều phương án lựa chọn</h2><p class="sub">Mỗi câu chọn một phương án.</p>`;
+  DE.p1.forEach((c,i)=>{
+    const k='a'+i, chon=S.tl[k];
+    h+=`<div class="card"><div class="cau"><b class="n">Câu ${i+1}.</b> ${c.q}</div>`+
+      c.o.map((o,j)=>{ let cls=chon===j?' chon':''; if(kq){ if(j===c.a) cls=' dung'; else if(chon===j) cls=' sai'; }
+        return `<label class="opt${cls}"><input type="radio" name="${k}" value="${j}" ${chon===j?'checked':''} ${kq?'disabled':''}><span><b>${L[j]}.</b> ${o}</span></label>`; }).join('')+
+      (kq?`<div class="kq ${chon===c.a?'dung':'sai'}">${chon===c.a?'✔ Đúng':'✘ '+(chon==null?'Chưa chọn':'Sai')+' — đáp án '+L[c.a]}</div><div class="giai">${c.e}</div>`:'')+`</div>`;
+  });
+  h+=`<h2>Phần II. Câu trắc nghiệm đúng sai</h2><p class="sub">Mỗi ý a), b), c), d) chọn Đúng hoặc Sai.</p>`;
+  DE.p2.forEach((c,i)=>{
+    h+=`<div class="card"><div class="cau"><b class="n">Câu ${i+1}.</b> ${c.q}</div><table class="ds">`+
+      c.y.map(([y,d],j)=>{ const k='b'+i+'_'+j, chon=S.tl[k]; let cls=''; if(kq) cls=(chon===d)?'dung':'sai';
+        return `<tr class="${cls}"><td class="y"><b>${'abcd'[j]})</b> ${y}${kq&&chon!==d?` <i>(đáp án: ${d?'Đúng':'Sai'})</i>`:''}</td><td><div class="nut">
+          <label><input type="radio" name="${k}" value="1" ${chon===true?'checked':''} ${kq?'disabled':''}><span>Đúng</span></label>
+          <label><input type="radio" name="${k}" value="0" ${chon===false?'checked':''} ${kq?'disabled':''}><span>Sai</span></label></div></td></tr>`; }).join('')+
+      `</table>${kq?`<div class="kq">Đúng ${kq.p2[i]}/4 ý → ${fmt(diemDS(kq.p2[i]))} điểm</div><div class="giai">${c.e}</div>`:''}</div>`;
+  });
+  h+=`<h2>Phần III. Câu trắc nghiệm trả lời ngắn</h2><p class="sub">Gõ kết quả là một số (dùng dấu phẩy cho số thập phân).</p>`;
+  DE.p3.forEach((c,i)=>{
+    const k='c'+i, v=S.tl[k]||'', dung=c.a.map(chuan).includes(chuan(v));
+    h+=`<div class="card"><div class="cau"><b class="n">Câu ${i+1}.</b> ${c.q}</div>
+      <div class="row"><input class="t" name="${k}" inputmode="decimal" placeholder="Đáp số" value="${String(v).replace(/"/g,'&quot;')}" ${kq?'disabled':''}></div>`+
+      (kq?`<div class="kq ${dung?'dung':'sai'}">${dung?'✔ Đúng':'✘ '+(v?'Sai':'Chưa trả lời')+' — đáp số '+c.a[0]}</div><div class="giai">${c.e}</div>`:'')+`</div>`;
+  });
+  if(!kq) h+=`<div class="err" id="err"></div><div class="row"><button class="btn" id="nop">📤 Nộp bài</button></div>`;
+  else h+=`<div class="row"><button class="btn ghost" id="lenTren">↑ Về kết quả</button></div>`;
+  $('#app').innerHTML=h; scrollTo(0,0);
+  if(kq){ $('#lenTren').onclick=ketQua; return; }
+  $('#app').addEventListener('change',ghi); $('#app').addEventListener('input',ghi);
+  $('#nop').onclick=nopBai;
+  demGio();
+}
+function ghi(e){
+  const t=e.target; if(!t.name) return;
+  if(t.name[0]==='a') S.tl[t.name]=+t.value;
+  else if(t.name[0]==='b') S.tl[t.name]=t.value==='1';
+  else S.tl[t.name]=t.value;
+  if(t.type==='radio') t.closest('.card').querySelectorAll(`input[name="${t.name}"]`).forEach(r=>r.closest('.opt')?.classList.toggle('chon',r.checked));
+  save();
+}
+function demGio(){
+  clearInterval(timer); if(!DE.phut) return;
+  const c=$('#clock'); c.hidden=false;
+  const tick=()=>{ const con=DE.phut*60-Math.floor((Date.now()-S.batDau)/1000);
+    if(con<=0){ c.textContent='⏰ Hết giờ gợi ý'; c.classList.add('het'); return; }
+    c.textContent='⏱ '+Math.floor(con/60)+':'+String(con%60).padStart(2,'0'); };
+  tick(); timer=setInterval(tick,1000);
+}
+const diemDS=n=>[0,0.1,0.25,0.5,1][n];
+
+/* ---------- chấm ---------- */
+function nopBai(){
+  const thieu=[];
+  DE.p1.forEach((c,i)=>{ if(S.tl['a'+i]==null) thieu.push('I.'+(i+1)); });
+  DE.p2.forEach((c,i)=>c.y.forEach((y,j)=>{ if(S.tl['b'+i+'_'+j]==null) thieu.push('II.'+(i+1)+'abcd'[j]); }));
+  DE.p3.forEach((c,i)=>{ if(!String(S.tl['c'+i]||'').trim()) thieu.push('III.'+(i+1)); });
+  if(thieu.length && !confirm('Em còn bỏ trống: '+thieu.join(', ')+'.\nVẫn nộp bài?')) return;
+  let bits='', diem=0; const p2=[];
+  DE.p1.forEach((c,i)=>{ const d=S.tl['a'+i]===c.a; bits+=d?1:0; if(d) diem+=0.25; });
+  DE.p2.forEach((c,i)=>{ let n=0; c.y.forEach(([y,dd],j)=>{ const d=S.tl['b'+i+'_'+j]===dd; bits+=d?1:0; if(d) n++; }); p2.push(n); diem+=diemDS(n); });
+  DE.p3.forEach((c,i)=>{ const d=c.a.map(chuan).includes(chuan(S.tl['c'+i])); bits+=d?1:0; if(d) diem+=0.25; });
+  const goc=`${DE.ma}-${S.lop}-${S.ma}-L${S.lan}-${bits}`;
+  S.nop={diem, p2, ma:goc+'-'+chk(goc), phut:Math.max(1,Math.round((Date.now()-S.batDau)/60000))};
+  save(); clearInterval(timer); ketQua();
+}
+function ketQua(){
+  const k=S.nop; $('#clock').hidden=true;
+  const thang10=k.diem/DIEM_TOI_DA*10;
+  $('#app').innerHTML=`
+  <div class="card" style="text-align:center">
+    <p class="muted small" style="margin:0">Lớp ${S.lop} · ${S.ma} · lần ${S.lan} · ${k.phut} phút</p>
+    <div class="diem">${fmt(thang10)}<span style="font-size:20px"> / 10</span></div>
+    <p class="muted small">(${fmt(k.diem)} / ${fmt(DIEM_TOI_DA)} điểm theo cách tính của đề, quy đổi thang 10 — chỉ để em tự luyện)</p>
+  </div>
+  <div class="card">
+    <b>Mã kết quả gửi cô:</b>
+    <div class="ma" id="ma">${k.ma}</div>
+    <div class="row"><button class="btn" id="chep">📋 Sao chép mã</button><span class="small muted" id="daChep"></span></div>
+    <p class="small muted">Dán mã này vào tin nhắn gửi cô theo hướng dẫn trên lớp (hoặc chụp màn hình). Không cần ghi họ tên.</p>
+  </div>
+  <div class="row"><button class="btn ghost" id="xem">🔍 Xem lời giải từng câu</button><button class="btn ghost" id="lai">↻ Làm lại (lần ${S.lan+1})</button></div>`;
+  $('#chep').onclick=()=>{ const t=k.ma;
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>$('#daChep').textContent='Đã chép ✔')
+      .catch(()=>{ const r=document.createRange(); r.selectNodeContents($('#ma')); getSelection().removeAllRanges(); getSelection().addRange(r); $('#daChep').textContent='Em giữ ngón tay để chép mã đã bôi đen'; }); };
+  $('#xem').onclick=()=>lamBai(true);
+  $('#lai').onclick=()=>{ if(!confirm('Làm lại từ đầu? Kết quả lần này vẫn còn trong mã em đã gửi.')) return;
+    S={lop:S.lop,ma:S.ma,lan:S.lan+1,tl:{},batDau:Date.now(),nop:null}; save(); lamBai(); };
+  scrollTo(0,0);
+}
+
+function route(){ if(S.nop) return ketQua(); if(S.ma&&S.batDau) return lamBai(); batDau(); }
+addEventListener('hashchange',route);
+route();
+</script>
+<a href="../index.html" id="ve-trang-lop" style="position:fixed;left:10px;bottom:10px;z-index:9999;background:#ffffffe6;color:#1f4d3a;border:1px solid #1f4d3a55;border-radius:999px;padding:4px 12px;font:600 13px Segoe UI,Roboto,Arial,sans-serif;text-decoration:none;box-shadow:0 1px 4px #0002">← Trang chủ</a><script src="../theo-doi.js"></script>
+</body>
+</html>
