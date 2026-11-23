@@ -4,35 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f4d3a">
 <title>Luyện dạng Hoá 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f2f7f6;--card:#fff;--ink:#11221e;--mute:#566a65;--line:#d5e3df;--soft:#e9f3f1;--pri:#0f766e;--pri2:#ccfbf1;--pri-ink:#fff;
-  --dung:#15803d;--dungbg:#dcfce7;--sai:#dc2626;--saibg:#fee2e2;--cam:#c2410c;--cambg:#ffedd5;--shadow:0 1px 2px #0001,0 4px 14px #0f766e14}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1514;--card:#14201e;--ink:#e5efec;--mute:#9db2ac;--line:#25403a;--soft:#18302b;
-  --pri:#2dd4bf;--pri2:#134e48;--pri-ink:#04211d;--dung:#4ade80;--dungbg:#11331f;--sai:#f87171;--saibg:#3b1414;--cam:#fb923c;--cambg:#3a2212;--shadow:0 1px 2px #0006}}
-:root[data-theme="dark"]{--bg:#0c1514;--card:#14201e;--ink:#e5efec;--mute:#9db2ac;--line:#25403a;--soft:#18302b;
-  --pri:#2dd4bf;--pri2:#134e48;--pri-ink:#04211d;--dung:#4ade80;--dungbg:#11331f;--sai:#f87171;--saibg:#3b1414;--cam:#fb923c;--cambg:#3a2212;--shadow:0 1px 2px #0006}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Segoe UI",Roboto,Arial,sans-serif}
+/* Giao diện 23/11/2026 «Phòng thí nghiệm Hoá 10» — cùng kiểu web lớp và trang trò chơi */
+:root{--bg:#fff8ee;--card:#fffdf8;--ink:#2b2118;--mute:#6f5f50;--line:#ecdcc8;--soft:#fdf0de;--go:#ead7bf;--pri:#c2410c;--pri2:#ffe3cc;--pri-ink:#fff;--gopri:#8f2f08;
+  --bang:#1f4d3a;--bang2:#2c6a50;--goban:#c98b52;
+  --dung:#16804f;--dungbg:#dcf5e6;--sai:#c23a1f;--saibg:#fde3dc;--cam:#b45309;--cambg:#fff1c9;--shadow:0 3px 0 var(--go),0 8px 22px #8a5a2b14;
+  --hoavan:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104'%3E%3Cg fill='none' stroke='%23f0e1cc' stroke-width='1.6'%3E%3Cpath d='M30 14l16 9v18l-16 9-16-9V23z'/%3E%3Ccircle cx='30' cy='32' r='8'/%3E%3Cpath d='M46 23l14-8M90 58l16 9v18l-16 9-16-9V67z'/%3E%3Cpath d='M90 58v-12'/%3E%3C/g%3E%3C/svg%3E")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b140e;--card:#2a2018;--ink:#f6ead9;--mute:#c2ae97;--line:#4a3a2c;--soft:#33271d;--go:#120c07;--pri:#ff8a3d;--pri2:#4a2a14;--pri-ink:#1b140e;--gopri:#a3480f;
+  --bang:#13301f;--bang2:#1c4430;--goban:#7a5230;--dung:#4ade80;--dungbg:#123322;--sai:#ff7a5c;--saibg:#3d1a12;--cam:#fbbf24;--cambg:#3a2a0a;--shadow:0 3px 0 #120c07,0 8px 22px #0006;
+  --hoavan:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104'%3E%3Cg fill='none' stroke='%23362819' stroke-width='1.6'%3E%3Cpath d='M30 14l16 9v18l-16 9-16-9V23z'/%3E%3Ccircle cx='30' cy='32' r='8'/%3E%3Cpath d='M46 23l14-8M90 58l16 9v18l-16 9-16-9V67z'/%3E%3Cpath d='M90 58v-12'/%3E%3C/g%3E%3C/svg%3E")}}
+:root[data-theme="dark"]{--bg:#1b140e;--card:#2a2018;--ink:#f6ead9;--mute:#c2ae97;--line:#4a3a2c;--soft:#33271d;--go:#120c07;--pri:#ff8a3d;--pri2:#4a2a14;--pri-ink:#1b140e;--gopri:#a3480f;
+  --bang:#13301f;--bang2:#1c4430;--goban:#7a5230;--dung:#4ade80;--dungbg:#123322;--sai:#ff7a5c;--saibg:#3d1a12;--cam:#fbbf24;--cambg:#3a2a0a;--shadow:0 3px 0 #120c07,0 8px 22px #0006}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:600 17px/1.55 Nunito,"Segoe UI",Roboto,Arial,sans-serif}
+body{background:var(--bg) var(--hoavan) 0 0/120px 104px}
+b,strong{font-weight:800}
 .wrap{max-width:820px;margin:0 auto;padding:0 16px 90px}
-header{background:linear-gradient(125deg,#083d39,#0f766e 60%,#14b8a6);color:#fff;padding:14px 0 16px}
+header{position:relative;color:#fff;padding:44px 0 14px;border-bottom:7px solid var(--goban);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='40'%3E%3Cpath d='M-5 4 Q280 30 565 4' fill='none' stroke='%23e8d3b0' stroke-width='1.6' opacity='.8'/%3E%3Cg font-family='Arial' font-weight='900' font-size='11' fill='%23fff' text-anchor='middle'%3E%3Cg transform='translate(20 6)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23d9580f'/%3E%3Ctext y='15'%3EH%3C/text%3E%3C/g%3E%3Cg transform='translate(80 12)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%231d6fb8'/%3E%3Ctext y='15'%3EC%3C/text%3E%3C/g%3E%3Cg transform='translate(140 16)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%2316804f'/%3E%3Ctext y='15'%3EN%3C/text%3E%3C/g%3E%3Cg transform='translate(200 18)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23e9a100'/%3E%3Ctext y='15'%3EO%3C/text%3E%3C/g%3E%3Cg transform='translate(260 19)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23c2185b'/%3E%3Ctext y='15'%3ENa%3C/text%3E%3C/g%3E%3Cg transform='translate(320 19)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%237c3aed'/%3E%3Ctext y='15'%3EMg%3C/text%3E%3C/g%3E%3Cg transform='translate(380 18)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%23d9580f'/%3E%3Ctext y='15'%3EAl%3C/text%3E%3C/g%3E%3Cg transform='translate(440 15)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%231d6fb8'/%3E%3Ctext y='15'%3ES%3C/text%3E%3C/g%3E%3Cg transform='translate(500 11)'%3E%3Cpath d='M-11 0h22v20l-11 5-11-5z' fill='%2316804f'/%3E%3Ctext y='15'%3ECl%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0/560px 40px repeat-x,
+  radial-gradient(120% 160% at 20% 0%,var(--bang2),var(--bang) 70%)}
 header .wrap{padding-bottom:0}
 [hidden]{display:none!important}
-header .k{font-size:13px;opacity:.85}
-header h1{margin:2px 0 0;font-size:clamp(20px,4.6vw,27px);line-height:1.25}
-.ve{display:inline-block;color:#fff;text-decoration:none;font-size:14px;opacity:.9;margin-bottom:4px;cursor:pointer;background:none;border:0;padding:0}
-.the{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:10px 0;box-shadow:var(--shadow);color:inherit;text-decoration:none;cursor:pointer;font:inherit}
+header .k{font-size:13px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#ffd8a8}
+header h1{margin:2px 0 0;font-size:clamp(21px,4.8vw,28px);line-height:1.2;font-weight:900}
+.ve{display:inline-block;color:var(--ink);background:var(--card);text-decoration:none;font-size:14px;font-weight:800;margin-bottom:6px;cursor:pointer;border:0;border-radius:99px;padding:4px 12px;box-shadow:0 2px 0 #0004;font-family:inherit}
+.the{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:13px 15px;margin:12px 0;box-shadow:var(--shadow);color:inherit;text-decoration:none;cursor:pointer;font:inherit}
 .the:hover{border-color:var(--pri)}
-.the b{display:block;font-size:17px}
+.the b{display:block;font-size:17px;font-weight:900}
+.the:active{transform:translateY(2px);box-shadow:0 1px 0 var(--go)}
 .the .m{font-size:14px;color:var(--mute)}
 .the.de{border:2px solid var(--pri);background:var(--soft)}
-.thanh{height:7px;border-radius:9px;background:var(--line);margin-top:7px;overflow:hidden}.thanh i{display:block;height:100%;background:var(--pri)}
-.cach{background:var(--soft);border-left:4px solid var(--pri);border-radius:10px;padding:10px 14px;margin:14px 0;font-size:16px}
+.thanh{height:12px;border-radius:9px;background:var(--soft);border:2px solid var(--line);margin-top:8px;overflow:hidden}.thanh i{display:block;height:100%;background:linear-gradient(90deg,#2bb3a3,#16804f);border-radius:9px}
+.cach{background:var(--card);border:2px solid var(--line);border-left:6px solid var(--pri);border-radius:14px;box-shadow:0 2px 0 var(--go);padding:10px 14px;margin:14px 0;font-size:16px}
 .cach b:first-child{color:var(--pri)}
-.cau{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin:12px 0;box-shadow:var(--shadow)}
-.cau .so{font-weight:700;color:var(--pri)}
-.pa{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:11px;padding:9px 12px;margin:7px 0;cursor:pointer;color:inherit;font:inherit}
-.pa .ch{flex:0 0 26px;height:26px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:700;font-size:14px}
+.cau{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 15px;margin:12px 0;box-shadow:var(--shadow)}
+.cau .so{font-weight:900;color:#fff;background:var(--pri);border-radius:8px;padding:1px 8px;margin-right:4px}
+.pa{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:9px 12px;margin:8px 0;box-shadow:0 2px 0 var(--go);cursor:pointer;color:inherit;font:inherit}
+.pa .ch{flex:0 0 28px;height:28px;border-radius:9px;background:var(--pri2);color:var(--pri);display:grid;place-items:center;font-weight:900;font-size:14px}
 .pa:hover:not(:disabled){border-color:var(--pri)}
 .pa.chon{border-color:var(--pri);background:var(--soft)}
 .pa.dung{border-color:var(--dung);background:var(--dungbg)}.pa.dung .ch{background:var(--dung);color:#fff}
@@ -46,19 +58,21 @@ header h1{margin:2px 0 0;font-size:clamp(20px,4.6vw,27px);line-height:1.25}
 .y .gy{grid-column:1/-1;font-size:15px;color:var(--mute)}
 .o{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .o input{font:inherit;width:140px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:inherit}
-.nut{display:inline-block;background:var(--pri);color:var(--pri-ink);border:0;border-radius:11px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
-.nut.phu{background:var(--card);color:var(--pri);border:1.5px solid var(--pri)}
+.nut{display:inline-block;background:var(--pri);color:var(--pri-ink);border:0;border-radius:14px;padding:9px 18px;font:inherit;font-weight:900;cursor:pointer;text-decoration:none;box-shadow:0 3px 0 var(--gopri)}
+.nut:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gopri)}
+.nut.phu{background:var(--card);color:var(--pri);border:2px solid var(--pri);box-shadow:0 3px 0 var(--go)}
 .nut:disabled{opacity:.5;cursor:default}
 .giai{margin-top:9px;padding:9px 12px;border-radius:10px;font-size:16px}
 .giai.dung{background:var(--dungbg)}.giai.sai{background:var(--saibg)}
 .giai b{display:block}
-.tong{background:var(--card);border:2px solid var(--pri);border-radius:14px;padding:14px 16px;margin:16px 0;text-align:center}
-.tong .lon{font-size:30px;font-weight:800;color:var(--pri)}
+.tong{background:var(--card);border:2px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:14px 16px;margin:16px 0;text-align:center}
+.tong .lv{width:92px;margin:0 auto 4px;display:block}.lv .mat-vui,.lv .mat-buon,.lv .mat-wow{display:none}.lv.vui .mat-vui,.lv.buon .mat-buon,.lv.wow .mat-wow{display:inline}
+.tong .lon{font-size:34px;font-weight:900;color:var(--pri)}
 .ke{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
-.dong{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600}
+.dong{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:3px solid var(--go);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600}
 .dong .gio{font-variant-numeric:tabular-nums;font-size:20px;color:var(--pri)}
 .dong .gio.het{color:var(--sai)}
-.phan{margin:18px 0 4px;font-weight:700;color:var(--pri)}
+.phan{margin:20px 0 4px;font-weight:900;color:var(--pri)}
 .ghi{font-size:14px;color:var(--mute)}
 .bao{background:var(--cambg);color:var(--cam);border-radius:10px;padding:8px 12px;font-size:15px;margin:10px 0}
 .nu{display:inline-flex;align-items:center;vertical-align:middle;line-height:1}
@@ -103,6 +117,9 @@ const bangSo = (a, b) => { const x = so4(a), y = so4(b); if (x === y) return tru
 function gui(d) { if (TRONG_KHUNG && ID) try { window.parent.postMessage(Object.assign({ nguon: 'triway-luyen', id: ID }, d), '*'); } catch (e) {} }
 let D = null, gioTat = null;
 function datTieuDe(k, t, ve) { $('#k').textContent = k; $('#td').textContent = t; $('#ve').hidden = !ve; $('#ve').onclick = ve || null; document.title = t + ' – Hoá 10'; }
+function linhVat(t) {
+  return `<svg class="lv ${t}" viewBox="0 0 100 114" aria-hidden="true"><rect x="38" y="8" width="24" height="34" rx="4" fill="#eaf7fb" stroke="#2b2118" stroke-width="3"/><rect x="33" y="3" width="34" height="9" rx="4.5" fill="#d9580f" stroke="#2b2118" stroke-width="3"/><circle cx="50" cy="72" r="37" fill="#eaf7fb" stroke="#2b2118" stroke-width="3"/><path d="M15.5 74 Q30 66 50 74 T84.5 74 A35 35 0 0 1 15.5 74Z" fill="#2bb3a3"/><path d="M27 58 Q31 46 42 41" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"/><ellipse cx="29" cy="79" rx="6" ry="4" fill="#ff9e80" opacity=".75"/><ellipse cx="71" cy="79" rx="6" ry="4" fill="#ff9e80" opacity=".75"/><g fill="#2b2118"><circle cx="38" cy="66" r="5.2"/><circle cx="62" cy="66" r="5.2"/></g><g fill="#fff"><circle cx="39.8" cy="64.2" r="1.8"/><circle cx="63.8" cy="64.2" r="1.8"/></g><path class="mat-vui" d="M40 79 Q50 90 60 79" fill="#c23a1f" stroke="#2b2118" stroke-width="3" stroke-linejoin="round"/><path class="mat-buon" d="M41 86 Q50 78 59 86" fill="none" stroke="#2b2118" stroke-width="3" stroke-linecap="round"/><ellipse class="mat-wow" cx="50" cy="83" rx="6" ry="7.5" fill="#c23a1f" stroke="#2b2118" stroke-width="3"/></svg>`;
+}
 function len() { scrollTo(0, 0); }
 
 /* ---------- TRANG CHỦ: chọn bài (mở riêng, không qua web lớp) ---------- */
@@ -202,7 +219,7 @@ function trangDang(i) {
     const dung = cau.filter(q => q.k === 'ds' ? q._diem === 4 : q._diem === 1).length;
     ghiTienDo('b' + D.ma + '-d' + i, dung);
     const sau = i + 1 < D.dang.length ? `<button class="nut" id="tiep">Dạng tiếp theo →</button>` : `<button class="nut" id="tiep">⏱ Làm bài luyện 15 phút →</button>`;
-    $('#kq').innerHTML = `<div class="tong"><div>Em làm đúng</div><div class="lon">${dung}/10</div><div class="ghi">${dung >= 8 ? 'Rất tốt! Em đã nắm chắc dạng này.' : dung >= 5 ? 'Khá rồi. Đọc lại lời giải các câu sai rồi làm lại một lượt nhé.' : 'Em đọc kĩ «Cách làm» ở đầu trang và lời giải từng câu, rồi làm lại nhé.'}</div>
+    $('#kq').innerHTML = `<div class="tong">${linhVat(dung >= 8 ? "wow" : dung >= 5 ? "vui" : "buon")}<div>Em làm đúng</div><div class="lon">${dung}/10</div><div class="ghi">${dung >= 8 ? 'Rất tốt! Em đã nắm chắc dạng này.' : dung >= 5 ? 'Khá rồi. Đọc lại lời giải các câu sai rồi làm lại một lượt nhé.' : 'Em đọc kĩ «Cách làm» ở đầu trang và lời giải từng câu, rồi làm lại nhé.'}</div>
       <div class="ke"><button class="nut phu" id="lai">↻ Làm lại (trộn câu)</button>${sau}</div></div>`;
     $('#lai').onclick = () => trangDang(i); $('#tiep').onclick = () => i + 1 < D.dang.length ? trangDang(i + 1) : moDe();
   };
@@ -241,7 +258,7 @@ function lamDe() {
     const d10 = diem.toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
     ghiTienDo('b' + D.ma + '-15', Math.round(diem * 10));
     gui({ viec: 'nop', diem: Math.round(diem * 10) });
-    $('#kq').innerHTML = `<div class="tong"><div>${tu ? 'Hết giờ — máy đã tự nộp bài.' : 'Em đã nộp bài.'} Điểm của em</div><div class="lon">${d10} / 10</div><div class="ghi" id="guiCo">${TRONG_KHUNG && ID ? 'Đang gửi điểm cho cô…' : 'Mở ngoài web lớp nên điểm không gửi cho cô.'}</div>
+    $('#kq').innerHTML = `<div class="tong">${linhVat(diem >= 8 ? "wow" : diem >= 5 ? "vui" : "buon")}<div>${tu ? 'Hết giờ — máy đã tự nộp bài.' : 'Em đã nộp bài.'} Điểm của em</div><div class="lon">${d10} / 10</div><div class="ghi" id="guiCo">${TRONG_KHUNG && ID ? 'Đang gửi điểm cho cô…' : 'Mở ngoài web lớp nên điểm không gửi cho cô.'}</div>
       <div class="ghi">Kéo lên để xem đáp án và lời giải từng câu.</div><div class="ke"><button class="nut phu" id="lai">↻ Làm lại</button><button class="nut" id="veBai">Về các dạng bài</button></div></div>`;
     $('#lai').onclick = moDe; $('#veBai').onclick = trangBai;
     $('#kq').scrollIntoView({ behavior: 'smooth' });
