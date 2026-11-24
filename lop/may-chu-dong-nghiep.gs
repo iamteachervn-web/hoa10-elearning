@@ -100,6 +100,7 @@ function xuLy(d) {
   if (viec === 'lop') return thongKeLop(String(d.lop || ''));
   if (viec === 'so') return soLuot();
   if (viec === 'ch') return chCongKhai();
+  if (viec === 'vinh') return vinhDanh(d.giao);
   const khoa = LockService.getScriptLock(); khoa.waitLock(25000);
   try {
     if (viec === 'dem') return demLuot(String(d.lop || ''));
@@ -216,6 +217,89 @@ function thongKeLop(lop) {
   const out = { ok: true, lop: lop, siSo: SI_SO[lop], thamGia: Object.keys(hs).length, thamGiaTuan: Object.keys(hsTuan).length,
     tuan: dsTuan, ks: ks, tienBo: tienBo, capNhat: luc() };
   c.put('lop' + lop, JSON.stringify(out), 120);
+  return out;
+}
+
+/* Bảng vinh danh học sinh chăm chỉ (sếp duyệt 24/11/2026) — chỉ mã HS, tính theo độ chăm, không theo điểm bài làm.
+   · Học liệu (clip, mô phỏng, trò chơi, phiếu…) chỉ cộng +2 khi em HỌC THẬT: tổng thời gian trang học liệu đang mở
+     trước mắt em (chuyển ứng dụng / tắt màn hình thì ngừng đếm) đạt ngưỡng NGUONG_HOC; clip: 80% thời lượng.
+   · Mỗi bài nộp khác nhau (khảo sát, chẩn đoán, luyện dạng) +5 · mỗi bài e-learning học xong +10 (máy chỉ nhận khi em học hết bài).
+   · Mỗi ngày có học +3 · thời gian học +1 mỗi 10 phút, mỗi ngày tính tối đa 60 phút.
+   · % hoàn thành nhiệm vụ: trên các bài cô đã giao có nộp kết quả (web gửi danh sách lên).
+   Bỏ tài khoản trải nghiệm (số thứ tự 60). */
+const VD_DIEM = { hl: 2, bai: 5, el: 10, ngay: 3, phut10: 1, tranPhut: 60 };
+const NGUONG_HOC = { clip: 90, mophong: 180, trochoi: 180, phieu: 300, khac: 60 };   // giây; clip có độ dài thì lấy 80%
+const DO_DAI_CLIP = {   // giây (đo 24/11/2026). Clip mới chưa có ở đây thì cần 90 giây.
+  'clip-bai1-tom-tat': 143, 'clip-bai10-phim-ai': 62, 'clip-bai10-tiktok': 116, 'clip-bai2-bin': 115, 'clip-bai2-tom-tat': 122,
+  'clip-bai3-bin': 119, 'clip-bai3-luyen-cau-hinh': 40, 'clip-bai5-bin': 148, 'clip-bai5-gioi-thieu': 209, 'clip-bai6-tiktok': 97,
+  'clip-bai6-tn1': 79, 'clip-bai6-tn2': 60, 'clip-bai7-tiktok': 108, 'clip-bai7-tn1': 127, 'clip-bai7-tn2': 86, 'clip-bai8-tiktok': 124,
+  'clip-bai9-tiktok': 103, 'clip-c2-dang1': 135, 'clip-c2-dang2': 134, 'clip-c2-dang3': 129, 'clip-c2-dang4': 130, 'clip-c2-dang5': 122,
+  'clip-c2-dang6': 143, 'clip-gk1-dang1': 192, 'clip-gk1-dang2': 197, 'clip-gk1-dang3': 251, 'clip-gk1-dang4': 185, 'clip-gk1-dang5': 242,
+  'clip-gk1-dang6': 196, 'clip-gk1-lo-trinh': 196, 'clip-nhan-tin-1': 76, 'clip-nhan-tin-2': 95, 'clip-nhan-tin-3': 87,
+};
+function canHoc(hl) {                 // số giây phải học để học liệu được tính; 0 = học liệu tính bằng bài nộp, không tính lúc mở
+  if (/-elearning-|-luyen-dang$|^ks-|^cd-/.test(hl)) return 0;
+  if (/^clip-/.test(hl)) return DO_DAI_CLIP[hl] ? Math.round(DO_DAI_CLIP[hl] * 0.8) : NGUONG_HOC.clip;
+  if (/-mo-phong/.test(hl)) return NGUONG_HOC.mophong;
+  if (/-tro-choi/.test(hl)) return NGUONG_HOC.trochoi;
+  if (/-phieu-/.test(hl)) return NGUONG_HOC.phieu;
+  return NGUONG_HOC.khac;
+}
+function ngayCua(x) {                 // ô ngày của Sheet có thể là Date hoặc chữ (yyyy-MM-dd hay dd/MM/yyyy HH:mm)
+  if (x instanceof Date) return ngay(x);
+  const s = String(x || ''), m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(s);
+  return m ? m[3] + '-' + m[2] + '-' + m[1] : s.slice(0, 10);
+}
+function vinhDanh(giaoVao) {
+  const giao = {};                    // { lớp: [mã bài cô đã giao có nộp kết quả] }
+  Object.keys(giaoVao && typeof giaoVao === 'object' ? giaoVao : {}).slice(0, 20).forEach(function (l) {
+    if (Array.isArray(giaoVao[l])) giao[chu(l, 10)] = giaoVao[l].map(function (x) { return chu(x, 60); }).filter(function (x) { return /^[a-z0-9-]+$/.test(x); }).slice(0, 300);
+  });
+  const khoa = 'vinh' + bamPin('giao', JSON.stringify(giao)).slice(0, 12);
+  const c = CacheService.getScriptCache(), cu = c.get(khoa);
+  if (cu) return JSON.parse(cu);
+  const tuanNay = tuanCua(new Date()), cap = { nam: {}, tuan: {} }, daBai = {};
+  const bo = function (ma) { return !ma || ma === 'khach' || /-60$/.test(ma); };
+  const moi = function (k, ma) { return cap[k][ma] || (cap[k][ma] = { ma: ma, hl: 0, bai: 0, el: 0, ngay: {} }); };
+  const ghi = function (ma, ng, fn) {
+    fn(moi('nam', ma));
+    if (ng && tuanCua(new Date(ng + 'T12:00:00Z')) === tuanNay) fn(moi('tuan', ma));
+  };
+  const hoc = {};                     // ma|hl -> số giây đã học (cộng dồn); đạt ngưỡng thì tính vào ngày đạt
+  bang('HoatDong').forEach(function (r) {
+    const ma = String(r[3]); if (bo(ma)) return;
+    const ng = ngayCua(r[1]), giay = +r[7] || 0, hl = String(r[5]), xong = String(r[6]) === 'xong';
+    ghi(ma, ng, function (x) { x.ngay[ng] = (x.ngay[ng] || 0) + giay; });
+    if (!xong || !hl) return;
+    const can = canHoc(hl), k = ma + '|' + hl;
+    if (!can || hoc[k] === -1) return;
+    hoc[k] = (hoc[k] || 0) + giay;
+    if (hoc[k] >= can) { hoc[k] = -1; ghi(ma, ng, function (x) { x.hl++; }); }
+  });
+  bang('KetQua').forEach(function (r) {
+    const ma = String(r[1]); if (bo(ma)) return;
+    const ng = ngayCua(r[0]), b = String(r[3]);
+    ghi(ma, ng, function (x) { if (!(ng in x.ngay)) x.ngay[ng] = 0; });
+    if (!b) return;
+    (daBai[ma] = daBai[ma] || {});
+    if (daBai[ma][b]) return;        // nộp lại cùng bài: chỉ tính lần đầu
+    daBai[ma][b] = 1;
+    ghi(ma, ng, function (x) { if (/-elearning-/.test(b)) x.el++; else x.bai++; });
+  });
+  const xep = function (m) {
+    return Object.keys(m).map(function (ma) {
+      const x = m[ma], ds = Object.keys(x.ngay), lop = ma.replace(/-\d+$/, ''), g = giao[lop] || [];
+      let phut = 0, dPhut = 0;
+      ds.forEach(function (d) { const p = Math.min(VD_DIEM.tranPhut, x.ngay[d] / 60); phut += p; dPhut += Math.floor(p / 10) * VD_DIEM.phut10; });
+      const nvXong = g.filter(function (b) { return daBai[ma] && daBai[ma][b]; }).length;
+      return { ma: ma, lop: lop, diem: x.hl * VD_DIEM.hl + x.bai * VD_DIEM.bai + x.el * VD_DIEM.el + ds.length * VD_DIEM.ngay + dPhut,
+        hl: x.hl, bai: x.bai, el: x.el, ngay: ds.length, phut: Math.round(phut),
+        nv: g.length ? Math.round(nvXong / g.length * 100) : null, nvXong: nvXong, nvSo: g.length };
+    }).filter(function (x) { return x.diem > 0; })
+      .sort(function (a, b) { return b.diem - a.diem || (b.nv || 0) - (a.nv || 0) || b.ngay - a.ngay || (a.ma < b.ma ? -1 : 1); });
+  };
+  const out = { ok: true, tuan: tuanNay, nam: xep(cap.nam), tuanNay: xep(cap.tuan), cach: VD_DIEM, nguong: NGUONG_HOC, capNhat: luc() };
+  c.put(khoa, JSON.stringify(out), 300);
   return out;
 }
 

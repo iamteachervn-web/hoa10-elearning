@@ -13,6 +13,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="chung.css">
+<style>
+/* Bảng vinh danh học sinh chăm chỉ (24/11/2026) */
+.vd-dau{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.vd-dau .chips{display:flex;gap:6px;flex-wrap:wrap}
+.vd-buc{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;margin:6px 0 14px}
+.vd-buc .bac{text-align:center;background:var(--soft);border:2px solid var(--line);border-radius:18px 18px 8px 8px;padding:10px 6px 12px;min-width:0}
+.vd-buc .bac.h1{padding-top:18px;border-color:var(--acc);box-shadow:0 0 0 3px #e9a10033}
+.vd-buc .huy{font-size:34px;line-height:1}
+.vd-buc .h1 .huy{font-size:44px}
+.vd-buc .ma{font-weight:900;font-size:18px;margin-top:4px}
+.vd-buc .d{color:var(--pri);font-weight:900;font-size:22px;font-variant-numeric:tabular-nums}
+.vd-buc .d small{font-size:12px;color:var(--mute);font-weight:700}
+.vd-ds{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.vd-ds li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:7px 12px}
+.vd-ds .h{font-weight:900;color:var(--mute);text-align:center;font-variant-numeric:tabular-nums}
+.vd-ds .ma{font-weight:900}
+.vd-ds .ct{display:block;font-size:12.5px;color:var(--mute);font-weight:700}
+.vd-ds .d{font-weight:900;color:var(--pri);font-size:19px;font-variant-numeric:tabular-nums;text-align:right}
+.vd-ds .d small{display:block;font-size:11px;color:var(--mute);font-weight:700}
+.vd-ds li.em,.vd-buc .bac.em{border-color:var(--pri);background:var(--pri2)}
+.vd-em{margin-top:12px}
+details.vd-cach{margin-top:12px;font-size:14px}
+details.vd-cach summary{cursor:pointer;font-weight:800;color:var(--pri)}
+details.vd-cach ul{margin:6px 0 0;padding-left:20px}
+@media (max-width:480px){.vd-buc{gap:6px}.vd-buc .ma{font-size:14px}.vd-buc .d{font-size:18px}.vd-buc .huy{font-size:28px}.vd-buc .h1 .huy{font-size:36px}}
+.vd-buc .nvp{font-size:12.5px;color:var(--mute);font-weight:800}
+</style>
 </head>
 <body>
 <div class="draft" id="banNhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng (cô Thơi đang duyệt, nội dung có thể còn thay đổi)</div>
@@ -20,6 +47,16 @@
   <span id="chonLop" style="display:flex;gap:6px"></span></div></div>
 <main class="wrap" style="padding-top:16px">
   <section id="khuEm" style="margin-top:0"></section>
+  <section id="vinh">
+    <h2 class="tieu">🏆 Bảng vinh danh — Top 20 bạn chăm học</h2>
+    <p class="phu">Tính theo <b>độ chăm</b> (học đều, học nhiều, làm đủ bài) chứ không theo điểm bài làm. Bảng chỉ hiện mã lớp – số thứ tự, không có tên. <span id="vdCapNhat"></span></p>
+    <div class="khung">
+      <div class="vd-dau"><span class="chips" id="vdKy"></span><span class="chips" id="vdLop"></span></div>
+      <div id="vdNoi"><div class="rong">Đang tải bảng vinh danh…</div></div>
+      <details class="vd-cach"><summary>Cách tính điểm chăm</summary><ul id="vdCach"></ul>
+        <p class="ghi">Mở lại một học liệu, nộp lại một bài nhiều lần chỉ tính một lần. Bảng «Tuần này» tính lại từ thứ Hai hằng tuần nên bạn nào cũng có cơ hội.</p></details>
+    </div>
+  </section>
   <section>
     <h2 class="tieu" id="tieuLop">Cả lớp</h2>
     <p class="phu">Chỉ hiện số liệu chung của cả lớp — không có tên hay điểm của từng bạn. <span id="capNhat"></span></p>
@@ -145,7 +182,63 @@ async function veLop() {
         <p class="ghi">Chỉ tính những bạn làm cả bài đầu và bài cuối của chương, lấy lần làm đầu tiên.</p></div>`;
   } catch (e) { noi.innerHTML = `<div class="bao vang">⚠ Chưa tải được số liệu: ${esc(e.message)}</div>`; }
 }
-veEm(); veLop();
+/* ---------- bảng vinh danh học sinh chăm chỉ (24/11/2026) ---------- */
+const VD = { ky: 'tuanNay', lop: 'khoi', du: null };
+// bài cô đã giao có nộp kết quả (như trang cô): khảo sát/chẩn đoán gửi mã ks, luyện dạng + e-learning gửi id
+function giaoVinh() {
+  const g = {};
+  Object.keys(SI_SO).forEach(l => {
+    const truoc = typeof GIAO_TRUOC === 'object' ? GIAO_TRUOC[l] || [] : [];
+    g[l] = [...new Set(truoc.concat(NHIEM_VU[l] || []))].map(timHL).filter(h => h && (h.ks || h.luyen || h.muc === 'elearning')).map(h => h.ks || h.id);
+  });
+  return g;
+}
+const tenMa = ma => { const m = /^(.+)-(\d+)$/.exec(ma); return m ? `${m[1]} · số ${m[2]}` : ma; };
+async function veVinh() {
+  const noi = $('#vdNoi');
+  $('#vdKy').innerHTML = [['tuanNay', '📅 Tuần này'], ['nam', '🌟 Cả năm học']].map(([k, t]) => `<button class="chip${VD.ky === k ? ' on' : ''}" data-ky="${k}">${t}</button>`).join('');
+  $('#vdLop').innerHTML = [['khoi', 'Cả khối'], ...Object.keys(SI_SO).map(l => [l, l])].map(([k, t]) => `<button class="chip${VD.lop === k ? ' on' : ''}" data-lop="${k}">${t}</button>`).join('');
+  $$('#vdKy .chip').forEach(b => b.onclick = () => { VD.ky = b.dataset.ky; veVinh(); });
+  $$('#vdLop .chip').forEach(b => b.onclick = () => { VD.lop = b.dataset.lop; veVinh(); });
+  if (!MAY_CHU) { noi.innerHTML = '<div class="bao vang">Cô chưa nối máy chủ nên chưa có bảng vinh danh.</div>'; return; }
+  if (!VD.du) {
+    try { VD.du = await goi('vinh', { giao: giaoVinh() }); }
+    catch (e) {
+      noi.innerHTML = /không hợp lệ/.test(e.message)
+        ? '<div class="bao vang">Bảng vinh danh sắp có — máy chủ của thầy/cô chưa cập nhật bản mới.</div>'
+        : `<div class="bao vang">⚠ Chưa tải được bảng vinh danh: ${esc(e.message)}</div>`;
+      return;
+    }
+  }
+  const x = VD.du, c = x.cach || {};
+  $('#vdCapNhat').textContent = 'Cập nhật ' + x.capNhat + '.';
+  $('#vdCach').innerHTML = `<li>Mỗi học liệu khác nhau em đã <b>học thật</b> (clip xem đủ 80%, mô phỏng – trò chơi từ ${Math.round((x.nguong || {}).mophong / 60)} phút, phiếu bài tập từ ${Math.round((x.nguong || {}).phieu / 60)} phút): <b>+${c.hl}</b></li><li>Mỗi bài khác nhau em đã nộp (khảo sát, chẩn đoán, luyện dạng): <b>+${c.bai}</b></li><li>Mỗi bài e-learning em học hết: <b>+${c.el}</b></li>
+    <li>Mỗi ngày có học: <b>+${c.ngay}</b></li><li>Thời gian học: <b>+${c.phut10}</b> cho mỗi 10 phút, mỗi ngày tính tối đa ${c.tranPhut} phút</li>`;
+  const ds = (x[VD.ky] || []).filter(h => VD.lop === 'khoi' || h.lop === VD.lop).map(h => Object.assign({}, h));
+  ds.forEach((h, i) => h.hang = i && ds[i - 1].diem === h.diem ? ds[i - 1].hang : i + 1);   // bằng điểm thì đồng hạng
+  const toi = hsLay(), maToi = toi && toi.ma, ky = VD.ky === 'tuanNay' ? 'tuần này' : 'cả năm học';
+  if (!ds.length) { noi.innerHTML = `<div class="rong">Chưa có bạn nào học ${ky}${VD.lop === 'khoi' ? '' : ' ở lớp ' + VD.lop}. Em hãy là người đầu tiên lên bảng nhé! 🚀</div>`; return; }
+  const top = ds.filter(h => h.hang <= 20), huy = ['🥇', '🥈', '🥉'];
+  const nv = h => h.nv == null ? '' : ` · ✅ ${h.nv}% nhiệm vụ`;
+  const ct = h => `🎬 ${h.el} e-learning · 📝 ${h.bai} bài · 📚 ${h.hl} học liệu · 📅 ${h.ngay} ngày · ⏱ ${h.phut} phút${nv(h)}`;
+  const ba = top.slice(0, 3), buc = ba.length === 3 ? [ba[1], ba[0], ba[2]] : ba;
+  let html = `<div class="vd-buc" style="${ba.length < 3 ? 'grid-template-columns:repeat(' + ba.length + ',1fr)' : ''}">` + buc.map(h =>
+    `<div class="bac h${h.hang}${h.ma === maToi ? ' em' : ''}" title="${ct(h)}"><div class="huy">${huy[h.hang - 1] || '🏅'}</div>
+      <div class="ma">${esc(tenMa(h.ma))}</div><div class="d">${soVN(h.diem)} <small>điểm</small></div>${h.nv == null ? '' : `<div class="nvp">✅ ${h.nv}% nhiệm vụ</div>`}${h.ma === maToi ? '<div class="ghi" style="margin:0">⭐ Là em đó!</div>' : ''}</div>`).join('') + '</div>';
+  if (top.length > 3) html += '<ol class="vd-ds">' + top.slice(3).map(h =>
+    `<li class="${h.ma === maToi ? 'em' : ''}"><span class="h">${h.hang}</span><span><span class="ma">${esc(tenMa(h.ma))}${h.ma === maToi ? ' ⭐ em' : ''}</span><span class="ct">${ct(h)}</span></span>
+      <span class="d">${soVN(h.diem)}<small>điểm</small></span></li>`).join('') + '</ol>';
+  if (maToi && (VD.lop === 'khoi' || lopCua(maToi) === VD.lop)) {
+    const em = ds.find(h => h.ma === maToi), bet = top[top.length - 1];
+    if (!em) html += `<p class="bao vang vd-em">Em (${esc(maToi)}) chưa có điểm chăm ${ky}. Mở một học liệu hoặc làm nhiệm vụ tuần là có điểm ngay!</p>`;
+    else if (em.hang > 20) html += `<p class="bao vd-em">Em (${esc(maToi)}) đang đứng thứ <b>${em.hang}</b> với <b>${soVN(em.diem)}</b> điểm — chỉ cần thêm <b>${soVN(bet.diem - em.diem + 1)}</b> điểm nữa là vào Top 20. Cố lên!</p>`;
+    else html += `<p class="bao vd-em">🎉 Em (${esc(maToi)}) đang trong Top 20 ${ky}, hạng <b>${em.hang}</b>. Giữ vững phong độ nhé!</p>`;
+    if (em && em.nv != null && em.nv < 100) html += `<p class="ghi">Em đã làm ${em.nvXong}/${em.nvSo} bài cô giao (${em.nv}%). Làm nốt nhiệm vụ ở khung «🎯 Nhiệm vụ tuần» phía trên để thêm điểm nhé.</p>`;
+  }
+  noi.innerHTML = html;
+}
+veEm(); veLop(); veVinh();
+if (location.hash === '#vinh') setTimeout(() => $('#vinh').scrollIntoView(), 50);
 </script>
 </body>
 </html>
