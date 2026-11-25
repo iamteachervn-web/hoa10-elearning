@@ -27,7 +27,7 @@
       <div id="lamNgay"></div>
       <div class="dem" id="dem">
         <div class="o"><i>👀 Lượt</i><b id="dTong">—</b><span>lượt truy cập</span></div>
-        <div class="o"><i>📅 Nay</i><b id="dHom">—</b><span>hôm nay</span></div>
+        <div class="o"><i>☀️ Nay</i><b id="dHom">—</b><span>hôm nay</span></div>
         <div class="o"><i>📚 Kho</i><b id="dHL">—</b><span>học liệu</span></div>
       </div>
     </div>
@@ -114,7 +114,7 @@ const DA = daHoc();
 function the(h) {
   const m = MUC[h.muc], cho = h.muc === 'clip' && !h.video;
   const meta = [DA[h.id] ? '<span class="da">✓ Đã học</span>' : '', moi(h.ngay) ? '<span class="moi">MỚI</span>' : '', `<span class="nh">${m.ten}</span>`, h.tg ? `⏱ ${esc(h.tg)}` : '',
-    /\.pdf$/i.test(h.nguon || '') ? '📄 PDF' : '', cho ? '⏳ Cô sắp đăng' : '', h.ks && KS_MO[h.ks] === false ? '🔒 Cô chưa mở' : ''].filter(Boolean).join(' · ');
+    /\.pdf$/i.test(h.nguon || '') ? '📄 PDF' : '', cho ? '⏳ Cô sắp đăng' : '', h.ks && KS_MO[h.ks] === false ? (moLucChu(h.ks) ? '🔒 Tự ' + moLucChu(h.ks) : '🔒 Cô chưa mở') : ''].filter(Boolean).join(' · ');
   const noi = `<span class="ic">${m.icon}</span><span><h5>${hoa(h.ten)}</h5>${h.mo ? `<p>${hoa(h.mo)}</p>` : ''}<span class="meta">${meta}</span></span>`;
   return cho ? `<div class="the ${m.mau} cho">${noi}</div>` : `<a class="the ${m.mau}" href="${encodeURI(linkHL(h))}" data-id="${h.id}">${noi}</a>`;
 }
@@ -163,7 +163,7 @@ veMuc(); veLoc(); ve(); veLop(null);
 
 /* Việc cần làm ngay: khảo sát cô đang mở — nút to ngay đầu trang (19/11/2026) */
 (function () {
-  const ks = hien.filter(h => h.ks && KS_MO[h.ks] && !KHAO_SAT[h.ks].haiBac);   // câu hai bậc (trước/sau tiết) nằm ở nhiệm vụ tuần, không đưa lên nút to
+  const ks = hien.filter(h => h.ks && KS_MO[h.ks] && !KHAO_SAT[h.ks].haiBac && !tuDo(h.ks));   // câu hai bậc nằm ở nhiệm vụ tuần; khảo sát chương tự do (1, 2) không đưa lên nút to
   if (!ks.length) return;
   const hs = hsLay();
   $('#lamNgay').innerHTML = ks.map(h => {

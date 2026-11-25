@@ -20,10 +20,27 @@ kho.set('hoa10_may_chu', MAY_CHU || '');
 function moChoEm(ksMa) {
   const k = typeof KHAO_SAT === 'object' ? KHAO_SAT[ksMa] : null;
   if (!k || !k.mo) return false;
+  if (tuDo(ksMa)) return true;   // chương HS tự do làm (CHUONG_TU_DO trong cai-dat.js)
   if (!(k.haiBac && k.loai === 'sau')) return true;
+  const gioMo = moLucCua(ksMa); if (gioMo && Date.now() >= Date.parse(gioMo)) return true;   // hẹn giờ mở khoá
   const hs = hsLay(); if (!hs) return false;
   const lop = lopCua(hs.ma), giao = [].concat(typeof GIAO_TRUOC === 'object' ? GIAO_TRUOC[lop] || [] : [], typeof NHIEM_VU === 'object' ? NHIEM_VU[lop] || [] : []);
   return HOC_LIEU.some(h => h.ks === ksMa && giao.includes(h.id));
+}
+const tuDo = ksMa => { const k = typeof KHAO_SAT === 'object' ? KHAO_SAT[ksMa] : null; return !!k && typeof CHUONG_TU_DO === 'object' && CHUONG_TU_DO.includes(k.chuong); };
+/* «mở lúc 11:00 ngày 25/11» nếu bài có hẹn giờ mở khoá và chưa tới giờ, không thì '' */
+/* giờ hẹn mở khoá của bài cho lớp của em đang vào (MO_LUC: một giờ chung hoặc { lớp: giờ }) */
+function moLucCua(ksMa) {
+  const m = typeof MO_LUC === 'object' ? MO_LUC[ksMa] : null;
+  if (!m) return '';
+  if (typeof m === 'string') return m;
+  const hs = hsLay(); return hs ? m[lopCua(hs.ma)] || '' : '';
+}
+function moLucChu(ksMa) {
+  const g = moLucCua(ksMa); if (!g) return '';
+  const t = Date.parse(g); if (isNaN(t) || Date.now() >= t) return '';
+  const d = new Date(t), h = n => String(n).padStart(2, '0');
+  return `mở lúc ${h(d.getHours())}:${h(d.getMinutes())} ngày ${h(d.getDate())}/${h(d.getMonth() + 1)}`;
 }
 /* lớp của một mã HS: «10A2-07» → «10A2», «10A10-07» → «10A10» */
 const lopCua = ma => { const s = String(ma || ''), i = s.lastIndexOf('-'); return i > 0 ? s.slice(0, i) : s; };

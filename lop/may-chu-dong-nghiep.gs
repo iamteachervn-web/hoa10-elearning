@@ -81,17 +81,30 @@ function lopCuaMa(ma) {
 function kiemHS(d, choPhepMoi) {          // trả về lớp nếu đúng mã + mật mã
   const lop = lopCuaMa(d.ma);
   if (!/^\d{4}$/.test(String(d.pin || ''))) throw new Error('Mật mã phải gồm đúng 4 chữ số.');
-  const sh = trang('HocSinh'), ds = bang('HocSinh'), bam = bamPin(d.ma, d.pin);
-  for (let i = 0; i < ds.length; i++) {
-    if (String(ds[i][0]) !== d.ma) continue;
-    if (!ds[i][1]) { sh.getRange(i + 2, 2, 1, 3).setValues([[bam, String(ds[i][2] || luc()), luc()]]); return lop; }
+  const sh = trang('HocSinh'), bam = bamPin(d.ma, d.pin);
+  const tim = function (ds) { for (let i = 0; i < ds.length; i++) if (String(ds[i][0]) === d.ma) return i; return -1; };
+  // Đường nhanh (gần như mọi lần): em đã có mật mã → chỉ đọc, không xếp hàng chờ ai
+  let ds = bang('HocSinh'), i = tim(ds);
+  if (i >= 0 && ds[i][1]) {
     if (String(ds[i][1]) !== bam) throw new Error('Mã này đã có bạn dùng với mật mã khác. Nếu đúng là của em mà quên mật mã thì báo cô.');
     if (choPhepMoi) sh.getRange(i + 2, 4).setValue(luc());
     return lop;
   }
-  if (!choPhepMoi) throw new Error('Em chưa vào lớp trên trang này. Vào Góc lớp để đặt mật mã.');
-  sh.appendRow([d.ma, bam, luc(), luc()]);
-  return lop;
+  if (i < 0 && !choPhepMoi) throw new Error('Em chưa vào lớp trên trang này. Vào Góc lớp để đặt mật mã.');
+  // Đặt mật mã lần đầu: khoá NGẮN chỉ quanh việc ghi, đọc lại trong khoá để 2 máy cùng đặt không đè nhau
+  const khoa = LockService.getScriptLock();
+  if (!khoa.tryLock(20000)) throw new Error('Nhiều bạn đang vào cùng lúc, em đợi vài giây rồi bấm lại nhé.');
+  try {
+    ds = bang('HocSinh'); i = tim(ds);
+    if (i >= 0) {
+      if (!ds[i][1]) { sh.getRange(i + 2, 2, 1, 3).setValues([[bam, String(ds[i][2] || luc()), luc()]]); return lop; }
+      if (String(ds[i][1]) !== bam) throw new Error('Mã này đã có bạn dùng với mật mã khác. Nếu đúng là của em mà quên mật mã thì báo cô.');
+      return lop;
+    }
+    sh.appendRow([d.ma, bam, luc(), luc()]);
+    SpreadsheetApp.flush();
+    return lop;
+  } finally { khoa.releaseLock(); }
 }
 
 /* ---------- xử lý yêu cầu ---------- */
@@ -101,9 +114,11 @@ function xuLy(d) {
   if (viec === 'so') return soLuot();
   if (viec === 'ch') return chCongKhai();
   if (viec === 'vinh') return vinhDanh(d.giao);
-  const khoa = LockService.getScriptLock(); khoa.waitLock(25000);
-  try {
-    if (viec === 'dem') return demLuot(String(d.lop || ''));
+  if (viec === 'dem') return demLuot(String(d.lop || ''));
+  /* Các việc dưới đây KHÔNG khoá cả máy chủ nữa (24/11/2026): trước đây mọi lượt mở học liệu, nộp bài,
+     xem tiến độ đều xếp một hàng — cả lớp cùng vào thì em xếp sau chờ quá 25 giây, báo «Thời gian chờ khóa».
+     appendRow của Google tự thêm dòng an toàn khi nhiều người ghi cùng lúc; kiemHS chỉ khoá khi đặt mật mã lần đầu. */
+  {
     if (viec === 'vao') { kiemHS(d, true); return { ok: true }; }
     if (viec === 'hd') {
       const lop = kiemHS(d, false), b = new Date();
@@ -130,6 +145,11 @@ function xuLy(d) {
       return { ok: true };
     }
     if (viec === 'toi') { kiemHS(d, false); return cuaToi(d.ma); }
+  }
+  // Việc của cô (trang cô, cài đặt): ít người gọi, giữ khoá cho chắc
+  const khoa = LockService.getScriptLock();
+  if (!khoa.tryLock(20000)) throw new Error('Máy chủ đang bận, cô đợi vài giây rồi tải lại trang nhé.');
+  try {
     if (viec === 'gv') return trangCo(String(d.mk || ''));
     if (viec === 'caidat') return datCaiDat(d);
     if (viec === 'giao') return giaoBai(d);
@@ -137,8 +157,13 @@ function xuLy(d) {
   } finally { khoa.releaseLock(); }
 }
 
-/* Đếm lượt vào trang chủ: mỗi ngày 1 dòng */
+/* Đếm lượt vào trang chủ: mỗi ngày 1 dòng. Khoá ngắn riêng; máy chủ quá bận thì bỏ qua 1 lượt đếm, không báo lỗi cho HS */
 function demLuot(lop) {
+  const khoa = LockService.getScriptLock();
+  if (!khoa.tryLock(10000)) return soLuot();
+  try { return demLuotTrongKhoa(lop); } finally { khoa.releaseLock(); }
+}
+function demLuotTrongKhoa(lop) {
   const sh = trang('LuotTruyCap'), hom = ngay(), n = sh.getLastRow(), l = SI_SO[lop] ? lop : '';
   let dong = 0;
   if (n >= 2) {

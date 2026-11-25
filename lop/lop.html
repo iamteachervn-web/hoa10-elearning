@@ -75,7 +75,7 @@ const LOP = (() => { const l = new URLSearchParams(location.search).get('l') || 
 document.title = 'Góc lớp ' + LOP + ' – Hoá học 10';
 $('#tieuDe').textContent = '🏫 Góc lớp ' + LOP; $('#tieuLop').textContent = 'Cả lớp ' + LOP;
 $('#chonLop').innerHTML = Object.keys(SI_SO).map(l => `<a class="ve" href="lop.html?l=${l}" style="${l === LOP ? 'background:#ffd8a8;color:#2b2118;font-weight:900' : ''}">${l}</a>`).join('');
-const TEN_KS = { 'c3-dau': 'Đầu C3', 'c3-cuoi': 'Cuối C3', 'c4-dau': 'Đầu C4', 'c4-cuoi': 'Cuối C4' };
+const TEN_KS = { 'c1-dau': 'Đầu C1', 'c1-cuoi': 'Cuối C1', 'c2-dau': 'Đầu C2', 'c2-cuoi': 'Cuối C2', 'c3-dau': 'Đầu C3', 'c3-cuoi': 'Cuối C3', 'c4-dau': 'Đầu C4', 'c4-cuoi': 'Cuối C4', 'c5-dau': 'Đầu C5', 'c5-cuoi': 'Cuối C5', 'c6-dau': 'Đầu C6', 'c6-cuoi': 'Cuối C6', 'c7-dau': 'Đầu C7', 'c7-cuoi': 'Cuối C7' };
 
 /* ---------- biểu đồ SVG tự vẽ ---------- */
 function bdTuan(tuan) {
@@ -112,7 +112,7 @@ function bdMuc(ks) {
     <div class="chu-thich"><span><i style="background:var(--mB)"></i>Biết</span><span><i style="background:var(--mH)"></i>Hiểu</span><span><i style="background:var(--mV)"></i>Vận dụng</span><span>(% câu đúng, tính theo lần làm đầu tiên)</span></div>`;
 }
 function bdTienBo(tb) {
-  const ch = ['c3', 'c4'].map(c => ({ c, ...tb[c] }));
+  const ch = Object.keys(tb || {}).sort().map(c => ({ c, ...tb[c] }));   // máy chủ hiện tính c3, c4
   return ch.map(x => {
     if (!x.n) return `<div class="dong-tb"><b>Chương ${x.c[1]}</b><div class="ghi">Chưa có bạn làm đủ cả bài đầu và bài cuối chương.</div></div>`;
     const tang = x.cuoi - x.dau;
@@ -154,7 +154,7 @@ async function veEm() {
       return `<div style="display:grid;grid-template-columns:70px 1fr 120px;gap:8px;align-items:center;margin:6px 0"><b>${TEN_KS[k]}</b>
         <span style="height:14px;border-radius:99px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:${x.dau}%;background:var(--pri)"></i></span>
         <span>${x.dau}%${x.lan > 1 ? ` · cao nhất ${x.cao}%` : ''}</span></div>`; }).join('') +
-      ['c3', 'c4'].map(c => t.bai[c + '-dau'] && t.bai[c + '-cuoi'] ? `<p class="bao">Chương ${c[1]}: em từ <b>${t.bai[c + '-dau'].dau}%</b> lên <b>${t.bai[c + '-cuoi'].dau}%</b> ${t.bai[c + '-cuoi'].dau >= t.bai[c + '-dau'].dau ? '🎉' : '— cùng cô ôn thêm nhé'}</p>` : '').join('')
+      ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'].map(c => t.bai[c + '-dau'] && t.bai[c + '-cuoi'] ? `<p class="bao">Chương ${c[1]}: em từ <b>${t.bai[c + '-dau'].dau}%</b> lên <b>${t.bai[c + '-cuoi'].dau}%</b> ${t.bai[c + '-cuoi'].dau >= t.bai[c + '-dau'].dau ? '🎉' : '— cùng cô ôn thêm nhé'}</p>` : '').join('')
       : 'Em chưa làm khảo sát nào. Bắt đầu từ nhiệm vụ tuần nhé!';
   } catch (e) { $('#eKS').textContent = '⚠ ' + e.message; }
 }
@@ -175,7 +175,7 @@ async function veLop() {
           <div class="o"><b>${soVN(tongLuot)}</b><span>lượt học (8 tuần)</span></div>
           <div class="o"><b>${soVN(tongPhut)}</b><span>phút học (8 tuần)</span></div></div></div></div>
       <div class="luoi2">
-        <div class="khung"><h3>📅 Lượt học mỗi tuần</h3>${bdTuan(x.tuan)}<p class="ghi">Cột cam là tuần này. Một lượt = một lần mở học liệu.</p></div>
+        <div class="khung"><h3>🗓️ Lượt học mỗi tuần</h3>${bdTuan(x.tuan)}<p class="ghi">Cột cam là tuần này. Một lượt = một lần mở học liệu.</p></div>
         <div class="khung"><h3>🧠 Tỉ lệ đúng theo mức độ</h3>${bdMuc(x.ks)}</div>
       </div>
       <div class="khung" style="margin-top:14px"><h3>🚀 Tiến bộ đầu → cuối chương</h3>${bdTienBo(x.tienBo)}
@@ -196,7 +196,7 @@ function giaoVinh() {
 const tenMa = ma => { const m = /^(.+)-(\d+)$/.exec(ma); return m ? `${m[1]} · số ${m[2]}` : ma; };
 async function veVinh() {
   const noi = $('#vdNoi');
-  $('#vdKy').innerHTML = [['tuanNay', '📅 Tuần này'], ['nam', '🌟 Cả năm học']].map(([k, t]) => `<button class="chip${VD.ky === k ? ' on' : ''}" data-ky="${k}">${t}</button>`).join('');
+  $('#vdKy').innerHTML = [['tuanNay', '🗓️ Tuần này'], ['nam', '🌟 Cả năm học']].map(([k, t]) => `<button class="chip${VD.ky === k ? ' on' : ''}" data-ky="${k}">${t}</button>`).join('');
   $('#vdLop').innerHTML = [['khoi', 'Cả khối'], ...Object.keys(SI_SO).map(l => [l, l])].map(([k, t]) => `<button class="chip${VD.lop === k ? ' on' : ''}" data-lop="${k}">${t}</button>`).join('');
   $$('#vdKy .chip').forEach(b => b.onclick = () => { VD.ky = b.dataset.ky; veVinh(); });
   $$('#vdLop .chip').forEach(b => b.onclick = () => { VD.lop = b.dataset.lop; veVinh(); });
@@ -220,7 +220,7 @@ async function veVinh() {
   if (!ds.length) { noi.innerHTML = `<div class="rong">Chưa có bạn nào học ${ky}${VD.lop === 'khoi' ? '' : ' ở lớp ' + VD.lop}. Em hãy là người đầu tiên lên bảng nhé! 🚀</div>`; return; }
   const top = ds.filter(h => h.hang <= 20), huy = ['🥇', '🥈', '🥉'];
   const nv = h => h.nv == null ? '' : ` · ✅ ${h.nv}% nhiệm vụ`;
-  const ct = h => `🎬 ${h.el} e-learning · 📝 ${h.bai} bài · 📚 ${h.hl} học liệu · 📅 ${h.ngay} ngày · ⏱ ${h.phut} phút${nv(h)}`;
+  const ct = h => `🎬 ${h.el} e-learning · 📝 ${h.bai} bài · 📚 ${h.hl} học liệu · ☀️ ${h.ngay} ngày · ⏱ ${h.phut} phút${nv(h)}`;
   const ba = top.slice(0, 3), buc = ba.length === 3 ? [ba[1], ba[0], ba[2]] : ba;
   let html = `<div class="vd-buc" style="${ba.length < 3 ? 'grid-template-columns:repeat(' + ba.length + ',1fr)' : ''}">` + buc.map(h =>
     `<div class="bac h${h.hang}${h.ma === maToi ? ' em' : ''}" title="${ct(h)}"><div class="huy">${huy[h.hang - 1] || '🏅'}</div>

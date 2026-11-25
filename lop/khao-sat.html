@@ -79,7 +79,7 @@ function batDauTrang() {
   if (!KS.mo) { $('#noi').innerHTML = '<div class="khung"><h3>🔒 Cô chưa mở bài này</h3><p>Khi tới lúc làm, cô sẽ mở và báo trên lớp nhé.</p></div>'; return; }
   const hs = hsLay();
   if (!hs) { hopVao($('#noi'), batDauTrang); $('#noi').insertAdjacentHTML('afterbegin', '<p class="phu">Em vào lớp trước để cô ghi nhận kết quả.</p>'); return; }
-  if (!moChoEm(MA_BAI)) { $('#noi').innerHTML = '<div class="khung"><h3>🔒 Bài này làm SAU giờ học</h3><p>Cô sẽ giao bài này cho lớp em sau tiết học trên lớp. Em quay lại khi cô dặn nhé.</p></div>'; return; }
+  if (!moChoEm(MA_BAI)) { const ml = moLucChu(MA_BAI); $('#noi').innerHTML = '<div class="khung"><h3>🔒 Bài này làm SAU giờ học</h3><p>' + (ml ? 'Bài sẽ tự ' + ml + '. Em quay lại lúc đó nhé.' : 'Cô sẽ giao bài này cho lớp em sau tiết học trên lớp. Em quay lại khi cô dặn nhé.') + '</p></div>'; return; }
   const dem = { B: 0, H: 0, V: 0 }; KS.cau.forEach(c => dem[c.muc]++);
   const daLam = +kho.get('hoa10_ks_' + MA_BAI + '_' + hs.ma, '0');
   $('#noi').innerHTML = `<div class="khung noi">
