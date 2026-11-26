@@ -58,7 +58,21 @@ function trang(ten) {
 }
 function bang(ten) {
   const sh = trang(ten), n = sh.getLastRow() - 1, c = TRANG[ten].length;
-  return n > 0 ? sh.getRange(2, 1, n, c).getValues() : [];
+  const rs = n > 0 ? sh.getRange(2, 1, n, c).getValues() : [];
+  if (ten === 'KetQua' && rs.length) suaMaBaiBiCat(sh, rs);
+  return rs;
+}
+/* Trước 26/11/2026 việc «nop» cắt mã bài còn 30 kí tự → e-learning mã dài (VD bai12-elearning-lien-ket-cong-hoa-tri)
+   bị ghi cụt, Trang cô báo 0 em xong. Sửa MỘT lần: lấy mã đầy đủ ở HoatDong (ghi đủ 60 kí tự), ghi đè cột Bài, rồi đánh dấu. */
+function suaMaBaiBiCat(sh, rs) {
+  const p = PropertiesService.getScriptProperties();
+  if (p.getProperty('DA_SUA_MA_BAI')) return;
+  const du = {};
+  bang('HoatDong').forEach(function (r) { const h = String(r[5]); if (h.length > 30) du[h.slice(0, 30)] = h; });
+  let doi = false;
+  rs.forEach(function (r) { const b = String(r[3]); if (b.length === 30 && du[b]) { r[3] = du[b]; doi = true; } });
+  if (doi) sh.getRange(2, 4, rs.length, 1).setValues(rs.map(function (r) { return [r[3]]; }));
+  p.setProperty('DA_SUA_MA_BAI', '1');
 }
 function ngay(d) { return Utilities.formatDate(d || new Date(), MUI_GIO, 'yyyy-MM-dd'); }
 function luc(d) { return Utilities.formatDate(d || new Date(), MUI_GIO, 'dd/MM/yyyy HH:mm'); }
@@ -126,7 +140,7 @@ function xuLy(d) {
       return { ok: true };
     }
     if (viec === 'nop') {
-      const lop = kiemHS(d, false), bai = chu(d.bai, 30);
+      const lop = kiemHS(d, false), bai = chu(d.bai, 60);   // 60 như HoatDong (trước 26/11 là 30 → cắt cụt mã e-learning dài)
       if (!/^[a-z0-9-]+$/.test(bai)) throw new Error('Bài không hợp lệ.');
       const lan = bang('KetQua').filter(function (r) { return String(r[1]) === d.ma && String(r[3]) === bai; }).length + 1;
       const pt = function (x) { return x === '' || x == null ? '' : String(so(x, 0, 100)); };
