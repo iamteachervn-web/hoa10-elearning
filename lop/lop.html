@@ -34,11 +34,31 @@
 .vd-ds .d small{display:block;font-size:11px;color:var(--mute);font-weight:700}
 .vd-ds li.em,.vd-buc .bac.em{border-color:var(--pri);background:var(--pri2)}
 .vd-em{margin-top:12px}
+.vd-lop{margin:0 0 12px}
+.vd-chua{margin-top:12px;font-size:14px;line-height:2}
+.vd-chua span{display:inline-block;background:var(--soft);border:1.5px solid var(--line);border-radius:99px;padding:0 9px;margin:0 4px 0 0;font-weight:700;color:var(--mute);line-height:1.7}
+.vd-chua span.em{border-color:var(--pri);color:var(--pri)}
 details.vd-cach{margin-top:12px;font-size:14px}
 details.vd-cach summary{cursor:pointer;font-weight:800;color:var(--pri)}
 details.vd-cach ul{margin:6px 0 0;padding-left:20px}
 @media (max-width:480px){.vd-buc{gap:6px}.vd-buc .ma{font-size:14px}.vd-buc .d{font-size:18px}.vd-buc .huy{font-size:28px}.vd-buc .h1 .huy{font-size:36px}}
 .vd-buc .nvp{font-size:12.5px;color:var(--mute);font-weight:800}
+/* % hoàn thành của em (27/11/2026) */
+.ht-dau{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.ht-dau .loi{flex:1;min-width:220px;font-weight:700}
+.ht-ch{display:grid;grid-template-columns:minmax(0,1fr) 150px 64px;gap:10px;align-items:center;margin:8px 0;font-size:14.5px}
+.ht-ch b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ht-ch .thanh{height:14px;border-radius:99px;background:var(--line);overflow:hidden}
+.ht-ch .thanh i{display:block;height:100%;border-radius:99px}
+.ht-ch .p{font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+.ht-ch .p small{display:block;font-size:11.5px;color:var(--mute);font-weight:700}
+.ht-bu{margin-top:12px}
+.ht-nhom{margin:14px 0 4px;font-size:14px;color:var(--mute);font-weight:900;text-transform:uppercase;letter-spacing:.3px}
+.ht-canh{margin:0 0 14px;font-size:15px}
+.ht-canh a{font-weight:900;color:var(--pri);white-space:nowrap}
+#eHT{scroll-margin-top:80px}
+.ht-bu .nv .cu{font-size:11.5px;font-weight:800;color:#b45309;background:#fef3c7;border-radius:99px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+@media (max-width:480px){.ht-ch{grid-template-columns:minmax(0,1fr) 90px 54px;font-size:13.5px}}
 </style>
 </head>
 <body>
@@ -49,7 +69,7 @@ details.vd-cach ul{margin:6px 0 0;padding-left:20px}
   <section id="khuEm" style="margin-top:0"></section>
   <section id="vinh">
     <h2 class="tieu">🏆 Bảng vinh danh — Top 20 bạn chăm học</h2>
-    <p class="phu">Tính theo <b>độ chăm</b> (học đều, học nhiều, làm đủ bài) chứ không theo điểm bài làm. Bảng chỉ hiện mã lớp – số thứ tự, không có tên. <span id="vdCapNhat"></span></p>
+    <p class="phu">Xếp trước hết theo <b>% nhiệm vụ cô giao đã hoàn thành</b> — % càng cao đứng càng trên; cùng % thì ai có <b>điểm chăm</b> cao hơn đứng trên. Không xét điểm bài làm. Bảng chỉ hiện mã lớp – số thứ tự, không có tên. <span id="vdCapNhat"></span></p>
     <div class="khung">
       <div class="vd-dau"><span class="chips" id="vdKy"></span><span class="chips" id="vdLop"></span></div>
       <div id="vdNoi"><div class="rong">Đang tải bảng vinh danh…</div></div>
@@ -60,6 +80,7 @@ details.vd-cach ul{margin:6px 0 0;padding-left:20px}
   <section>
     <h2 class="tieu" id="tieuLop">Cả lớp</h2>
     <p class="phu">Chỉ hiện số liệu chung của cả lớp — không có tên hay điểm của từng bạn. <span id="capNhat"></span></p>
+    <button class="nut" id="xemXH" style="margin-bottom:12px">🏅 Xem thứ tự xếp hạng cả lớp</button>
     <div id="khuLop"></div>
   </section>
 </main>
@@ -128,6 +149,47 @@ function bdTienBo(tb) {
   }).join('');
 }
 
+/* ---------- % hoàn thành của em (27/11/2026) ----------
+   Cùng cách tính với trang cô: trên bài cô ĐÃ GIAO cho lớp (GIAO_TRUOC + NHIEM_VU), chỉ học liệu có nộp kết quả
+   (khảo sát, chẩn đoán, luyện dạng 15′, e-learning); «xong» = đã nộp, không xét điểm.
+   Việc chưa xong — cả việc của tuần trước — hiện thành danh sách để em làm bù. */
+const coKQ = h => !!(h && (h.ks || h.luyen || h.muc === 'elearning'));
+const xongEm = (h, t) => !!t.bai[h.ks || h.id];
+function veHT(t) {
+  const truoc = typeof GIAO_TRUOC === 'object' ? GIAO_TRUOC[LOP] || [] : [], nay = NHIEM_VU[LOP] || [];
+  const ds = [...new Set(truoc.concat(nay))].map(timHL).filter(h => coKQ(h) && !h.an);
+  const noi = $('#eHT');
+  if (!ds.length) { noi.textContent = 'Cô chưa giao bài nào có nộp kết quả cho lớp mình.'; return; }
+  const m = {};
+  ds.forEach(h => { const c = (timBai(String(h.bai)) || {}).ch; (m[c] = m[c] || []).push(h); });
+  const xong = ds.filter(h => xongEm(h, t)).length, p = Math.round(xong / ds.length * 100);
+  const mau = v => v >= 80 ? 'var(--dung)' : v >= 50 ? 'var(--acc)' : 'var(--sai)';
+  const thieu = ds.filter(h => !xongEm(h, t)), thieuCu = thieu.filter(h => !nay.includes(h.id));
+  // CẢNH BÁO: việc các tuần trước chưa xong — vẫn nhắc ở đầu khu của em cho tới khi làm bù đủ (sếp dặn 27/11/2026)
+  const canh = $('#eCanh');
+  if (canh) canh.innerHTML = thieuCu.length ? `<div class="bao vang ht-canh">⚠️ <b>Em còn ${thieuCu.length} việc của tuần trước chưa hoàn thành</b>: ${thieuCu.slice(0, 3).map(h => hoa(h.ten)).join(' · ')}${thieuCu.length > 3 ? '…' : ''}.
+    <a href="#eHT">Xem và làm bù ngay →</a></div>` : '';
+  // % theo từng phần nhiệm vụ
+  const PHAN = [['ks', '✍️ Khảo sát chương'], ['el', '🎓 E-learning (học hết bài)'], ['cd', '🧭 Câu hỏi trước – sau tiết'], ['luyen', '📝 Luyện dạng + 15 phút']];
+  const phanCua = h => h.luyen ? 'luyen' : h.ks ? (KHAO_SAT[h.ks] && KHAO_SAT[h.ks].haiBac ? 'cd' : 'ks') : 'el';
+  const dong = (ten, nhom) => { const n = nhom.length, x = nhom.filter(h => xongEm(h, t)).length, pc = Math.round(x / n * 100);
+    return `<div class="ht-ch"><b title="${esc(ten)}">${esc(ten)}</b><span class="thanh"><i style="width:${pc}%;background:${mau(pc)}"></i></span>
+      <span class="p">${pc}%<small>${x}/${n} việc</small></span></div>`; };
+  const loi = p === 100 ? '🎉 Em đã làm đủ tất cả bài cô giao. Tuyệt vời!'
+    : p >= 80 ? `Sắp đủ rồi! Còn <b>${thieu.length}</b> việc nữa thôi.`
+    : `Em còn <b>${thieu.length}</b> việc chưa làm. Làm bù dần ở danh sách bên dưới nhé!`;
+  noi.innerHTML = `<div class="ht-dau">${vong(p, mau(p), 96)}<div class="loi">Em đã làm <b>${xong}/${ds.length}</b> việc cô giao (${p}%).<br>${loi}</div></div>
+    <h4 class="ht-nhom">Theo từng phần nhiệm vụ</h4>
+    ${PHAN.map(([k, ten]) => { const nhom = ds.filter(h => phanCua(h) === k); return nhom.length ? dong(ten, nhom) : ''; }).join('')}
+    ${nay.length ? `<h4 class="ht-nhom">Tuần này / tuần trước</h4>${[['📅 Nhiệm vụ tuần này', ds.filter(h => nay.includes(h.id))], ['⏮️ Việc các tuần trước', ds.filter(h => !nay.includes(h.id))]]
+      .map(([ten, nhom]) => nhom.length ? dong(ten, nhom) : '').join('')}` : ''}
+    <h4 class="ht-nhom">Theo chương</h4>
+    ${Object.keys(m).sort((a, b) => a - b).map(c => dong(CHUONG[c] || 'Khác', m[c])).join('')}
+    ${thieu.length ? `<div class="ht-bu"><h3 style="margin:8px 0 2px;font-size:16px">🧩 Việc em cần làm bù</h3>${thieu.map(h =>
+      `<a class="nv" href="${encodeURI(linkHL(h))}" data-id="${h.id}"><span class="tick">!</span><span>${MUC[h.muc].icon} ${hoa(h.ten)}${nay.includes(h.id) ? '' : '<span class="cu">tuần trước</span>'}</span></a>`).join('')}</div>` : ''}
+    <p class="ghi" style="margin-top:8px">Tính trên các bài có nộp kết quả: khảo sát, câu hỏi trước – sau tiết, e-learning (học hết bài), luyện dạng + 15 phút. Nộp xong là tính, không xét điểm. Số liệu theo máy chủ, có thể chậm vài phút.</p>`;
+}
+
 /* ---------- khu của em ---------- */
 async function veEm() {
   const hs = hsLay(), noi = $('#khuEm');
@@ -137,18 +199,21 @@ async function veEm() {
     return;
   }
   const nv = (NHIEM_VU[LOP] || []).map(timHL).filter(Boolean);
-  noi.innerHTML = `<div class="luoi2">
+  noi.innerHTML = `<div id="eCanh"></div><div class="luoi2">
     <div class="khung"><h3>👋 Chào ${esc(hs.ma)} <button class="chip" id="thoat" style="float:right;font-size:13px">Đăng xuất</button></h3>
       <div class="so-to"><div class="o"><b id="eTuan">…</b><span>lượt học tuần này</span></div><div class="o"><b id="ePhut">…</b><span>phút đã học</span></div><div class="o"><b id="eHL">…</b><span>học liệu đã mở</span></div></div>
       <h3 style="margin-top:16px">📈 Khảo sát của em</h3><div id="eKS" class="ghi">Đang tải…</div></div>
     <div class="khung"><h3>🎯 Nhiệm vụ tuần ${esc(NHIEM_VU.tuan || '')}</h3>
-      ${nv.length ? nv.map(h => `<a class="nv" href="${encodeURI(linkHL(h))}" data-id="${h.id}"><span class="tick">✓</span><span>${MUC[h.muc].icon} ${hoa(h.ten)}</span></a>`).join('') : '<p class="ghi">Tuần này cô chưa giao nhiệm vụ.</p>'}</div></div>`;
+      ${nv.length ? nv.map(h => `<a class="nv" href="${encodeURI(linkHL(h))}" data-id="${h.id}"><span class="tick">✓</span><span>${MUC[h.muc].icon} ${hoa(h.ten)}</span></a>`).join('') : '<p class="ghi">Tuần này cô chưa giao nhiệm vụ.</p>'}</div></div>
+    <div class="khung" style="margin-top:14px"><h3>📊 Em đã hoàn thành bao nhiêu?</h3><div id="eHT" class="ghi">Đang tải…</div></div>`;
   $('#thoat').onclick = () => { hsThoat(); veEm(); };
-  if (!MAY_CHU) { $('#eKS').textContent = 'Cô chưa nối máy chủ nên chưa có số liệu.'; ['#eTuan', '#ePhut', '#eHL'].forEach(s => $(s).textContent = '—'); return; }
+  if (!MAY_CHU) { $('#eKS').textContent = $('#eHT').textContent = 'Cô chưa nối máy chủ nên chưa có số liệu.'; ['#eTuan', '#ePhut', '#eHL'].forEach(s => $(s).textContent = '—'); return; }
   try {
     const t = await goi('toi', hs);
     $('#eTuan').textContent = soVN(t.luotTuan); $('#ePhut').textContent = soVN(t.phut); $('#eHL').textContent = soVN(Object.keys(t.daMo).length);
-    $$('#khuEm .nv').forEach(a => { const id = a.dataset.id, h = timHL(id); if (t.daMo[id] || (h.ks && t.bai[h.ks])) a.classList.add('xong'); });
+    // bài có nộp kết quả: chỉ tích khi đã nộp (mở e-learning chưa học hết thì chưa tính) — cùng cách trang cô
+    $$('#khuEm .nv').forEach(a => { const id = a.dataset.id, h = timHL(id); if (coKQ(h) ? xongEm(h, t) : t.daMo[id]) a.classList.add('xong'); });
+    veHT(t);
     const dong = Object.keys(TEN_KS).filter(k => t.bai[k]);
     $('#eKS').innerHTML = dong.length ? dong.map(k => { const x = t.bai[k];
       return `<div style="display:grid;grid-template-columns:70px 1fr 120px;gap:8px;align-items:center;margin:6px 0"><b>${TEN_KS[k]}</b>
@@ -156,7 +221,7 @@ async function veEm() {
         <span>${x.dau}%${x.lan > 1 ? ` · cao nhất ${x.cao}%` : ''}</span></div>`; }).join('') +
       ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'].map(c => t.bai[c + '-dau'] && t.bai[c + '-cuoi'] ? `<p class="bao">Chương ${c[1]}: em từ <b>${t.bai[c + '-dau'].dau}%</b> lên <b>${t.bai[c + '-cuoi'].dau}%</b> ${t.bai[c + '-cuoi'].dau >= t.bai[c + '-dau'].dau ? '🎉' : '— cùng cô ôn thêm nhé'}</p>` : '').join('')
       : 'Em chưa làm khảo sát nào. Bắt đầu từ nhiệm vụ tuần nhé!';
-  } catch (e) { $('#eKS').textContent = '⚠ ' + e.message; }
+  } catch (e) { $('#eKS').textContent = '⚠ ' + e.message; const o = $('#eHT'); if (o && /Đang tải/.test(o.textContent)) o.textContent = '⚠ ' + e.message; }
 }
 
 /* ---------- khu cả lớp ---------- */
@@ -197,7 +262,7 @@ const tenMa = ma => { const m = /^(.+)-(\d+)$/.exec(ma); return m ? `${m[1]} · 
 async function veVinh() {
   const noi = $('#vdNoi');
   $('#vdKy').innerHTML = [['tuanNay', '🗓️ Tuần này'], ['nam', '🌟 Cả năm học']].map(([k, t]) => `<button class="chip${VD.ky === k ? ' on' : ''}" data-ky="${k}">${t}</button>`).join('');
-  $('#vdLop').innerHTML = [['khoi', 'Cả khối'], ...Object.keys(SI_SO).map(l => [l, l])].map(([k, t]) => `<button class="chip${VD.lop === k ? ' on' : ''}" data-lop="${k}">${t}</button>`).join('');
+  $('#vdLop').innerHTML = [['khoi', '🏆 Top 20 cả khối'], ...Object.keys(SI_SO).map(l => [l, '🏫 Cả lớp ' + l])].map(([k, t]) => `<button class="chip${VD.lop === k ? ' on' : ''}" data-lop="${k}">${t}</button>`).join('');
   $$('#vdKy .chip').forEach(b => b.onclick = () => { VD.ky = b.dataset.ky; veVinh(); });
   $$('#vdLop .chip').forEach(b => b.onclick = () => { VD.lop = b.dataset.lop; veVinh(); });
   if (!MAY_CHU) { noi.innerHTML = '<div class="bao vang">Cô chưa nối máy chủ nên chưa có bảng vinh danh.</div>'; return; }
@@ -212,33 +277,53 @@ async function veVinh() {
   }
   const x = VD.du, c = x.cach || {};
   $('#vdCapNhat').textContent = 'Cập nhật ' + x.capNhat + '.';
-  $('#vdCach').innerHTML = `<li>Mỗi học liệu khác nhau em đã <b>học thật</b> (clip xem đủ 80%, mô phỏng – trò chơi từ ${Math.round((x.nguong || {}).mophong / 60)} phút, phiếu bài tập từ ${Math.round((x.nguong || {}).phieu / 60)} phút): <b>+${c.hl}</b></li><li>Mỗi bài khác nhau em đã nộp (khảo sát, chẩn đoán, luyện dạng): <b>+${c.bai}</b></li><li>Mỗi bài e-learning em học hết: <b>+${c.el}</b></li>
+  $('#vdCach').innerHTML = `<li><b>Thứ hạng:</b> xếp theo <b>% nhiệm vụ cô giao em đã hoàn thành</b> (nộp bài là tính) — % cao hơn đứng trên. Cùng % thì ai nhiều <b>điểm chăm</b> hơn đứng trên. Điểm chăm cộng như sau:</li><li>Mỗi học liệu khác nhau em đã <b>học thật</b> (clip xem đủ 80%, mô phỏng – trò chơi từ ${Math.round((x.nguong || {}).mophong / 60)} phút, phiếu bài tập từ ${Math.round((x.nguong || {}).phieu / 60)} phút): <b>+${c.hl}</b></li><li>Mỗi bài khác nhau em đã nộp (khảo sát, chẩn đoán, luyện dạng): <b>+${c.bai}</b></li><li>Mỗi bài e-learning em học hết: <b>+${c.el}</b></li>
     <li>Mỗi ngày có học: <b>+${c.ngay}</b></li><li>Thời gian học: <b>+${c.phut10}</b> cho mỗi 10 phút, mỗi ngày tính tối đa ${c.tranPhut} phút</li>`;
-  const ds = (x[VD.ky] || []).filter(h => VD.lop === 'khoi' || h.lop === VD.lop).map(h => Object.assign({}, h));
-  ds.forEach((h, i) => h.hang = i && ds[i - 1].diem === h.diem ? ds[i - 1].hang : i + 1);   // bằng điểm thì đồng hạng
+  // XẾP HẠNG (sếp chốt 27/11/2026): % nhiệm vụ hoàn thành trước, cùng % thì điểm chăm cao hơn đứng trên.
+  // Máy chủ trả đủ danh sách nên xếp lại ở đây — không phải triển khai lại Apps Script.
+  const nvSo = h => h.nv == null ? -1 : h.nv;
+  const ds = (x[VD.ky] || []).filter(h => VD.lop === 'khoi' || h.lop === VD.lop).map(h => Object.assign({}, h))
+    .sort((a, b) => nvSo(b) - nvSo(a) || b.diem - a.diem || b.ngay - a.ngay || (a.ma < b.ma ? -1 : 1));
+  const bang2 = (a, b) => nvSo(a) === nvSo(b) && a.diem === b.diem;
+  ds.forEach((h, i) => h.hang = i && bang2(ds[i - 1], h) ? ds[i - 1].hang : i + 1);   // cùng % và cùng điểm thì đồng hạng
   const toi = hsLay(), maToi = toi && toi.ma, ky = VD.ky === 'tuanNay' ? 'tuần này' : 'cả năm học';
   if (!ds.length) { noi.innerHTML = `<div class="rong">Chưa có bạn nào học ${ky}${VD.lop === 'khoi' ? '' : ' ở lớp ' + VD.lop}. Em hãy là người đầu tiên lên bảng nhé! 🚀</div>`; return; }
-  const top = ds.filter(h => h.hang <= 20), huy = ['🥇', '🥈', '🥉'];
-  const nv = h => h.nv == null ? '' : ` · ✅ ${h.nv}% nhiệm vụ`;
-  const ct = h => `🎬 ${h.el} e-learning · 📝 ${h.bai} bài · 📚 ${h.hl} học liệu · ☀️ ${h.ngay} ngày · ⏱ ${h.phut} phút${nv(h)}`;
+  // Chọn một lớp = hiện THỨ TỰ CẢ LỚP (mọi bạn có hoạt động, không cắt Top 20) + số thứ tự chưa có hoạt động (sếp giao 27/11/2026)
+  const caLop = VD.lop !== 'khoi';
+  const top = caLop ? ds : ds.filter(h => h.hang <= 20), huy = ['🥇', '🥈', '🥉'];
+  const ct = h => `🎬 ${h.el} e-learning · 📝 ${h.bai} bài · 📚 ${h.hl} học liệu · ☀️ ${h.ngay} ngày · ⏱ ${h.phut} phút`;
   const ba = top.slice(0, 3), buc = ba.length === 3 ? [ba[1], ba[0], ba[2]] : ba;
-  let html = `<div class="vd-buc" style="${ba.length < 3 ? 'grid-template-columns:repeat(' + ba.length + ',1fr)' : ''}">` + buc.map(h =>
+  let html = caLop ? `<p class="bao vd-lop">🏫 <b>Thứ tự xếp hạng cả lớp ${esc(VD.lop)}</b> · ${ky} · ${ds.length}/${SI_SO[VD.lop] || '?'} bạn đã có hoạt động.</p>` : '';
+  html += `<div class="vd-buc" style="${ba.length < 3 ? 'grid-template-columns:repeat(' + ba.length + ',1fr)' : ''}">` + buc.map(h =>
     `<div class="bac h${h.hang}${h.ma === maToi ? ' em' : ''}" title="${ct(h)}"><div class="huy">${huy[h.hang - 1] || '🏅'}</div>
-      <div class="ma">${esc(tenMa(h.ma))}</div><div class="d">${soVN(h.diem)} <small>điểm</small></div>${h.nv == null ? '' : `<div class="nvp">✅ ${h.nv}% nhiệm vụ</div>`}${h.ma === maToi ? '<div class="ghi" style="margin:0">⭐ Là em đó!</div>' : ''}</div>`).join('') + '</div>';
+      <div class="ma">${esc(tenMa(h.ma))}</div>${h.nv == null ? `<div class="d">${soVN(h.diem)} <small>điểm</small></div>` : `<div class="d">✅ ${h.nv}% <small>nhiệm vụ</small></div><div class="nvp">${soVN(h.diem)} điểm chăm</div>`}${h.ma === maToi ? '<div class="ghi" style="margin:0">⭐ Là em đó!</div>' : ''}</div>`).join('') + '</div>';
   if (top.length > 3) html += '<ol class="vd-ds">' + top.slice(3).map(h =>
     `<li class="${h.ma === maToi ? 'em' : ''}"><span class="h">${h.hang}</span><span><span class="ma">${esc(tenMa(h.ma))}${h.ma === maToi ? ' ⭐ em' : ''}</span><span class="ct">${ct(h)}</span></span>
-      <span class="d">${soVN(h.diem)}<small>điểm</small></span></li>`).join('') + '</ol>';
-  if (maToi && (VD.lop === 'khoi' || lopCua(maToi) === VD.lop)) {
+      <span class="d">${h.nv == null ? `${soVN(h.diem)}<small>điểm</small>` : `${h.nv}%<small>${soVN(h.diem)} điểm</small>`}</span></li>`).join('') + '</ol>';
+  if (caLop) {
+    const co = new Set(ds.map(h => h.ma)), chua = [];
+    for (let i = 1; i <= (SI_SO[VD.lop] || 0); i++) { const ma = VD.lop + '-' + String(i).padStart(2, '0'); if (!co.has(ma)) chua.push(ma); }
+    if (chua.length) html += `<div class="vd-chua"><b>Chưa có hoạt động ${ky} (${chua.length} bạn):</b> ${chua.map(ma => `<span class="${ma === maToi ? 'em' : ''}">số ${ma.split('-').pop()}</span>`).join('')}</div>`;
+  }
+  if (maToi && caLop && lopCua(maToi) === VD.lop) {
+    const em = ds.find(h => h.ma === maToi);
+    html += em ? `<p class="bao vd-em">Em (${esc(maToi)}) đang đứng thứ <b>${em.hang}/${ds.length}</b> trong lớp ${esc(VD.lop)} ${ky}${em.nv != null ? ` — ✅ ${em.nv}% nhiệm vụ, ${soVN(em.diem)} điểm chăm` : ''}.${em.hang > 1 ? ' Làm bù nhiệm vụ cô giao để lên hạng nhé!' : ' 🎉 Dẫn đầu lớp!'}</p>`
+      : `<p class="bao vang vd-em">Em (${esc(maToi)}) chưa có hoạt động ${ky}. Mở nhiệm vụ tuần và làm bài là có tên trên bảng ngay!</p>`;
+  } else if (maToi && (VD.lop === 'khoi' || lopCua(maToi) === VD.lop)) {
     const em = ds.find(h => h.ma === maToi), bet = top[top.length - 1];
     if (!em) html += `<p class="bao vang vd-em">Em (${esc(maToi)}) chưa có điểm chăm ${ky}. Mở một học liệu hoặc làm nhiệm vụ tuần là có điểm ngay!</p>`;
-    else if (em.hang > 20) html += `<p class="bao vd-em">Em (${esc(maToi)}) đang đứng thứ <b>${em.hang}</b> với <b>${soVN(em.diem)}</b> điểm — chỉ cần thêm <b>${soVN(bet.diem - em.diem + 1)}</b> điểm nữa là vào Top 20. Cố lên!</p>`;
+    else if (em.hang > 20) html += `<p class="bao vd-em">Em (${esc(maToi)}) đang đứng thứ <b>${em.hang}</b>${em.nv != null ? ` (✅ ${em.nv}% nhiệm vụ, ${soVN(em.diem)} điểm)` : ` với ${soVN(em.diem)} điểm`} — ${nvSo(em) < nvSo(bet)
+      ? `bạn cuối Top 20 đã làm <b>${bet.nv}%</b> nhiệm vụ. Làm bù nhiệm vụ cô giao là cách nhanh nhất để vào bảng!`
+      : `chỉ cần thêm <b>${soVN(bet.diem - em.diem + 1)}</b> điểm chăm nữa là vào Top 20. Cố lên!`}</p>`;
     else html += `<p class="bao vd-em">🎉 Em (${esc(maToi)}) đang trong Top 20 ${ky}, hạng <b>${em.hang}</b>. Giữ vững phong độ nhé!</p>`;
-    if (em && em.nv != null && em.nv < 100) html += `<p class="ghi">Em đã làm ${em.nvXong}/${em.nvSo} bài cô giao (${em.nv}%). Làm nốt nhiệm vụ ở khung «🎯 Nhiệm vụ tuần» phía trên để thêm điểm nhé.</p>`;
+    if (em && em.nv != null && em.nv < 100) html += `<p class="ghi">Em đã làm ${em.nvXong}/${em.nvSo} bài cô giao (${em.nv}%). Làm nốt nhiệm vụ ở khung «🎯 Nhiệm vụ tuần» phía trên để lên hạng — bảng xếp theo % nhiệm vụ trước nhé.</p>`;
   }
   noi.innerHTML = html;
 }
+if (location.hash === '#xephang') VD.lop = LOP;   // link «xếp hạng cả lớp» từ trang chủ
 veEm(); veLop(); veVinh();
-if (location.hash === '#vinh') setTimeout(() => $('#vinh').scrollIntoView(), 50);
+$('#xemXH').onclick = () => { VD.lop = LOP; veVinh(); $('#vinh').scrollIntoView({ behavior: 'smooth' }); };
+if (location.hash === '#vinh' || location.hash === '#xephang') setTimeout(() => $('#vinh').scrollIntoView(), 50);
 </script>
 </body>
 </html>

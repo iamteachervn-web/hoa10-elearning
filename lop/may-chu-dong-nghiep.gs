@@ -335,7 +335,7 @@ function vinhDanh(giaoVao) {
         hl: x.hl, bai: x.bai, el: x.el, ngay: ds.length, phut: Math.round(phut),
         nv: g.length ? Math.round(nvXong / g.length * 100) : null, nvXong: nvXong, nvSo: g.length };
     }).filter(function (x) { return x.diem > 0; })
-      .sort(function (a, b) { return b.diem - a.diem || (b.nv || 0) - (a.nv || 0) || b.ngay - a.ngay || (a.ma < b.ma ? -1 : 1); });
+      .sort(function (a, b) { return (b.nv == null ? -1 : b.nv) - (a.nv == null ? -1 : a.nv) || b.diem - a.diem || b.ngay - a.ngay || (a.ma < b.ma ? -1 : 1); });   // % nhiệm vụ trước, cùng % thì điểm chăm (sếp chốt 27/11/2026)
   };
   const out = { ok: true, tuan: tuanNay, nam: xep(cap.nam), tuanNay: xep(cap.tuan), cach: VD_DIEM, nguong: NGUONG_HOC, capNhat: luc() };
   c.put(khoa, JSON.stringify(out), 300);
